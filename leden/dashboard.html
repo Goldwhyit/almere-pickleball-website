@@ -43,10 +43,22 @@
   }
   @media (prefers-color-scheme: dark) { .status-badge { color: #8ab6ec; } }
   .status-badge.leeg { background: rgba(91,107,125,0.12); color: var(--ink-muted); }
-  .speeldag-regel { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-top: 1px solid var(--line); }
+  .speeldag-regel { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); gap: 10px; }
   .speeldag-regel:first-of-type { border-top: none; padding-top: 0; }
-  .speeldag-regel .dag { font-weight: 700; }
-  .speeldag-regel .datum { color: var(--ink-muted); font-size: 13px; }
+  .speeldag-regel .dag { font-weight: 700; font-size: 14.5px; }
+  .speeldag-regel .locatie { font-weight: 400; color: var(--ink-muted); font-size: 12.5px; }
+  .speeldag-regel .aantal { color: var(--ink-muted); font-size: 12.5px; margin-top: 2px; }
+  .knop {
+    padding: 8px 14px; border-radius: 8px; border: none; font-size: 13px; font-weight: 700;
+    cursor: pointer; white-space: nowrap;
+  }
+  .knop.aanmelden { background: var(--gold); color: #241a02; }
+  .knop.afmelden { background: rgba(179,38,30,0.1); color: #b3261e; }
+  .knop.vol { background: rgba(91,107,125,0.12); color: var(--ink-muted); cursor: default; }
+  .knop:disabled { opacity: 0.5; cursor: default; }
+  .melding { font-size: 13px; margin-top: 10px; padding: 8px 10px; border-radius: 8px; }
+  .melding.fout { background: rgba(179,38,30,0.1); color: #b3261e; }
+  .melding.ok { background: rgba(0,91,191,0.1); color: var(--navy); }
   .nieuws-item { padding: 10px 0; border-top: 1px solid var(--line); }
   .nieuws-item:first-of-type { border-top: none; padding-top: 0; }
   .nieuws-item h3 { margin: 0 0 4px; font-size: 14.5px; }
@@ -80,19 +92,35 @@
 <script src="/assets/supabase.js"></script>
 <script>
   const sessie = vereisSessie();
+  let mijnAbonnement = null;
 
   document.getElementById('uitlog-knop').addEventListener('click', uitloggen);
 
-  function volgendeDatum(weekdag, tijd) {
-    const nu = new Date();
-    const vandaagIso = nu.getDay() === 0 ? 7 : nu.getDay();
-    const dagenTot = (weekdag - vandaagIso + 7) % 7;
-    const [uur, minuut] = tijd.split(':').map(Number);
-    const kandidaat = new Date(nu.getFullYear(), nu.getMonth(), nu.getDate() + dagenTot, uur, minuut);
-    if (kandidaat < nu) kandidaat.setDate(kandidaat.getDate() + 7);
-    return kandidaat;
-  }
   const dagnamen = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
+
+  /// Genereert de komende speelavonden (net als reserveren_screen.dart in de
+  /// app): per actieve speeldag, elke week tot en met [weken] weken vooruit,
+  /// juli overgeslagen (buiten het seizoen, zie valideer_speeldag()).
+  function volgendeSessies(speeldagen, weken) {
+    const nu = new Date();
+    const eind = new Date(nu); eind.setDate(eind.getDate() + weken * 7);
+    const sessies = [];
+    for (let dag = new Date(nu.getFullYear(), nu.getMonth(), nu.getDate()); dag < eind; dag.setDate(dag.getDate() + 1)) {
+      if (dag.getMonth() === 6) continue; // juli = index 6
+      const isodow = dag.getDay() === 0 ? 7 : dag.getDay();
+      for (const sd of speeldagen) {
+        if (sd.weekdag !== isodow) continue;
+        const [suur, smin] = sd.start_tijd.split(':').map(Number);
+        const start = new Date(dag.getFullYear(), dag.getMonth(), dag.getDate(), suur, smin);
+        if (start < nu) continue;
+        const [euur, emin] = sd.eind_tijd.split(':').map(Number);
+        const eindTijd = new Date(dag.getFullYear(), dag.getMonth(), dag.getDate(), euur, emin);
+        sessies.push({ speeldagId: sd.id, start, eind: eindTijd, locatie: sd.locatie, maxSpelers: sd.max_spelers });
+      }
+    }
+    sessies.sort((a, b) => a.start - b.start);
+    return sessies;
+  }
 
   async function laadProfiel() {
     const rows = await haalOp('leden', { select: 'naam', id: 'eq.' + sessie.user_id });
@@ -106,30 +134,111 @@
       lid_id: 'eq.' + sessie.user_id, status: 'eq.actief', limit: '1',
     });
     if (!rows.length) {
+      mijnAbonnement = null;
       el.innerHTML = '<span class="status-badge leeg">Geen actief abonnement</span>';
       return;
     }
-    const abo = rows[0];
-    const naam = abo.abonnementen ? abo.abonnementen.naam : '';
+    mijnAbonnement = rows[0];
+    const naam = mijnAbonnement.abonnementen ? mijnAbonnement.abonnementen.naam : '';
     let extra = '';
-    if (abo.abonnementen && (abo.abonnementen.vorm === 'strippenkaart' || abo.abonnementen.vorm === 'proef') && abo.geldig_tot) {
-      extra = ' · ' + (abo.strippen_resterend ?? 0) + ' over, geldig tot ' +
-        new Date(abo.geldig_tot).toLocaleDateString('nl-NL');
+    if (mijnAbonnement.abonnementen && (mijnAbonnement.abonnementen.vorm === 'strippenkaart' || mijnAbonnement.abonnementen.vorm === 'proef') && mijnAbonnement.geldig_tot) {
+      extra = (mijnAbonnement.strippen_resterend ?? 0) + ' over, geldig tot ' +
+        new Date(mijnAbonnement.geldig_tot).toLocaleDateString('nl-NL');
     }
     el.innerHTML = '<div class="status-regel"><span class="status-badge">' + naam + '</span></div>' +
-      (extra ? '<p style="margin:10px 0 0;font-size:13.5px;color:var(--ink-muted)">' + extra.replace(' · ', '') + '</p>' : '');
+      (extra ? '<p style="margin:10px 0 0;font-size:13.5px;color:var(--ink-muted)">' + extra + '</p>' : '');
   }
 
   async function laadSpeeldagen() {
     const el = document.getElementById('speeldagen-inhoud');
-    const rows = await haalOp('speeldagen', { select: 'weekdag,start_tijd,eind_tijd,locatie', actief: 'eq.true', order: 'weekdag.asc' });
-    if (!rows.length) { el.textContent = 'Geen speelavonden gevonden.'; return; }
-    el.innerHTML = rows.map(sd => {
-      const datum = volgendeDatum(sd.weekdag, sd.start_tijd);
-      return '<div class="speeldag-regel"><span class="dag">' + dagnamen[sd.weekdag - 1] + ' ' + sd.start_tijd.slice(0, 5) +
-        '–' + sd.eind_tijd.slice(0, 5) + '<br><small style="font-weight:400;color:var(--ink-muted)">' + sd.locatie + '</small></span>' +
-        '<span class="datum">eerstvolgende:<br>' + datum.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + '</span></div>';
-    }).join('');
+    const speeldagen = await haalOp('speeldagen', { select: 'id,weekdag,start_tijd,eind_tijd,locatie,max_spelers', actief: 'eq.true' });
+    if (!speeldagen.length) { el.textContent = 'Geen speelavonden gevonden.'; return; }
+    const sessies = volgendeSessies(speeldagen, 5).slice(0, 6);
+    if (!sessies.length) { el.textContent = 'Geen aankomende speelavonden binnen het seizoen.'; return; }
+
+    const vanaf = sessies[0].start.toISOString();
+    const tot = sessies[sessies.length - 1].eind.toISOString();
+    const reserveringen = await haalOp('reserveringen', {
+      select: 'id,lid_id,start_tijd',
+      and: '(start_tijd.gte.' + vanaf + ',start_tijd.lte.' + tot + ')',
+    });
+
+    el.innerHTML = sessies.map((s, i) => {
+      const startIso = s.start.toISOString();
+      const opDezeAvond = reserveringen.filter(r => r.start_tijd === startIso);
+      const mijnReservering = opDezeAvond.find(r => r.lid_id === sessie.user_id);
+      const vol = opDezeAvond.length >= s.maxSpelers;
+      let knop;
+      if (mijnReservering) {
+        knop = '<button class="knop afmelden" data-actie="afmelden" data-index="' + i + '" data-id="' + mijnReservering.id + '">Afmelden</button>';
+      } else if (vol) {
+        knop = '<button class="knop vol" disabled>Vol</button>';
+      } else {
+        knop = '<button class="knop aanmelden" data-actie="aanmelden" data-index="' + i + '">Aanmelden</button>';
+      }
+      return '<div class="speeldag-regel">' +
+        '<span><span class="dag">' + dagnamen[s.start.getDay() === 0 ? 6 : s.start.getDay() - 1] + ' ' +
+        s.start.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + '</span><br>' +
+        '<span class="locatie">' + s.locatie + ' · ' + opDezeAvond.length + '/' + s.maxSpelers + '</span></span>' +
+        knop + '</div>';
+    }).join('') + '<div id="speeldagen-melding"></div>';
+
+    window.__sessies = sessies;
+    el.querySelectorAll('[data-actie]').forEach(btn => btn.addEventListener('click', () => {
+      if (btn.dataset.actie === 'aanmelden') aanmelden(window.__sessies[Number(btn.dataset.index)], btn);
+      else afmelden(btn.dataset.id, btn);
+    }));
+  }
+
+  function toonSpeeldagMelding(tekst, isFout) {
+    const el = document.getElementById('speeldagen-melding');
+    if (el) el.innerHTML = '<div class="melding ' + (isFout ? 'fout' : 'ok') + '">' + tekst + '</div>';
+  }
+
+  async function aanmelden(sessieInfo, btn) {
+    btn.disabled = true;
+    btn.textContent = 'Bezig…';
+    try {
+      const nieuw = await voegToe('reserveringen', {
+        speeldag_id: sessieInfo.speeldagId,
+        lid_id: sessie.user_id,
+        start_tijd: sessieInfo.start.toISOString(),
+        eind_tijd: sessieInfo.eind.toISOString(),
+      });
+      await laadSpeeldagen();
+      if (mijnAbonnement && mijnAbonnement.abonnementen && mijnAbonnement.abonnementen.vorm === 'sessie') {
+        try {
+          const res = await functieAanroepen('create-mollie-payment', { type: 'sessie', reservering_id: nieuw.id });
+          if (res.checkoutUrl) {
+            toonSpeeldagMelding('Aangemeld! Je wordt doorgestuurd naar de betaalpagina…', false);
+            window.location.href = res.checkoutUrl;
+            return;
+          }
+        } catch (betaalFout) {
+          toonSpeeldagMelding('Aangemeld, maar de betaling kon niet gestart worden: ' + betaalFout.message, true);
+          return;
+        }
+      }
+      toonSpeeldagMelding('Je bent aangemeld.', false);
+    } catch (e) {
+      toonSpeeldagMelding(e.message, true);
+      btn.disabled = false;
+      btn.textContent = 'Aanmelden';
+    }
+  }
+
+  async function afmelden(reserveringId, btn) {
+    btn.disabled = true;
+    btn.textContent = 'Bezig…';
+    try {
+      await verwijder('reserveringen', { id: 'eq.' + reserveringId });
+      await laadSpeeldagen();
+      toonSpeeldagMelding('Je bent afgemeld.', false);
+    } catch (e) {
+      toonSpeeldagMelding(e.message, true);
+      btn.disabled = false;
+      btn.textContent = 'Afmelden';
+    }
   }
 
   async function laadNieuws() {
@@ -141,9 +250,10 @@
     ).join('');
   }
 
-  Promise.all([laadProfiel(), laadAbonnement(), laadSpeeldagen(), laadNieuws()]).catch(e => {
-    console.error(e);
-  });
+  (async () => {
+    await laadAbonnement();
+    await Promise.all([laadProfiel(), laadSpeeldagen(), laadNieuws()]);
+  })().catch(e => console.error(e));
 </script>
 </body>
 </html>

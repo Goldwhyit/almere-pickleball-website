@@ -113,6 +113,44 @@ async function haalOp(tabel, params) {
   return resp.json();
 }
 
+/// Voegt een rij toe; geeft de nieuwe rij terug (incl. gegenereerde id).
+async function voegToe(tabel, rij) {
+  const headers = { ...authHeaders(), Prefer: 'return=representation' };
+  let resp = await fetch(REST_BASE + '/' + tabel, { method: 'POST', headers, body: JSON.stringify(rij) });
+  if (resp.status === 401 && (await verversSessie())) {
+    resp = await fetch(REST_BASE + '/' + tabel, { method: 'POST', headers: { ...authHeaders(), Prefer: 'return=representation' }, body: JSON.stringify(rij) });
+  }
+  const data = await resp.json().catch(() => null);
+  if (!resp.ok) throw new Error((data && (data.message || data.error_description)) || 'Opslaan is mislukt.');
+  return Array.isArray(data) ? data[0] : data;
+}
+
+/// filter bijv. { id: 'eq.' + reserveringId }
+async function verwijder(tabel, filter) {
+  const zoek = new URLSearchParams(filter);
+  let resp = await fetch(REST_BASE + '/' + tabel + '?' + zoek.toString(), { method: 'DELETE', headers: authHeaders() });
+  if (resp.status === 401 && (await verversSessie())) {
+    resp = await fetch(REST_BASE + '/' + tabel + '?' + zoek.toString(), { method: 'DELETE', headers: authHeaders() });
+  }
+  if (!resp.ok) {
+    const data = await resp.json().catch(() => null);
+    throw new Error((data && data.message) || 'Verwijderen is mislukt.');
+  }
+}
+
+/// filter bijv. { id: 'eq.' + id }; wijzigingen bijv. { betaald: true }
+async function werkBij(tabel, filter, wijzigingen) {
+  const zoek = new URLSearchParams(filter);
+  let resp = await fetch(REST_BASE + '/' + tabel + '?' + zoek.toString(), { method: 'PATCH', headers: authHeaders(), body: JSON.stringify(wijzigingen) });
+  if (resp.status === 401 && (await verversSessie())) {
+    resp = await fetch(REST_BASE + '/' + tabel + '?' + zoek.toString(), { method: 'PATCH', headers: authHeaders(), body: JSON.stringify(wijzigingen) });
+  }
+  if (!resp.ok) {
+    const data = await resp.json().catch(() => null);
+    throw new Error((data && data.message) || 'Bijwerken is mislukt.');
+  }
+}
+
 async function rpc(naam, body) {
   let resp = await fetch(REST_BASE + '/rpc/' + naam, {
     method: 'POST', headers: authHeaders(), body: JSON.stringify(body || {}),
