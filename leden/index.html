@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Inloggen — Almere Pickleball</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ffd23f'/%3E%3Ccircle cx='34' cy='30' r='6' fill='%23005bbf'/%3E%3Ccircle cx='58' cy='24' r='6' fill='%23005bbf'/%3E%3Ccircle cx='74' cy='42' r='6' fill='%23005bbf'/%3E%3Ccircle cx='70' cy='66' r='6' fill='%23005bbf'/%3E%3Ccircle cx='48' cy='76' r='6' fill='%23005bbf'/%3E%3Ccircle cx='26' cy='58' r='6' fill='%23005bbf'/%3E%3Ccircle cx='50' cy='50' r='6' fill='%23005bbf'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --navy: #005bbf; --navy-deep: #003d82; --gold: #ffd23f; --gold-deep: #b8860a;
+    --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1);
+    --danger: #b3261e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    font-family: 'Manrope', -apple-system, sans-serif; background: var(--paper); color: var(--ink);
+    padding: 24px;
+  }
+  .kaart {
+    width: 100%; max-width: 380px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 20px; padding: 32px 28px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  }
+  .merk { font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 12px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--navy); text-align: center; }
+  @media (prefers-color-scheme: dark) { .merk { color: #8ab6ec; } }
+  h1 { font-family: 'Unbounded', sans-serif; font-size: 22px; margin: 8px 0 4px; text-align: center; }
+  p.uitleg { text-align: center; color: var(--ink-muted); font-size: 14px; margin: 0 0 24px; }
+  label { display: block; font-size: 13px; font-weight: 600; color: var(--ink-muted); margin-top: 14px; }
+  label:first-of-type { margin-top: 0; }
+  input {
+    width: 100%; margin-top: 6px; padding: 12px 14px; border-radius: 10px; border: 1.5px solid var(--line);
+    background: var(--paper); color: var(--ink); font-size: 15px;
+  }
+  button.primair {
+    width: 100%; margin-top: 22px; padding: 13px; border: none; border-radius: 10px;
+    background: var(--gold); color: #241a02; font-size: 15px; font-weight: 700; cursor: pointer;
+  }
+  button.primair:disabled { opacity: 0.5; cursor: default; }
+  .fout { color: var(--danger); font-size: 13.5px; margin-top: 12px; text-align: center; }
+  .terug { display: block; text-align: center; margin-top: 20px; font-size: 13px; color: var(--ink-muted); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="kaart">
+  <div class="merk">Almere Pickleball</div>
+  <h1>Ledenportaal</h1>
+  <p class="uitleg">Log in met je bestaande clubaccount (dezelfde gegevens als de app).</p>
+  <form id="login-form">
+    <label for="email">E-mailadres</label>
+    <input type="email" id="email" autocomplete="email" required />
+    <label for="wachtwoord">Wachtwoord</label>
+    <input type="password" id="wachtwoord" autocomplete="current-password" required />
+    <button type="submit" class="primair" id="login-knop">Inloggen</button>
+    <div class="fout" id="fout-melding"></div>
+  </form>
+  <a class="terug" href="/">← Terug naar de website</a>
+</div>
+<script src="/assets/supabase.js"></script>
+<script>
+  if (isIngelogd()) window.location.href = '/leden/dashboard.html';
+
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const knop = document.getElementById('login-knop');
+    const foutEl = document.getElementById('fout-melding');
+    foutEl.textContent = '';
+    knop.disabled = true;
+    knop.textContent = 'Bezig…';
+    try {
+      await inloggen(document.getElementById('email').value.trim(), document.getElementById('wachtwoord').value);
+      window.location.href = '/leden/dashboard.html';
+    } catch (err) {
+      foutEl.textContent = err.message;
+      knop.disabled = false;
+      knop.textContent = 'Inloggen';
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+// Almere Pickleball — kleine Supabase-client-wrapper voor de statische
+// website (geen npm/bundler, gewoon een los script-bestand).
+//
+// Praat rechtstreeks met de Supabase Auth REST API en PostgREST, exact
+// hetzelfde patroon als supabase/functions/toernooi-dashboard/index.ts in
+// de hoofdrepo (die aanpak is al bewezen deze sessie). De hier ingebouwde
+// sleutel is de publieke/publishable Supabase-sleutel — dezelfde die ook in
+// de Flutter-app zit en op de toernooien-pagina hiernaast. RLS-beleid in de
+// database bepaalt de echte toegang, dus dit is geen secret.
+
+const SUPABASE_URL = 'https://yvjilitusziafdopvxnx.supabase.co';
+const ANON_KEY = 'sb_publishable_28_i6yHyP_Q8ExokzXvonA_KBhYk4or';
+const REST_BASE = SUPABASE_URL + '/rest/v1';
+const AUTH_BASE = SUPABASE_URL + '/auth/v1';
+const FUNCTIES_BASE = SUPABASE_URL + '/functions/v1';
+const SESSIE_SLEUTEL = 'pb_almere_sessie';
+
+function huidigeSessie() {
+  try {
+    return JSON.parse(localStorage.getItem(SESSIE_SLEUTEL) || 'null');
+  } catch (_) {
+    return null;
+  }
+}
+
+function bewaarSessie(sessie) {
+  localStorage.setItem(SESSIE_SLEUTEL, JSON.stringify(sessie));
+}
+
+function verwijderSessie() {
+  localStorage.removeItem(SESSIE_SLEUTEL);
+}
+
+function isIngelogd() {
+  return huidigeSessie() !== null;
+}
+
+/// Stuurt naar de inlogpagina als er geen sessie is — voor gebruik bovenaan
+/// een pagina die alleen voor ingelogde leden bedoeld is.
+function vereisSessie() {
+  if (!isIngelogd()) {
+    window.location.href = '/leden/';
+    return null;
+  }
+  return huidigeSessie();
+}
+
+async function inloggen(email, wachtwoord) {
+  const resp = await fetch(AUTH_BASE + '/token?grant_type=password', {
+    method: 'POST',
+    headers: { apikey: ANON_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password: wachtwoord }),
+  });
+  const data = await resp.json();
+  if (!resp.ok) {
+    throw new Error(data.error_description || data.msg || 'Inloggen mislukt. Controleer je e-mailadres en wachtwoord.');
+  }
+  bewaarSessie({
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+    user_id: data.user.id,
+  });
+  return data;
+}
+
+function uitloggen() {
+  verwijderSessie();
+  window.location.href = '/leden/';
+}
+
+/// Ververst het access-token met het refresh-token — Supabase-access-tokens
+/// zijn maar kort geldig (standaard 1 uur), dit voorkomt dat een lid steeds
+/// opnieuw moet inloggen tijdens hetzelfde bezoek.
+async function verversSessie() {
+  const sessie = huidigeSessie();
+  if (!sessie) return null;
+  const resp = await fetch(AUTH_BASE + '/token?grant_type=refresh_token', {
+    method: 'POST',
+    headers: { apikey: ANON_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refresh_token: sessie.refresh_token }),
+  });
+  if (!resp.ok) {
+    verwijderSessie();
+    return null;
+  }
+  const data = await resp.json();
+  const nieuweSessie = {
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+    user_id: data.user.id,
+  };
+  bewaarSessie(nieuweSessie);
+  return nieuweSessie;
+}
+
+function authHeaders() {
+  const sessie = huidigeSessie();
+  return {
+    apikey: ANON_KEY,
+    Authorization: 'Bearer ' + (sessie ? sessie.access_token : ANON_KEY),
+    'Content-Type': 'application/json',
+  };
+}
+
+/// select bijv. "id,naam,niveau"; params bijv. { lid_id: 'eq.' + uid, order: 'created_at.desc' }
+async function haalOp(tabel, params) {
+  const zoek = new URLSearchParams(params || {});
+  let resp = await fetch(REST_BASE + '/' + tabel + '?' + zoek.toString(), { headers: authHeaders() });
+  if (resp.status === 401 && (await verversSessie())) {
+    resp = await fetch(REST_BASE + '/' + tabel + '?' + zoek.toString(), { headers: authHeaders() });
+  }
+  if (!resp.ok) throw new Error('Kon gegevens niet laden (' + tabel + ').');
+  return resp.json();
+}
+
+async function rpc(naam, body) {
+  let resp = await fetch(REST_BASE + '/rpc/' + naam, {
+    method: 'POST', headers: authHeaders(), body: JSON.stringify(body || {}),
+  });
+  if (resp.status === 401 && (await verversSessie())) {
+    resp = await fetch(REST_BASE + '/rpc/' + naam, {
+      method: 'POST', headers: authHeaders(), body: JSON.stringify(body || {}),
+    });
+  }
+  const data = await resp.json().catch(() => null);
+  if (!resp.ok) throw new Error((data && data.message) || 'Actie mislukt.');
+  return data;
+}
+
+async function functieAanroepen(naam, body) {
+  const resp = await fetch(FUNCTIES_BASE + '/' + naam, {
+    method: 'POST', headers: authHeaders(), body: JSON.stringify(body || {}),
+  });
+  const data = await resp.json().catch(() => ({}));
+  if (!resp.ok) throw new Error(data.error || 'Actie mislukt.');
+  return data;
+}

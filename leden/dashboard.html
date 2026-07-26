@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mijn Almere Pickleball</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ffd23f'/%3E%3Ccircle cx='34' cy='30' r='6' fill='%23005bbf'/%3E%3Ccircle cx='58' cy='24' r='6' fill='%23005bbf'/%3E%3Ccircle cx='74' cy='42' r='6' fill='%23005bbf'/%3E%3Ccircle cx='70' cy='66' r='6' fill='%23005bbf'/%3E%3Ccircle cx='48' cy='76' r='6' fill='%23005bbf'/%3E%3Ccircle cx='26' cy='58' r='6' fill='%23005bbf'/%3E%3Ccircle cx='50' cy='50' r='6' fill='%23005bbf'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --navy: #005bbf; --navy-deep: #003d82; --gold: #ffd23f; --gold-deep: #b8860a;
+    --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Manrope', -apple-system, sans-serif; background: var(--paper); color: var(--ink); }
+  header {
+    background: linear-gradient(135deg, var(--navy), var(--navy-deep)); color: #fff;
+    padding: 22px 20px 30px; display: flex; align-items: center; gap: 12px;
+  }
+  header .merk { font-family: 'Unbounded', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #cfe0f0; }
+  header h1 { font-family: 'Unbounded', sans-serif; font-size: 20px; margin: 4px 0 0; flex: 1; }
+  header button {
+    background: rgba(255,255,255,0.15); color: #fff; border: none; border-radius: 8px;
+    padding: 9px 14px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  main { max-width: 640px; margin: -16px auto 60px; padding: 0 18px; }
+  .kaart {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .kaart h2 { font-family: 'Unbounded', sans-serif; font-size: 14px; margin: 0 0 12px;
+    color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .status-regel { display: flex; align-items: center; gap: 12px; }
+  .status-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 700;
+    background: rgba(0,91,191,0.1); color: var(--navy);
+  }
+  @media (prefers-color-scheme: dark) { .status-badge { color: #8ab6ec; } }
+  .status-badge.leeg { background: rgba(91,107,125,0.12); color: var(--ink-muted); }
+  .speeldag-regel { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-top: 1px solid var(--line); }
+  .speeldag-regel:first-of-type { border-top: none; padding-top: 0; }
+  .speeldag-regel .dag { font-weight: 700; }
+  .speeldag-regel .datum { color: var(--ink-muted); font-size: 13px; }
+  .nieuws-item { padding: 10px 0; border-top: 1px solid var(--line); }
+  .nieuws-item:first-of-type { border-top: none; padding-top: 0; }
+  .nieuws-item h3 { margin: 0 0 4px; font-size: 14.5px; }
+  .nieuws-item p { margin: 0; font-size: 13.5px; color: var(--ink-muted); line-height: 1.5; }
+  .laden { text-align: center; color: var(--ink-muted); padding: 30px; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="merk">Almere Pickleball</div>
+    <h1 id="welkom">Welkom</h1>
+  </div>
+  <button id="uitlog-knop">Uitloggen</button>
+</header>
+<main>
+  <div class="kaart">
+    <h2>Mijn abonnement</h2>
+    <div id="abonnement-inhoud" class="laden">Laden…</div>
+  </div>
+  <div class="kaart">
+    <h2>Speelavonden</h2>
+    <div id="speeldagen-inhoud" class="laden">Laden…</div>
+  </div>
+  <div class="kaart">
+    <h2>Nieuws</h2>
+    <div id="nieuws-inhoud" class="laden">Laden…</div>
+  </div>
+</main>
+<script src="/assets/supabase.js"></script>
+<script>
+  const sessie = vereisSessie();
+
+  document.getElementById('uitlog-knop').addEventListener('click', uitloggen);
+
+  function volgendeDatum(weekdag, tijd) {
+    const nu = new Date();
+    const vandaagIso = nu.getDay() === 0 ? 7 : nu.getDay();
+    const dagenTot = (weekdag - vandaagIso + 7) % 7;
+    const [uur, minuut] = tijd.split(':').map(Number);
+    const kandidaat = new Date(nu.getFullYear(), nu.getMonth(), nu.getDate() + dagenTot, uur, minuut);
+    if (kandidaat < nu) kandidaat.setDate(kandidaat.getDate() + 7);
+    return kandidaat;
+  }
+  const dagnamen = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
+
+  async function laadProfiel() {
+    const rows = await haalOp('leden', { select: 'naam', id: 'eq.' + sessie.user_id });
+    if (rows.length) document.getElementById('welkom').textContent = 'Welkom, ' + rows[0].naam;
+  }
+
+  async function laadAbonnement() {
+    const el = document.getElementById('abonnement-inhoud');
+    const rows = await haalOp('lid_abonnementen', {
+      select: 'status,strippen_resterend,geldig_tot,abonnementen(naam,vorm)',
+      lid_id: 'eq.' + sessie.user_id, status: 'eq.actief', limit: '1',
+    });
+    if (!rows.length) {
+      el.innerHTML = '<span class="status-badge leeg">Geen actief abonnement</span>';
+      return;
+    }
+    const abo = rows[0];
+    const naam = abo.abonnementen ? abo.abonnementen.naam : '';
+    let extra = '';
+    if (abo.abonnementen && (abo.abonnementen.vorm === 'strippenkaart' || abo.abonnementen.vorm === 'proef') && abo.geldig_tot) {
+      extra = ' · ' + (abo.strippen_resterend ?? 0) + ' over, geldig tot ' +
+        new Date(abo.geldig_tot).toLocaleDateString('nl-NL');
+    }
+    el.innerHTML = '<div class="status-regel"><span class="status-badge">' + naam + '</span></div>' +
+      (extra ? '<p style="margin:10px 0 0;font-size:13.5px;color:var(--ink-muted)">' + extra.replace(' · ', '') + '</p>' : '');
+  }
+
+  async function laadSpeeldagen() {
+    const el = document.getElementById('speeldagen-inhoud');
+    const rows = await haalOp('speeldagen', { select: 'weekdag,start_tijd,eind_tijd,locatie', actief: 'eq.true', order: 'weekdag.asc' });
+    if (!rows.length) { el.textContent = 'Geen speelavonden gevonden.'; return; }
+    el.innerHTML = rows.map(sd => {
+      const datum = volgendeDatum(sd.weekdag, sd.start_tijd);
+      return '<div class="speeldag-regel"><span class="dag">' + dagnamen[sd.weekdag - 1] + ' ' + sd.start_tijd.slice(0, 5) +
+        '–' + sd.eind_tijd.slice(0, 5) + '<br><small style="font-weight:400;color:var(--ink-muted)">' + sd.locatie + '</small></span>' +
+        '<span class="datum">eerstvolgende:<br>' + datum.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + '</span></div>';
+    }).join('');
+  }
+
+  async function laadNieuws() {
+    const el = document.getElementById('nieuws-inhoud');
+    const rows = await haalOp('nieuws', { select: 'titel,inhoud,gepubliceerd_op', order: 'gepubliceerd_op.desc', limit: '5' });
+    if (!rows.length) { el.textContent = 'Nog geen nieuwsberichten.'; return; }
+    el.innerHTML = rows.map(n =>
+      '<div class="nieuws-item"><h3>' + n.titel + '</h3><p>' + n.inhoud + '</p></div>'
+    ).join('');
+  }
+
+  Promise.all([laadProfiel(), laadAbonnement(), laadSpeeldagen(), laadNieuws()]).catch(e => {
+    console.error(e);
+  });
+</script>
+</body>
+</html>
