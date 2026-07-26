@@ -64,6 +64,15 @@
   .nieuws-item h3 { margin: 0 0 4px; font-size: 14.5px; }
   .nieuws-item p { margin: 0; font-size: 13.5px; color: var(--ink-muted); line-height: 1.5; }
   .laden { text-align: center; color: var(--ink-muted); padding: 30px; }
+  .toernooi-regel { padding: 12px 0; border-top: 1px solid var(--line); }
+  .toernooi-regel:first-of-type { border-top: none; padding-top: 0; }
+  .toernooi-regel .naam { font-weight: 700; font-size: 14.5px; }
+  .toernooi-regel .details { color: var(--ink-muted); font-size: 12.5px; margin-top: 2px; }
+  .toernooi-regel .actie { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .toernooi-regel select {
+    padding: 8px 10px; border-radius: 8px; border: 1.5px solid var(--line);
+    background: var(--paper); color: var(--ink); font-size: 13px; flex: 1; min-width: 140px;
+  }
 </style>
 </head>
 <body>
@@ -83,6 +92,10 @@
   <div class="kaart">
     <h2>Speelavonden</h2>
     <div id="speeldagen-inhoud" class="laden">Laden…</div>
+  </div>
+  <div class="kaart">
+    <h2>Toernooien</h2>
+    <div id="toernooien-inhoud" class="laden">Laden…</div>
   </div>
   <div class="kaart">
     <h2>Nieuws</h2>
@@ -250,9 +263,128 @@
     ).join('');
   }
 
+  const klasseLabels = { open: 'Open', mix: 'Mix', vrouwen: 'Vrouwen', mannen: 'Mannen' };
+  const niveauLabels = { open: 'Alle niveaus', beginner: 'Beginner', gevorderd: 'Gevorderd', competitie: 'Competitie' };
+  let alleLeden = null;
+
+  async function laadToernooien() {
+    const el = document.getElementById('toernooien-inhoud');
+    const vandaag = new Date().toISOString().substring(0, 10);
+    const toernooien = await haalOp('toernooien', {
+      select: 'id,naam,datum,klasse,niveau,inschrijfwijze,inschrijfgeld,inschrijving_open',
+      datum: 'gte.' + vandaag, order: 'datum.asc',
+    });
+    if (!toernooien.length) { el.textContent = 'Geen aankomende toernooien.'; return; }
+
+    const ids = toernooien.map(t => t.id).join(',');
+    const mijnTeams = await haalOp('toernooi_teams', {
+      select: 'id,toernooi_id,speler1_id,speler2_id',
+      or: '(speler1_id.eq.' + sessie.user_id + ',speler2_id.eq.' + sessie.user_id + ')',
+      toernooi_id: 'in.(' + ids + ')',
+    });
+
+    el.innerHTML = toernooien.map((t, i) => {
+      const mijnTeam = mijnTeams.find(team => team.toernooi_id === t.id);
+      const details = klasseLabels[t.klasse] + ' · ' + niveauLabels[t.niveau] +
+        (t.inschrijfgeld > 0 ? ' · €' + Number(t.inschrijfgeld).toFixed(2) + ' inschrijfgeld' : '');
+      let actie;
+      if (mijnTeam) {
+        actie = '<button class="knop afmelden" data-actie="uitschrijven" data-team="' + mijnTeam.id + '" data-index="' + i + '">Uitschrijven</button>';
+      } else if (!t.inschrijving_open) {
+        actie = '<button class="knop vol" disabled>Inschrijving gesloten</button>';
+      } else if (t.inschrijfwijze === 'paar') {
+        actie = '<select data-partner-voor="' + i + '"><option value="">Kies je partner…</option></select>' +
+          '<button class="knop aanmelden" data-actie="inschrijven-paar" data-index="' + i + '">Inschrijven</button>';
+      } else {
+        actie = '<button class="knop aanmelden" data-actie="inschrijven" data-index="' + i + '">Inschrijven</button>';
+      }
+      return '<div class="toernooi-regel"><div class="naam">' + t.naam + '</div>' +
+        '<div class="details">' + new Date(t.datum).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) +
+        ' · ' + details + '</div><div class="actie">' + actie + '</div></div>';
+    }).join('') + '<div id="toernooien-melding"></div>';
+
+    window.__toernooien = toernooien;
+
+    const partnerSelects = el.querySelectorAll('[data-partner-voor]');
+    if (partnerSelects.length) {
+      if (!alleLeden) {
+        alleLeden = await haalOp('leden', { select: 'id,naam', order: 'naam.asc' });
+      }
+      partnerSelects.forEach(sel => {
+        alleLeden.filter(l => l.id !== sessie.user_id).forEach(l => {
+          const opt = document.createElement('option');
+          opt.value = l.id; opt.textContent = l.naam;
+          sel.appendChild(opt);
+        });
+      });
+    }
+
+    el.querySelectorAll('[data-actie]').forEach(btn => btn.addEventListener('click', () => {
+      const t = window.__toernooien[Number(btn.dataset.index)];
+      if (btn.dataset.actie === 'uitschrijven') uitschrijvenToernooi(btn.dataset.team, btn);
+      else if (btn.dataset.actie === 'inschrijven-paar') {
+        const sel = el.querySelector('[data-partner-voor="' + btn.dataset.index + '"]');
+        if (!sel.value) { toonToernooiMelding('Kies eerst een partner.', true); return; }
+        inschrijvenToernooi(t, sel.value, btn);
+      } else {
+        inschrijvenToernooi(t, null, btn);
+      }
+    }));
+  }
+
+  function toonToernooiMelding(tekst, isFout) {
+    const el = document.getElementById('toernooien-melding');
+    if (el) el.innerHTML = '<div class="melding ' + (isFout ? 'fout' : 'ok') + '">' + tekst + '</div>';
+  }
+
+  async function inschrijvenToernooi(toernooi, partnerId, btn) {
+    btn.disabled = true;
+    btn.textContent = 'Bezig…';
+    try {
+      const team = await voegToe('toernooi_teams', {
+        toernooi_id: toernooi.id,
+        speler1_id: sessie.user_id,
+        ...(partnerId ? { speler2_id: partnerId } : {}),
+      });
+      await laadToernooien();
+      if (toernooi.inschrijfgeld > 0) {
+        try {
+          const res = await functieAanroepen('create-mollie-payment', { type: 'toernooi', toernooi_team_id: team.id });
+          if (res.checkoutUrl) {
+            toonToernooiMelding('Ingeschreven! Je wordt doorgestuurd naar de betaalpagina…', false);
+            window.location.href = res.checkoutUrl;
+            return;
+          }
+        } catch (betaalFout) {
+          toonToernooiMelding('Ingeschreven, maar de betaling kon niet gestart worden: ' + betaalFout.message, true);
+          return;
+        }
+      }
+      toonToernooiMelding('Je bent ingeschreven.', false);
+    } catch (e) {
+      toonToernooiMelding(e.message, true);
+      btn.disabled = false;
+      btn.textContent = 'Inschrijven';
+    }
+  }
+
+  async function uitschrijvenToernooi(teamId, btn) {
+    btn.disabled = true;
+    btn.textContent = 'Bezig…';
+    try {
+      await verwijder('toernooi_teams', { id: 'eq.' + teamId });
+      await laadToernooien();
+      toonToernooiMelding('Je bent uitgeschreven.', false);
+    } catch (e) {
+      toonToernooiMelding(e.message, true);
+      btn.disabled = false;
+      btn.textContent = 'Uitschrijven';
+    }
+  }
+
   (async () => {
     await laadAbonnement();
-    await Promise.all([laadProfiel(), laadSpeeldagen(), laadNieuws()]);
+    await Promise.all([laadProfiel(), laadSpeeldagen(), laadToernooien(), laadNieuws()]);
   })().catch(e => console.error(e));
 </script>
 </body>
