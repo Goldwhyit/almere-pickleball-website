@@ -21,6 +21,29 @@
   .toernooi-regel .naam-rij { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
   .mail-knop { background: var(--navy); color: #fff; }
   .link-knop { background: transparent; color: var(--navy); border: 1.5px solid var(--navy); }
+  .stat-rij { display: flex; gap: 10px; margin-top: 14px; }
+  .stat-tegel {
+    flex: 1; background: var(--paper); border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px 12px; text-align: center; cursor: default;
+  }
+  .stat-tegel.klikbaar { cursor: pointer; }
+  .stat-tegel .waarde { font-size: 20px; font-weight: 700; color: var(--navy); }
+  @media (prefers-color-scheme: dark) { .stat-tegel .waarde { color: #8ab6ec; } }
+  .stat-tegel .label { font-size: 11.5px; color: var(--ink-muted); margin-top: 2px; }
+  .rank-regel { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+  .rank-regel:first-of-type { border-top: none; padding-top: 0; }
+  .rank-regel .positie { width: 20px; text-align: center; font-weight: 700; color: var(--ink-muted); font-size: 13px; }
+  .rank-regel .avatar {
+    width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--navy), var(--navy-deep)); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;
+  }
+  .rank-regel .naam { flex: 1; font-weight: 600; font-size: 14px; }
+  .rank-regel .rating { font-weight: 700; font-size: 14px; color: var(--gold-deep); }
+  @media (prefers-color-scheme: dark) { .rank-regel .rating { color: var(--gold); } }
+  .training-kop { display: flex; align-items: center; gap: 8px; }
+  .training-kop .dag { font-weight: 700; font-size: 15px; }
+  .training-locatie { font-size: 12.5px; color: var(--ink-muted); margin-top: 2px; }
 </style>
 </head>
 <body>
@@ -37,9 +60,11 @@
     <div class="pil-toggle">
       <button id="pil-almere" class="actief">Almere</button>
       <button id="pil-landelijk">Landelijk</button>
+      <button id="pil-training">Training</button>
     </div>
     <div id="almere-inhoud" class="laden">Laden…</div>
     <div id="landelijk-inhoud" class="laden" style="display:none">Laden…</div>
+    <div id="training-inhoud" class="laden" style="display:none">Laden…</div>
   </div>
 </main>
 <div id="nav-plek"></div>
@@ -51,13 +76,17 @@
 
   document.getElementById('pil-almere').addEventListener('click', () => wisselWeergave('almere'));
   document.getElementById('pil-landelijk').addEventListener('click', () => wisselWeergave('landelijk'));
+  document.getElementById('pil-training').addEventListener('click', () => wisselWeergave('training'));
 
   function wisselWeergave(w) {
     document.getElementById('pil-almere').classList.toggle('actief', w === 'almere');
     document.getElementById('pil-landelijk').classList.toggle('actief', w === 'landelijk');
+    document.getElementById('pil-training').classList.toggle('actief', w === 'training');
     document.getElementById('almere-inhoud').style.display = w === 'almere' ? '' : 'none';
     document.getElementById('landelijk-inhoud').style.display = w === 'landelijk' ? '' : 'none';
+    document.getElementById('training-inhoud').style.display = w === 'training' ? '' : 'none';
     if (w === 'landelijk' && !window.__landelijkGeladen) { window.__landelijkGeladen = true; laadLandelijk(); }
+    if (w === 'training' && !window.__trainingGeladen) { window.__trainingGeladen = true; laadTraining(); }
   }
 
   // --- Almere-toernooien: eigen inschrijving + betaling ---
@@ -246,6 +275,82 @@
       const t = window.__landelijk[Number(btn.dataset.mailIndex)];
       inschrijvenPerMail(t.naam, t.email.trim());
     }));
+  }
+
+  // --- Training: eerstvolgende trainingsavond + ranglijst-top-10 ---
+
+  const dagnamen = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
+
+  function initialen(naam) {
+    return naam.split(' ').filter(Boolean).slice(0, 2).map(n => n[0].toUpperCase()).join('');
+  }
+
+  async function volgendeTrainingssessie() {
+    const speeldagen = await haalOp('speeldagen', {
+      select: 'id,weekdag,start_tijd,eind_tijd,locatie,aantal_banen', actief: 'eq.true',
+    });
+    if (!speeldagen.length) return null;
+    const nu = new Date();
+    for (let dag = new Date(nu.getFullYear(), nu.getMonth(), nu.getDate());
+         dag < new Date(nu.getTime() + 60 * 24 * 3600 * 1000);
+         dag.setDate(dag.getDate() + 1)) {
+      if (dag.getMonth() === 6) continue;
+      const isodow = dag.getDay() === 0 ? 7 : dag.getDay();
+      for (const sd of speeldagen) {
+        if (sd.weekdag !== isodow) continue;
+        const [uur, min] = sd.start_tijd.split(':').map(Number);
+        const start = new Date(dag.getFullYear(), dag.getMonth(), dag.getDate(), uur, min);
+        if (start < nu) continue;
+        const reserveringen = await haalOp('reserveringen', {
+          select: 'id', speeldag_id: 'eq.' + sd.id, start_tijd: 'eq.' + start.toISOString(),
+        });
+        const nAanmeldingen = reserveringen.length;
+        const banenNodig = Math.min(Math.max(Math.ceil(nAanmeldingen / 4), 1), 8);
+        return {
+          speeldagId: sd.id, start, locatie: sd.locatie,
+          aanmeldingen: nAanmeldingen,
+          banen: Math.min(banenNodig, sd.aantal_banen),
+        };
+      }
+    }
+    return null;
+  }
+
+  async function laadTraining() {
+    const el = document.getElementById('training-inhoud');
+    const [sessieInfo, ranking] = await Promise.all([
+      volgendeTrainingssessie(),
+      haalOp('leden', { select: 'naam,rating', order: 'rating.desc', limit: '10' }),
+    ]);
+
+    let sessieHtml = '<p class="details">Geen speelavonden gevonden binnen de komende weken.</p>';
+    if (sessieInfo) {
+      sessieHtml =
+        '<div class="training-kop"><span class="dag">' +
+        dagnamen[sessieInfo.start.getDay() === 0 ? 6 : sessieInfo.start.getDay() - 1] + ' ' +
+        sessieInfo.start.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + '</span></div>' +
+        '<div class="training-locatie">' + sessieInfo.start.toTimeString().slice(0, 5) + ' · ' + sessieInfo.locatie + '</div>' +
+        '<div class="stat-rij">' +
+        '<div class="stat-tegel"><div class="waarde">' + sessieInfo.aanmeldingen + '</div><div class="label">Aanmeldingen</div></div>' +
+        '<div class="stat-tegel"><div class="waarde">' + sessieInfo.banen + '</div><div class="label">Banen ingezet</div></div>' +
+        '</div>' +
+        '<a class="knop aanmelden" href="/leden/reserveren.html" style="display:block;text-align:center;margin-top:14px;text-decoration:none">Bekijk speelavond →</a>';
+    }
+
+    const rankingHtml = ranking.length ? ranking.map((l, i) =>
+      '<div class="rank-regel"><span class="positie">' + (i + 1) + '</span>' +
+      '<span class="avatar">' + initialen(l.naam) + '</span>' +
+      '<span class="naam">' + l.naam + '</span>' +
+      '<span class="rating">' + (l.rating != null ? Number(l.rating).toFixed(2) : '–') + '</span></div>'
+    ).join('') : '';
+
+    el.innerHTML =
+      '<div class="toernooi-regel">' + sessieHtml + '</div>' +
+      '<div style="margin-top:20px">' +
+      '<h2 style="margin-bottom:2px">Ranglijst</h2>' +
+      '<p class="details" style="margin-bottom:10px">Top 10 op basis van rating. Volledige ranglijst op de Leden-pagina.</p>' +
+      (rankingHtml || '<p class="details">Nog geen ranglijst beschikbaar.</p>') +
+      '</div>';
   }
 
   laadToernooien().catch(e => console.error(e));
