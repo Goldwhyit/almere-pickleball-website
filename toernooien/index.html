@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Toernooien — Almere Pickleball</title>
+<meta name="description" content="Actuele poule-standen en wedstrijdschema's van de Almere Pickleball-toernooien." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ffd23f'/%3E%3Ccircle cx='34' cy='30' r='6' fill='%23005bbf'/%3E%3Ccircle cx='58' cy='24' r='6' fill='%23005bbf'/%3E%3Ccircle cx='74' cy='42' r='6' fill='%23005bbf'/%3E%3Ccircle cx='70' cy='66' r='6' fill='%23005bbf'/%3E%3Ccircle cx='48' cy='76' r='6' fill='%23005bbf'/%3E%3Ccircle cx='26' cy='58' r='6' fill='%23005bbf'/%3E%3Ccircle cx='50' cy='50' r='6' fill='%23005bbf'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --navy: #005bbf; --navy-deep: #003d82;
+    --gold: #ffd23f; --gold-deep: #b8860a;
+    --paper: #f5f8fc; --card: #ffffff;
+    --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4, 27, 51, 0.1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Manrope', -apple-system, sans-serif;
+    background: var(--paper); color: var(--ink);
+  }
+  header {
+    background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+    color: #fff; padding: 28px 20px 34px;
+  }
+  header .terug { color: #cfe0f0; font-size: 13px; text-decoration: none; }
+  header h1 { font-family: 'Unbounded', sans-serif; font-size: clamp(1.4rem, 5vw, 2rem); margin: 10px 0 4px; }
+  header p { margin: 0; color: #cfe0f0; font-size: 14px; }
+  main { max-width: 640px; margin: -16px auto 60px; padding: 0 18px; }
+  select {
+    width: 100%; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--line);
+    background: var(--card); color: var(--ink); font-size: 15px; margin-bottom: 16px;
+  }
+  .kaart {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 18px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .kaart h2 { font-family: 'Unbounded', sans-serif; font-size: 15px; margin: 0 0 10px; }
+  table.stand { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 13.5px; }
+  table.stand th, table.stand td { text-align: left; padding: 6px; }
+  table.stand th { color: var(--ink-muted); font-weight: 600; font-size: 11px; text-transform: uppercase; }
+  table.stand th.num, table.stand td.num { text-align: center; font-variant-numeric: tabular-nums; }
+  table.stand tbody tr:nth-child(odd) { background: rgba(0,91,191,0.04); }
+  .wedstrijd { display: flex; justify-content: space-between; padding: 7px 4px; font-size: 14px; border-top: 1px solid var(--line); }
+  .wedstrijd:first-of-type { border-top: none; }
+  .wedstrijd .score { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .wedstrijd .score.leeg { color: var(--ink-muted); font-weight: 400; font-size: 12.5px; }
+  .leeg-melding { text-align: center; color: var(--ink-muted); padding: 40px 20px; }
+</style>
+</head>
+<body>
+<header>
+  <a class="terug" href="/">← Almere Pickleball</a>
+  <h1 id="titel">Toernooien</h1>
+  <p>Poule-standen en wedstrijdschema, live bijgewerkt.</p>
+</header>
+<main>
+  <select id="toernooi-select"></select>
+  <div id="app" class="leeg-melding">Even laden…</div>
+</main>
+
+<script>
+const REST_BASE = 'https://yvjilitusziafdopvxnx.supabase.co/rest/v1';
+const ANON_KEY = 'sb_publishable_28_i6yHyP_Q8ExokzXvonA_KBhYk4or';
+const headers = { apikey: ANON_KEY, Authorization: 'Bearer ' + ANON_KEY, 'Content-Type': 'application/json' };
+
+const app = document.getElementById('app');
+const titelEl = document.getElementById('titel');
+const selectEl = document.getElementById('toernooi-select');
+let toernooien = [];
+
+async function rpc(naam, params) {
+  const resp = await fetch(REST_BASE + '/rpc/' + naam, { method: 'POST', headers, body: JSON.stringify(params) });
+  if (!resp.ok) throw new Error('Kon gegevens niet laden.');
+  return resp.json();
+}
+
+function berekenStand(pouleId, wedstrijden, teamIds) {
+  const stand = {};
+  teamIds.forEach(id => stand[id] = { gespeeld: 0, gewonnen: 0, punten: 0, saldo: 0 });
+  wedstrijden.filter(w => w.poule_id === pouleId && w.score1 !== null).forEach(w => {
+    stand[w.team1_id].gespeeld++; stand[w.team2_id].gespeeld++;
+    stand[w.team1_id].saldo += w.score1 - w.score2;
+    stand[w.team2_id].saldo += w.score2 - w.score1;
+    if (w.score1 > w.score2) { stand[w.team1_id].gewonnen++; stand[w.team1_id].punten += 2; }
+    else { stand[w.team2_id].gewonnen++; stand[w.team2_id].punten += 2; }
+  });
+  return teamIds.map(id => ({ id, ...stand[id] })).sort((a, b) => b.punten - a.punten || b.saldo - a.saldo);
+}
+
+function teamNaam(team) {
+  if (!team) return '?';
+  return team.speler2_naam ? team.speler1_naam + ' & ' + team.speler2_naam : team.speler1_naam;
+}
+
+async function laadToernooien() {
+  toernooien = await rpc('publieke_toernooien', {});
+  if (!toernooien.length) {
+    app.className = 'leeg-melding';
+    app.textContent = 'Er zijn nog geen toernooien gepland.';
+    selectEl.style.display = 'none';
+    return;
+  }
+  selectEl.innerHTML = toernooien.map(t =>
+    '<option value="' + t.id + '">' + t.naam + ' — ' + new Date(t.datum).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) + '</option>'
+  ).join('');
+  await laadToernooi(toernooien[0].id);
+}
+selectEl.addEventListener('change', () => laadToernooi(selectEl.value));
+
+async function laadToernooi(toernooiId) {
+  app.className = 'leeg-melding';
+  app.textContent = 'Even laden…';
+  const tn = toernooien.find(t => t.id === toernooiId);
+  titelEl.textContent = tn ? tn.naam : 'Toernooien';
+
+  const [teams, poules, wedstrijden] = await Promise.all([
+    rpc('publieke_toernooi_teams', { p_toernooi_id: toernooiId }),
+    rpc('publieke_toernooi_poules', { p_toernooi_id: toernooiId }),
+    rpc('publieke_toernooi_wedstrijden', { p_toernooi_id: toernooiId }),
+  ]);
+  const teamsById = {}; teams.forEach(t => teamsById[t.id] = t);
+
+  if (!poules.length) {
+    app.className = 'leeg-melding';
+    app.textContent = 'De poules voor dit toernooi zijn nog niet ingedeeld.';
+    return;
+  }
+
+  const pouleNamen = {}; const teamsPerPoule = {};
+  poules.forEach(p => {
+    pouleNamen[p.poule_id] = p.poule_naam;
+    (teamsPerPoule[p.poule_id] ||= []).push(p.team_id);
+  });
+
+  app.className = '';
+  app.innerHTML = Object.keys(teamsPerPoule).map(pouleId => {
+    const stand = berekenStand(Number(pouleId), wedstrijden, teamsPerPoule[pouleId]);
+    const rijen = stand.map(r =>
+      '<tr><td>' + teamNaam(teamsById[r.id]) + '</td><td class="num">' + r.gespeeld + '</td>' +
+      '<td class="num">' + r.gewonnen + '</td><td class="num">' + (r.saldo > 0 ? '+' : '') + r.saldo + '</td>' +
+      '<td class="num">' + r.punten + '</td></tr>'
+    ).join('');
+    const wedstrijdenHtml = wedstrijden.filter(w => w.poule_id === Number(pouleId)).map(w => {
+      const gespeeld = w.score1 !== null;
+      return '<div class="wedstrijd"><span>' + teamNaam(teamsById[w.team1_id]) + ' vs ' + teamNaam(teamsById[w.team2_id]) + '</span>' +
+        '<span class="score' + (gespeeld ? '' : ' leeg') + '">' + (gespeeld ? w.score1 + ' – ' + w.score2 : 'nog te spelen') + '</span></div>';
+    }).join('');
+    return '<div class="kaart"><h2>' + pouleNamen[pouleId] + '</h2>' +
+      '<table class="stand"><thead><tr><th>Team</th><th class="num">GS</th><th class="num">W</th><th class="num">Saldo</th><th class="num">Pt</th></tr></thead>' +
+      '<tbody>' + rijen + '</tbody></table>' + wedstrijdenHtml + '</div>';
+  }).join('');
+}
+
+laadToernooien().catch(e => {
+  app.className = 'leeg-melding';
+  app.textContent = 'Kon toernooien niet laden: ' + e.message;
+});
+</script>
+</body>
+</html>

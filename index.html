@@ -163,6 +163,15 @@
   .store-knop .tekst { text-align: left; line-height: 1.15; }
   .store-knop .klein { display: block; font-size: 10px; color: #cfe0f0; }
   .store-knop .groot { display: block; font-size: 14.5px; font-weight: 700; }
+  .toernooien-link {
+    display: inline-block;
+    margin-top: 40px;
+    font-weight: 700;
+    font-size: 14.5px;
+    color: var(--navy);
+    text-decoration: none;
+  }
+  @media (prefers-color-scheme: dark) { .toernooien-link { color: #8ab6ec; } }
   .footer {
     margin-top: auto;
     padding-top: 48px;
@@ -210,6 +219,8 @@
       </div>
     </div>
   </div>
+
+  <a class="toernooien-link" href="/toernooien/">Bekijk de actuele toernooistanden →</a>
 
   <div class="footer">© <span id="jaar"></span> Almere Pickleball</div>
 </main>
