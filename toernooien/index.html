@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Toernooien — Almere Pickleball</title>
 <meta name="description" content="Actuele poule-standen en wedstrijdschema's van de Almere Pickleball-toernooien." />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ffd23f'/%3E%3Ccircle cx='34' cy='30' r='6' fill='%23005bbf'/%3E%3Ccircle cx='58' cy='24' r='6' fill='%23005bbf'/%3E%3Ccircle cx='74' cy='42' r='6' fill='%23005bbf'/%3E%3Ccircle cx='70' cy='66' r='6' fill='%23005bbf'/%3E%3Ccircle cx='48' cy='76' r='6' fill='%23005bbf'/%3E%3Ccircle cx='26' cy='58' r='6' fill='%23005bbf'/%3E%3Ccircle cx='50' cy='50' r='6' fill='%23005bbf'/%3E%3C/svg%3E" />
+<link rel="icon" type="image/png" href="/assets/img/logo.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -28,7 +28,8 @@
     background: linear-gradient(135deg, var(--navy), var(--navy-deep));
     color: #fff; padding: 28px 20px 34px;
   }
-  header .terug { color: #cfe0f0; font-size: 13px; text-decoration: none; }
+  header .terug { color: #cfe0f0; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+  header .terug img { border-radius: 6px; }
   header h1 { font-family: 'Unbounded', sans-serif; font-size: clamp(1.4rem, 5vw, 2rem); margin: 10px 0 4px; }
   header p { margin: 0; color: #cfe0f0; font-size: 14px; }
   main { max-width: 640px; margin: -16px auto 60px; padding: 0 18px; }
@@ -55,7 +56,7 @@
 </head>
 <body>
 <header>
-  <a class="terug" href="/">← Almere Pickleball</a>
+  <a class="terug" href="/"><img src="/assets/img/logo.png" alt="" width="28" height="27" /> Almere Pickleball</a>
   <h1 id="titel">Toernooien</h1>
   <p>Poule-standen en wedstrijdschema, live bijgewerkt.</p>
 </header>

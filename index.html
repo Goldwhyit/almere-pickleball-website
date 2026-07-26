@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Almere Pickleball</title>
 <meta name="description" content="De pickleballclub van Almere — binnenkort hier met een nieuwe website en app." />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ffd23f'/%3E%3Ccircle cx='34' cy='30' r='6' fill='%23005bbf'/%3E%3Ccircle cx='58' cy='24' r='6' fill='%23005bbf'/%3E%3Ccircle cx='74' cy='42' r='6' fill='%23005bbf'/%3E%3Ccircle cx='70' cy='66' r='6' fill='%23005bbf'/%3E%3Ccircle cx='48' cy='76' r='6' fill='%23005bbf'/%3E%3Ccircle cx='26' cy='58' r='6' fill='%23005bbf'/%3E%3Ccircle cx='50' cy='50' r='6' fill='%23005bbf'/%3E%3C/svg%3E" />
+<link rel="icon" type="image/png" href="/assets/img/logo.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -56,29 +56,19 @@
     align-items: center;
     text-align: center;
   }
-  .bal {
-    width: 84px;
-    height: 84px;
-    margin-bottom: 28px;
+  .logo {
+    width: 180px;
+    height: auto;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 6px 18px rgba(0, 91, 191, 0.22));
     animation: zweven 5s ease-in-out infinite;
   }
   @keyframes zweven {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-10px) rotate(8deg); }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
   }
   @media (prefers-reduced-motion: reduce) {
-    .bal { animation: none; }
-  }
-  .merk {
-    font-family: 'Unbounded', sans-serif;
-    font-weight: 500;
-    font-size: 13px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--navy);
-  }
-  @media (prefers-color-scheme: dark) {
-    .merk { color: #8ab6ec; }
+    .logo { animation: none; }
   }
   h1 {
     font-family: 'Unbounded', sans-serif;
@@ -212,18 +202,8 @@
 <body>
 <div class="achtergrond"></div>
 <main>
-  <svg class="bal" viewBox="0 0 100 100" aria-hidden="true">
-    <circle cx="50" cy="50" r="46" fill="var(--gold)" />
-    <circle cx="34" cy="30" r="6" fill="var(--navy)" />
-    <circle cx="58" cy="24" r="6" fill="var(--navy)" />
-    <circle cx="74" cy="42" r="6" fill="var(--navy)" />
-    <circle cx="70" cy="66" r="6" fill="var(--navy)" />
-    <circle cx="48" cy="76" r="6" fill="var(--navy)" />
-    <circle cx="26" cy="58" r="6" fill="var(--navy)" />
-    <circle cx="50" cy="50" r="6" fill="var(--navy)" />
-  </svg>
+  <img class="logo" src="/assets/img/logo.png" alt="Almere Pickleball" width="180" height="176" />
 
-  <div class="merk">Almere Pickleball</div>
   <h1>We zijn <span>volop aan het bouwen</span></h1>
 
   <div class="badge"><span class="stip"></span> Nieuwe website in aanbouw</div>
