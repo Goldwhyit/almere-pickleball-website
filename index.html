@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Almere Pickleball</title>
+<meta name="description" content="De pickleballclub van Almere — binnenkort hier met een nieuwe website en app." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ffd23f'/%3E%3Ccircle cx='34' cy='30' r='6' fill='%23005bbf'/%3E%3Ccircle cx='58' cy='24' r='6' fill='%23005bbf'/%3E%3Ccircle cx='74' cy='42' r='6' fill='%23005bbf'/%3E%3Ccircle cx='70' cy='66' r='6' fill='%23005bbf'/%3E%3Ccircle cx='48' cy='76' r='6' fill='%23005bbf'/%3E%3Ccircle cx='26' cy='58' r='6' fill='%23005bbf'/%3E%3Ccircle cx='50' cy='50' r='6' fill='%23005bbf'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --navy: #005bbf;
+    --navy-deep: #003d82;
+    --navy-ink: #041b33;
+    --gold: #ffd23f;
+    --gold-deep: #e0a92e;
+    --paper: #f5f8fc;
+    --ink: #0b1420;
+    --ink-muted: #5b6b7d;
+    --line: rgba(4, 27, 51, 0.1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #071224;
+      --ink: #eef3f9;
+      --ink-muted: #9fb2c4;
+      --line: rgba(255, 255, 255, 0.12);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .achtergrond {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse 900px 600px at 15% -10%, rgba(0, 91, 191, 0.16), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 110% 15%, rgba(255, 210, 63, 0.14), transparent 55%);
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 12vh 24px 64px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .bal {
+    width: 84px;
+    height: 84px;
+    margin-bottom: 28px;
+    animation: zweven 5s ease-in-out infinite;
+  }
+  @keyframes zweven {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(8deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bal { animation: none; }
+  }
+  .merk {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--navy);
+  }
+  @media (prefers-color-scheme: dark) {
+    .merk { color: #8ab6ec; }
+  }
+  h1 {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    font-size: clamp(2.1rem, 6vw, 3.4rem);
+    line-height: 1.08;
+    margin: 14px 0 0;
+    text-wrap: balance;
+  }
+  h1 span { color: var(--gold-deep); }
+  @media (prefers-color-scheme: dark) { h1 span { color: var(--gold); } }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 22px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: var(--navy);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+  }
+  .badge .stip {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold);
+    animation: knipperen 1.6s ease-in-out infinite;
+  }
+  @keyframes knipperen { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+  p.uitleg {
+    max-width: 480px;
+    margin: 22px 0 0;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--ink-muted);
+  }
+  .app-sectie {
+    margin-top: 56px;
+    width: 100%;
+    max-width: 480px;
+    padding: 28px 24px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--line);
+    backdrop-filter: blur(6px);
+  }
+  @media (prefers-color-scheme: dark) {
+    .app-sectie { background: rgba(255, 255, 255, 0.04); }
+  }
+  .app-sectie h2 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 6px;
+  }
+  .app-sectie p {
+    margin: 0 0 20px;
+    font-size: 14.5px;
+    color: var(--ink-muted);
+  }
+  .store-knoppen {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .store-knop {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 18px;
+    border-radius: 12px;
+    background: var(--navy-ink);
+    color: #fff;
+    opacity: 0.55;
+    cursor: default;
+    user-select: none;
+    min-width: 168px;
+  }
+  .store-knop svg { flex-shrink: 0; }
+  .store-knop .tekst { text-align: left; line-height: 1.15; }
+  .store-knop .klein { display: block; font-size: 10px; color: #cfe0f0; }
+  .store-knop .groot { display: block; font-size: 14.5px; font-weight: 700; }
+  .footer {
+    margin-top: auto;
+    padding-top: 48px;
+    font-size: 12.5px;
+    color: var(--ink-muted);
+  }
+</style>
+</head>
+<body>
+<div class="achtergrond"></div>
+<main>
+  <svg class="bal" viewBox="0 0 100 100" aria-hidden="true">
+    <circle cx="50" cy="50" r="46" fill="var(--gold)" />
+    <circle cx="34" cy="30" r="6" fill="var(--navy)" />
+    <circle cx="58" cy="24" r="6" fill="var(--navy)" />
+    <circle cx="74" cy="42" r="6" fill="var(--navy)" />
+    <circle cx="70" cy="66" r="6" fill="var(--navy)" />
+    <circle cx="48" cy="76" r="6" fill="var(--navy)" />
+    <circle cx="26" cy="58" r="6" fill="var(--navy)" />
+    <circle cx="50" cy="50" r="6" fill="var(--navy)" />
+  </svg>
+
+  <div class="merk">Almere Pickleball</div>
+  <h1>We zijn <span>volop aan het bouwen</span></h1>
+
+  <div class="badge"><span class="stip"></span> Nieuwe website in aanbouw</div>
+
+  <p class="uitleg">
+    Onze nieuwe website komt er binnenkort aan — met alles over de club,
+    speelavonden, toernooien en lidmaatschap. Tot die tijd: bedankt voor je
+    geduld, en tot snel op de baan.
+  </p>
+
+  <div class="app-sectie">
+    <h2>De clubapp</h2>
+    <p>Binnenkort beschikbaar voor iPhone en Android.</p>
+    <div class="store-knoppen">
+      <div class="store-knop" role="img" aria-label="Binnenkort in de App Store">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M16.365 1.43c0 1.14-.417 2.06-1.25 2.77-.83.71-1.83 1.09-2.86 1.02-.14-1.1.35-2.09 1.16-2.83.81-.74 1.9-1.16 2.95-1.16zM20.5 17.32c-.5 1.15-1.1 2.28-1.98 3.3-.9 1.05-1.85 2.08-3.3 2.11-1.4.03-1.87-.83-3.5-.83-1.63 0-2.14.8-3.46.86-1.4.06-2.46-1.13-3.37-2.17-1.87-2.15-3.3-6.08-1.38-8.74 0.95-1.32 2.65-2.16 4.5-2.19 1.36-.03 2.65.92 3.48.92.83 0 2.38-1.14 4.02-.97.68.03 2.6.28 3.83 2.09-.1.06-2.28 1.34-2.26 3.99.02 3.16 2.78 4.21 2.82 4.23-.02.06-.44 1.5-.9 2.4z"/></svg>
+        <span class="tekst"><span class="klein">Binnenkort in de</span><span class="groot">App Store</span></span>
+      </div>
+      <div class="store-knop" role="img" aria-label="Binnenkort op Google Play">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M3.6 2.7c-.35.36-.55.9-.55 1.6v15.4c0 .7.2 1.24.55 1.6l.1.08 8.62-8.63v-.2L3.7 2.6l-.1.1z"/><path d="M15.3 14.9l-2.87-2.87v-.2l2.87-2.87.07.04 3.4 1.93c.97.55.97 1.45 0 2l-3.4 1.93z" opacity=".85"/><path d="M15.37 14.86l-2.94-2.94-8.73 8.73c.32.34.85.38 1.45.05l10.22-5.84" opacity=".95"/><path d="M15.37 9.14L5.15 3.3c-.6-.33-1.13-.29-1.45.05l8.73 8.73 2.94-2.94z" opacity=".95"/></svg>
+        <span class="tekst"><span class="klein">Binnenkort op</span><span class="groot">Google Play</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">© <span id="jaar"></span> Almere Pickleball</div>
+</main>
+<script>
+  document.getElementById('jaar').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
