@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Leden — Almere Pickleball</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" type="image/png" href="/assets/img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/leden.css" />
+<style>
+  .zoekbalk {
+    width: 100%; padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--line);
+    background: var(--paper); color: var(--ink); font-size: 14px; font-family: inherit; margin-bottom: 10px;
+  }
+  .niveau-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .niveau-filters button {
+    padding: 6px 12px; border-radius: 999px; border: 1.5px solid var(--line); background: transparent;
+    color: var(--ink-muted); font-size: 12.5px; font-weight: 600; cursor: pointer;
+  }
+  .niveau-filters button.actief { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .lid-regel { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+  .lid-regel:first-of-type { border-top: none; padding-top: 0; }
+  .avatar {
+    width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--navy), var(--navy-deep)); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px;
+  }
+  .lid-naam { font-weight: 700; font-size: 14.5px; }
+  .lid-sub { color: var(--ink-muted); font-size: 12.5px; margin-top: 1px; }
+  .lid-rating { font-weight: 700; font-size: 15px; color: var(--navy); min-width: 40px; text-align: right; }
+  @media (prefers-color-scheme: dark) { .lid-rating { color: #8ab6ec; } }
+  .rang-nummer { width: 22px; text-align: center; font-weight: 700; color: var(--ink-muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <img src="/assets/img/logo.png" alt="" width="40" height="39" style="border-radius: 8px;" />
+  <div style="flex: 1;">
+    <div class="merk">Almere Pickleball</div>
+    <h1 id="kop-titel">Leden</h1>
+  </div>
+  <div id="account-plek"></div>
+</header>
+<main>
+  <div class="kaart">
+    <div class="pil-toggle">
+      <button id="pil-leden" class="actief">Leden</button>
+      <button id="pil-ranglijst">Ranglijst</button>
+    </div>
+    <div id="leden-zoek-blok">
+      <input id="zoekveld" class="zoekbalk" type="search" placeholder="Zoek op naam…" />
+      <div class="niveau-filters">
+        <button data-niveau="" class="actief">Alle niveaus</button>
+        <button data-niveau="beginner">Beginner</button>
+        <button data-niveau="gevorderd">Gevorderd</button>
+        <button data-niveau="competitie">Competitie</button>
+      </div>
+    </div>
+    <div id="leden-inhoud" class="laden">Laden…</div>
+  </div>
+</main>
+<div id="nav-plek"></div>
+<script src="/assets/supabase.js"></script>
+<script src="/assets/nav.js"></script>
+<script>
+  const sessie = vereisSessie();
+  initNav('leden');
+
+  const niveauLabels = { beginner: 'Beginner', gevorderd: 'Gevorderd', competitie: 'Competitie' };
+
+  let alleLeden = [];
+  let statsMap = {};
+  let zoek = '';
+  let niveauFilter = '';
+  let toonRanglijst = false;
+
+  function initialen(naam) {
+    return naam.split(' ').filter(Boolean).slice(0, 2).map(n => n[0].toUpperCase()).join('');
+  }
+
+  function subtitel(lid) {
+    const niveau = niveauLabels[lid.niveau] || lid.niveau || '';
+    const s = statsMap[lid.id];
+    if (!s || !s.gespeeld) return niveau;
+    const pct = Math.round((s.gewonnen / s.gespeeld) * 100);
+    return niveau + ' · ' + s.gespeeld + ' gespeeld, ' + s.gewonnen + ' gewonnen (' + pct + '%)';
+  }
+
+  function gefilterdeLeden() {
+    return alleLeden.filter(l => {
+      const naamMatch = l.naam.toLowerCase().includes(zoek);
+      const niveauMatch = !niveauFilter || l.niveau === niveauFilter;
+      return naamMatch && niveauMatch;
+    });
+  }
+
+  function render() {
+    const el = document.getElementById('leden-inhoud');
+    const lijst = gefilterdeLeden();
+    if (!lijst.length) { el.innerHTML = 'Geen leden gevonden.'; return; }
+
+    if (toonRanglijst) {
+      const gesorteerd = [...lijst].sort((a, b) => (Number(b.rating) || 0) - (Number(a.rating) || 0));
+      el.innerHTML = gesorteerd.map((l, i) => {
+        const rating = l.rating != null ? Number(l.rating).toFixed(2) : '–';
+        return '<div class="lid-regel"><span class="rang-nummer">' + (i + 1) + '</span>' +
+          '<span class="avatar">' + initialen(l.naam) + '</span>' +
+          '<span style="flex:1"><span class="lid-naam">' + l.naam + '</span>' +
+          '<div class="lid-sub">' + subtitel(l) + '</div></span>' +
+          '<span class="lid-rating">' + rating + '</span></div>';
+      }).join('');
+    } else {
+      el.innerHTML = lijst.map(l =>
+        '<div class="lid-regel"><span class="avatar">' + initialen(l.naam) + '</span>' +
+        '<span style="flex:1"><span class="lid-naam">' + l.naam + '</span>' +
+        '<div class="lid-sub">' + subtitel(l) + '</div></span></div>'
+      ).join('');
+    }
+  }
+
+  document.getElementById('zoekveld').addEventListener('input', e => {
+    zoek = e.target.value.trim().toLowerCase();
+    render();
+  });
+
+  document.querySelectorAll('.niveau-filters button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      niveauFilter = btn.dataset.niveau;
+      document.querySelectorAll('.niveau-filters button').forEach(b => b.classList.toggle('actief', b === btn));
+      render();
+    });
+  });
+
+  document.getElementById('pil-leden').addEventListener('click', () => wisselWeergave(false));
+  document.getElementById('pil-ranglijst').addEventListener('click', () => wisselWeergave(true));
+
+  function wisselWeergave(ranglijst) {
+    toonRanglijst = ranglijst;
+    document.getElementById('pil-leden').classList.toggle('actief', !ranglijst);
+    document.getElementById('pil-ranglijst').classList.toggle('actief', ranglijst);
+    document.getElementById('kop-titel').textContent = ranglijst ? 'Ranglijst' : 'Leden';
+    render();
+  }
+
+  async function laadLeden() {
+    const [leden, stats] = await Promise.all([
+      haalOp('leden', { select: 'id,naam,niveau,rating', order: 'naam.asc' }),
+      haalOp('lid_avond_statistieken', { select: 'lid_id,gespeeld,gewonnen' }),
+    ]);
+    alleLeden = leden;
+    statsMap = {};
+    stats.forEach(s => { statsMap[s.lid_id] = s; });
+    render();
+  }
+
+  laadLeden().catch(e => {
+    document.getElementById('leden-inhoud').textContent = e.message;
+  });
+</script>
+</body>
+</html>

@@ -66,7 +66,7 @@
 </div>
 <script src="/assets/supabase.js"></script>
 <script>
-  if (isIngelogd()) window.location.href = '/leden/dashboard.html';
+  if (isIngelogd()) window.location.href = '/leden/home.html';
 
   document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -77,7 +77,7 @@
     knop.textContent = 'Bezig…';
     try {
       await inloggen(document.getElementById('email').value.trim(), document.getElementById('wachtwoord').value);
-      window.location.href = '/leden/dashboard.html';
+      window.location.href = '/leden/home.html';
     } catch (err) {
       foutEl.textContent = err.message;
       knop.disabled = false;

@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baan huren — Almere Pickleball</title>
+<link rel="icon" type="image/png" href="/assets/img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --navy: #005bbf; --navy-deep: #003d82; --gold: #ffd23f; --gold-deep: #b8860a;
+    --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1);
+    --danger: #b3261e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+    .prijs-regel .bedrag { color: #f2c869; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Manrope', -apple-system, sans-serif; background: var(--paper); color: var(--ink); }
+  header {
+    background: linear-gradient(135deg, var(--navy), var(--navy-deep)); color: #fff;
+    padding: 28px 20px 36px; display: flex; align-items: center; gap: 12px;
+  }
+  header .merk { font-family: 'Unbounded', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #cfe0f0; }
+  header h1 { font-family: 'Unbounded', sans-serif; font-size: 20px; margin: 4px 0 0; }
+  header p { margin: 4px 0 0; color: #cfe0ee; font-size: 13.5px; }
+  main { max-width: 480px; margin: -18px auto 40px; padding: 0 18px; }
+  .kaart {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .kaart h2 { font-family: 'Unbounded', sans-serif; font-size: 14px; margin: 0 0 4px;
+    color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .kaart .toelichting { font-size: 13px; color: var(--ink-muted); margin: 0 0 12px; }
+  .banen { display: flex; gap: 8px; flex-wrap: wrap; }
+  .baan-optie {
+    flex: 1; min-width: 100px; border: 1.5px solid var(--line); border-radius: 10px;
+    padding: 12px 8px; text-align: center; cursor: pointer; background: transparent; color: var(--ink);
+    font-size: 14px; font-weight: 600; font-family: inherit;
+  }
+  .baan-optie.actief { border-color: var(--gold); background: rgba(255,210,63,0.16); }
+  .baan-optie small { display: block; font-weight: 400; color: var(--ink-muted); margin-top: 2px; }
+  input[type=text], input[type=email], input[type=tel] {
+    width: 100%; padding: 11px 12px; border: 1.5px solid var(--line); border-radius: 10px;
+    background: var(--paper); color: var(--ink); font-size: 15px; margin-top: 6px; font-family: inherit;
+  }
+  label { font-size: 13px; color: var(--ink-muted); display: block; margin-top: 12px; }
+  label:first-child { margin-top: 0; }
+  .datums { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .datum-optie {
+    display: flex; justify-content: space-between; align-items: center;
+    border: 1.5px solid var(--line); border-radius: 10px; padding: 11px 14px;
+    cursor: pointer; background: transparent; color: var(--ink); font-size: 14.5px; text-align: left;
+    font-variant-numeric: tabular-nums; font-family: inherit; width: 100%;
+  }
+  .datum-optie.actief { border-color: var(--gold); background: rgba(255,210,63,0.16); font-weight: 600; }
+  .datum-optie:disabled { opacity: 0.35; cursor: not-allowed; }
+  .datum-optie .status { font-size: 12.5px; color: var(--ink-muted); }
+  .prijs-regel { display: flex; justify-content: space-between; align-items: baseline; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .prijs-regel .bedrag { font-size: 22px; font-weight: 700; color: var(--navy); }
+  button.primair {
+    width: 100%; padding: 14px; border: none; border-radius: 10px; margin-top: 16px;
+    background: var(--gold); color: #241a02; font-size: 15.5px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  button.primair:disabled { opacity: 0.45; cursor: not-allowed; }
+  .fout { color: var(--danger); font-size: 13.5px; margin-top: 10px; }
+  .laden { text-align: center; color: var(--ink-muted); padding: 30px; }
+  .terug { display: block; text-align: center; margin-top: 8px; font-size: 13px; color: var(--ink-muted); text-decoration: none; }
+</style>
+</head>
+<body>
+<header>
+  <img src="/assets/img/logo.png" alt="" width="40" height="39" style="border-radius: 8px;" />
+  <div>
+    <div class="merk">Almere Pickleball</div>
+    <h1>Baan huren</h1>
+    <p>Baan 6, 7 of 8 bij Sporthal Almere Haven, dinsdag 19:30–21:30 uur.</p>
+  </div>
+</header>
+<main>
+  <div id="app" class="laden">Even laden…</div>
+  <a class="terug" href="/">← Terug naar de website</a>
+</main>
+<script src="/assets/supabase.js"></script>
+<script>
+  const euro = new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' });
+  const dagFormat = new Intl.DateTimeFormat('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+
+  let instellingen = [];
+  let bezetteDatums = [];
+  let gekozenBaan = null;
+  let gekozenDatum = null;
+
+  const app = document.getElementById('app');
+
+  function isoDatum(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  // De eerstvolgende 8 data die op de juiste weekdag vallen (isodow: 1=ma .. 7=zo).
+  function volgendeData(weekdag) {
+    const data = [];
+    const nu = new Date();
+    nu.setHours(0, 0, 0, 0);
+    const cursor = new Date(nu);
+    while (data.length < 8) {
+      const isodow = cursor.getDay() === 0 ? 7 : cursor.getDay();
+      if (isodow === weekdag) data.push(new Date(cursor));
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    return data;
+  }
+
+  function dagnaam(weekdag) {
+    return ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'][weekdag - 1];
+  }
+
+  function uren(baan) {
+    const [sh, sm] = baan.start_tijd.split(':').map(Number);
+    const [eh, em] = baan.eind_tijd.split(':').map(Number);
+    return (eh * 60 + em - (sh * 60 + sm)) / 60;
+  }
+
+  function render() {
+    const baan = instellingen.find(b => b.baan_id === gekozenBaan);
+    const tijdOmschrijving = baan
+      ? dagnaam(baan.weekdag) + ' ' + baan.start_tijd.slice(0, 5) + '–' + baan.eind_tijd.slice(0, 5)
+      : '';
+    app.className = '';
+    app.innerHTML =
+      '<div class="kaart"><h2>Kies een baan</h2>' +
+      '<p class="toelichting">Verhuur is alleen op ' + tijdOmschrijving + ' (zelfde moment als de clubtraining).</p>' +
+      '<div class="banen">' +
+      instellingen.map(b =>
+        '<button type="button" class="baan-optie' + (b.baan_id === gekozenBaan ? ' actief' : '') + '" data-baan="' + b.baan_id + '">' +
+        b.baan_naam + '<small>' + euro.format(b.prijs_per_uur * uren(b)) + '</small></button>'
+      ).join('') +
+      '</div></div>' +
+      (gekozenBaan ? '<div class="kaart"><h2>Kies een datum</h2><div id="datums-houder" class="laden">Beschikbaarheid laden…</div></div>' : '') +
+      (gekozenBaan && gekozenDatum ?
+        '<div class="kaart">' +
+        '<h2>Je gegevens</h2>' +
+        '<label>Naam<input type="text" id="naam-invoer" autocomplete="name" /></label>' +
+        '<label>E-mail<input type="email" id="email-invoer" autocomplete="email" /></label>' +
+        '<label>Telefoon (optioneel)<input type="tel" id="telefoon-invoer" autocomplete="tel" /></label>' +
+        '<div class="prijs-regel"><span>Te betalen</span><span class="bedrag">' +
+        euro.format(baan.prijs_per_uur * uren(baan)) + '</span></div>' +
+        '<button type="button" class="primair" id="boek-knop">Doorgaan naar betalen</button>' +
+        '<div id="fout-melding"></div>' +
+        '</div>' : '');
+
+    app.querySelectorAll('.baan-optie').forEach(el => el.addEventListener('click', () => {
+      gekozenBaan = Number(el.dataset.baan);
+      gekozenDatum = null;
+      laadBezetteDatums().then(render);
+    }));
+
+    if (gekozenBaan) toonDatums();
+    const boekKnop = document.getElementById('boek-knop');
+    if (boekKnop) boekKnop.addEventListener('click', boekEnBetaal);
+  }
+
+  async function laadBezetteDatums() {
+    bezetteDatums = await rpc('beschikbare_verhuur_datums', { p_baan_id: gekozenBaan });
+  }
+
+  function toonDatums() {
+    const houder = document.getElementById('datums-houder');
+    if (!houder) return;
+    const baan = instellingen.find(b => b.baan_id === gekozenBaan);
+    const bezet = new Set(bezetteDatums.map(b => b.datum));
+    const opties = volgendeData(baan.weekdag);
+    houder.className = 'datums';
+    houder.innerHTML = opties.map(d => {
+      const iso = isoDatum(d);
+      const isBezet = bezet.has(iso);
+      return '<button type="button" class="datum-optie' + (iso === gekozenDatum ? ' actief' : '') + '"' +
+        (isBezet ? ' disabled' : '') + ' data-datum="' + iso + '">' +
+        '<span>' + dagFormat.format(d) + '</span>' +
+        (isBezet ? '<span class="status">Bezet</span>' : '') +
+        '</button>';
+    }).join('');
+    houder.querySelectorAll('.datum-optie:not(:disabled)').forEach(el => el.addEventListener('click', () => {
+      gekozenDatum = el.dataset.datum;
+      render();
+    }));
+  }
+
+  async function boekEnBetaal() {
+    const foutHouder = document.getElementById('fout-melding');
+    const knop = document.getElementById('boek-knop');
+    foutHouder.textContent = '';
+    const naam = document.getElementById('naam-invoer').value.trim();
+    const email = document.getElementById('email-invoer').value.trim();
+    const telefoon = document.getElementById('telefoon-invoer').value.trim();
+    if (!naam || !email) {
+      foutHouder.innerHTML = '<div class="fout">Vul je naam en e-mailadres in.</div>';
+      return;
+    }
+    knop.disabled = true;
+    knop.textContent = 'Bezig…';
+    try {
+      const nieuweId = await rpc('boek_baan_verhuur', {
+        p_baan_id: gekozenBaan, p_datum: gekozenDatum,
+        p_naam: naam, p_email: email, p_telefoon: telefoon || null,
+      });
+      const betaalData = await functieAanroepen('create-huur-betaling', { baan_verhuur_id: nieuweId });
+      if (!betaalData.checkoutUrl) throw new Error(betaalData.error || 'Betaling starten is mislukt.');
+      window.location.href = betaalData.checkoutUrl;
+    } catch (e) {
+      foutHouder.innerHTML = '<div class="fout">' + e.message + '</div>';
+      knop.disabled = false;
+      knop.textContent = 'Doorgaan naar betalen';
+    }
+  }
+
+  (async function init() {
+    try {
+      instellingen = await rpc('verhuur_instellingen', {});
+      if (!instellingen.length) {
+        app.className = 'laden';
+        app.textContent = 'Er zijn op dit moment geen banen beschikbaar voor verhuur.';
+        return;
+      }
+      gekozenBaan = instellingen[0].baan_id;
+      await laadBezetteDatums();
+      render();
+    } catch (e) {
+      app.className = 'laden';
+      app.textContent = 'Kon de pagina niet laden: ' + e.message;
+    }
+  })();
+</script>
+</body>
+</html>

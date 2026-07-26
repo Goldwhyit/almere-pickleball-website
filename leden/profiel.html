@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Profiel — Almere Pickleball</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" type="image/png" href="/assets/img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/leden.css" />
+</head>
+<body>
+<header>
+  <img src="/assets/img/logo.png" alt="" width="40" height="39" style="border-radius: 8px;" />
+  <div style="flex: 1;">
+    <div class="merk">Almere Pickleball</div>
+    <h1 id="welkom">Profiel</h1>
+  </div>
+  <div id="account-plek"></div>
+</header>
+<main>
+  <div class="kaart">
+    <h2>Mijn abonnement</h2>
+    <div id="abonnement-inhoud" class="laden">Laden…</div>
+  </div>
+</main>
+<div id="nav-plek"></div>
+<script src="/assets/supabase.js"></script>
+<script src="/assets/nav.js"></script>
+<script>
+  const sessie = vereisSessie();
+  initNav('profiel');
+
+  let mijnLeeftijd = null;
+  let mijnAbonnement = null;
+
+  const betaalwijzePerVorm = { jaar: 'jaarlijks_vooruit', maand: 'maandelijkse_incasso', strippenkaart: 'eenmalig', sessie: 'per_sessie', proef: 'eenmalig' };
+
+  function berekenLeeftijd(geboortedatum) {
+    if (!geboortedatum) return null;
+    const nu = new Date(); const gd = new Date(geboortedatum);
+    let leeftijd = nu.getFullYear() - gd.getFullYear();
+    if (nu.getMonth() < gd.getMonth() || (nu.getMonth() === gd.getMonth() && nu.getDate() < gd.getDate())) leeftijd--;
+    return leeftijd;
+  }
+
+  async function laadProfiel() {
+    const rows = await haalOp('leden', { select: 'naam,geboortedatum', id: 'eq.' + sessie.user_id });
+    if (rows.length) {
+      document.getElementById('welkom').textContent = 'Welkom, ' + rows[0].naam;
+      mijnLeeftijd = berekenLeeftijd(rows[0].geboortedatum);
+    }
+  }
+
+  async function laadAbonnement() {
+    const el = document.getElementById('abonnement-inhoud');
+
+    const actief = await haalOp('lid_abonnementen', {
+      select: 'id,status,strippen_resterend,geldig_tot,abonnementen(naam,vorm)',
+      lid_id: 'eq.' + sessie.user_id, status: 'eq.actief', limit: '1',
+    });
+    if (actief.length) {
+      mijnAbonnement = actief[0];
+      const naam = mijnAbonnement.abonnementen ? mijnAbonnement.abonnementen.naam : '';
+      let extra = '';
+      if (mijnAbonnement.abonnementen && (mijnAbonnement.abonnementen.vorm === 'strippenkaart' || mijnAbonnement.abonnementen.vorm === 'proef') && mijnAbonnement.geldig_tot) {
+        extra = (mijnAbonnement.strippen_resterend ?? 0) + ' over, geldig tot ' +
+          new Date(mijnAbonnement.geldig_tot).toLocaleDateString('nl-NL');
+      }
+      el.innerHTML = '<div class="status-regel"><span class="status-badge">' + naam + '</span></div>' +
+        (extra ? '<p style="margin:10px 0 0;font-size:13.5px;color:var(--ink-muted)">' + extra + '</p>' : '') +
+        '<button class="knop afmelden" id="opzeg-knop" style="margin-top:12px">Abonnement opzeggen</button>' +
+        '<div id="abonnement-melding"></div>';
+      document.getElementById('opzeg-knop').addEventListener('click', opzeggen);
+      return;
+    }
+
+    const wachtend = await haalOp('lid_abonnementen', {
+      select: 'id,abonnementen(naam)',
+      lid_id: 'eq.' + sessie.user_id, status: 'eq.in_afwachting', order: 'created_at.desc', limit: '1',
+    });
+    if (wachtend.length) {
+      mijnAbonnement = null;
+      const naam = wachtend[0].abonnementen ? wachtend[0].abonnementen.naam : '';
+      el.innerHTML = '<span class="status-badge leeg">In afwachting van betaling — ' + naam + '</span>' +
+        '<button class="knop aanmelden" id="betaal-knop" style="margin-top:12px;display:block">Betaal nu via iDEAL</button>' +
+        '<div id="abonnement-melding"></div>';
+      document.getElementById('betaal-knop').addEventListener('click', (e) => betaalWachtendAbonnement(wachtend[0].id, e.target));
+      return;
+    }
+
+    mijnAbonnement = null;
+    await toonAbonnementKiezer(el);
+  }
+
+  function toonAbonnementMelding(tekst, isFout) {
+    const el = document.getElementById('abonnement-melding');
+    if (el) el.innerHTML = '<div class="melding ' + (isFout ? 'fout' : 'ok') + '">' + tekst + '</div>';
+  }
+
+  async function toonAbonnementKiezer(el) {
+    const categorie = (mijnLeeftijd !== null && mijnLeeftijd <= 17) ? 'jeugd' : 'volwassen';
+    const opties = await haalOp('abonnementen', { select: '*', actief: 'eq.true', categorie: 'in.(' + categorie + ',alle)', order: 'vorm.asc' });
+    if (!opties.length) { el.textContent = 'Geen abonnementsvormen beschikbaar.'; return; }
+    el.innerHTML = '<span class="status-badge leeg">Geen actief abonnement</span>' +
+      '<div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">' +
+      opties.map((a, i) => {
+        const prijs = Number(a.prijs) > 0 ? '€' + Number(a.prijs).toFixed(2) : 'Gratis';
+        return '<label style="display:flex;align-items:center;gap:8px;font-size:13.5px;padding:8px;border:1.5px solid var(--line);border-radius:10px;cursor:pointer">' +
+          '<input type="radio" name="abo-keuze" value="' + i + '" ' + (i === 0 ? 'checked' : '') + ' />' +
+          '<span style="flex:1">' + a.naam + '</span><strong>' + prijs + '</strong></label>';
+      }).join('') +
+      '</div><button class="knop aanmelden" id="start-abo-knop" style="margin-top:14px">Abonnement starten</button>' +
+      '<div id="abonnement-melding"></div>';
+    document.getElementById('start-abo-knop').addEventListener('click', (e) => {
+      const gekozenIndex = Number(el.querySelector('input[name="abo-keuze"]:checked').value);
+      startAbonnement(opties[gekozenIndex], e.target);
+    });
+  }
+
+  async function startAbonnement(abo, btn) {
+    btn.disabled = true;
+    btn.textContent = 'Bezig…';
+    const betaalwijze = betaalwijzePerVorm[abo.vorm] || 'eenmalig';
+    try {
+      if (Number(abo.prijs) <= 0) {
+        const isStrippenkaart = abo.vorm === 'strippenkaart' || abo.vorm === 'proef';
+        const nu = new Date();
+        const rij = { lid_id: sessie.user_id, abonnement_id: abo.id, betaalwijze, status: 'actief' };
+        if (isStrippenkaart) {
+          rij.strippen_resterend = abo.strippen;
+          const geldigTot = new Date(nu); geldigTot.setMonth(geldigTot.getMonth() + Number(abo.geldig_maanden));
+          rij.geldig_tot = geldigTot.toISOString().substring(0, 10);
+        }
+        await voegToe('lid_abonnementen', rij);
+        await laadAbonnement();
+        toonAbonnementMelding('Abonnement gestart.', false);
+        return;
+      }
+      const res = await functieAanroepen('create-mollie-payment', { type: 'abonnement', abonnement_id: abo.id, betaalwijze });
+      await laadAbonnement();
+      if (res.checkoutUrl) {
+        toonAbonnementMelding('Je wordt doorgestuurd naar de betaalpagina…', false);
+        window.location.href = res.checkoutUrl;
+      }
+    } catch (e) {
+      toonAbonnementMelding(e.message, true);
+      btn.disabled = false;
+      btn.textContent = 'Abonnement starten';
+    }
+  }
+
+  async function betaalWachtendAbonnement(lidAbonnementId, btn) {
+    btn.disabled = true;
+    btn.textContent = 'Bezig…';
+    try {
+      const res = await functieAanroepen('create-mollie-payment', { type: 'abonnement', lid_abonnement_id: lidAbonnementId });
+      if (res.checkoutUrl) {
+        toonAbonnementMelding('Je wordt doorgestuurd naar de betaalpagina…', false);
+        window.location.href = res.checkoutUrl;
+      }
+    } catch (e) {
+      toonAbonnementMelding(e.message, true);
+      btn.disabled = false;
+      btn.textContent = 'Betaal nu via iDEAL';
+    }
+  }
+
+  async function opzeggen() {
+    if (!confirm('Weet je zeker dat je je abonnement wilt opzeggen?')) return;
+    try {
+      await rpc('zeg_abonnement_op', {});
+      await laadAbonnement();
+      toonAbonnementMelding('Abonnement opgezegd.', false);
+    } catch (e) {
+      toonAbonnementMelding(e.message, true);
+    }
+  }
+
+  (async () => {
+    await laadProfiel();
+    await laadAbonnement();
+  })().catch(e => console.error(e));
+</script>
+</body>
+</html>

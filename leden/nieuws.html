@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nieuws — Almere Pickleball</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" type="image/png" href="/assets/img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/leden.css" />
+</head>
+<body>
+<header>
+  <img src="/assets/img/logo.png" alt="" width="40" height="39" style="border-radius: 8px;" />
+  <div style="flex: 1;">
+    <div class="merk">Almere Pickleball</div>
+    <h1>Nieuws</h1>
+  </div>
+  <div id="account-plek"></div>
+</header>
+<main>
+  <div class="kaart">
+    <div id="nieuws-inhoud" class="laden">Laden…</div>
+  </div>
+</main>
+<div id="nav-plek"></div>
+<script src="/assets/supabase.js"></script>
+<script src="/assets/nav.js"></script>
+<script>
+  const sessie = vereisSessie();
+  initNav('nieuws');
+
+  async function laadNieuws() {
+    const el = document.getElementById('nieuws-inhoud');
+    const rows = await haalOp('nieuws', { select: 'titel,inhoud,gepubliceerd_op', order: 'gepubliceerd_op.desc' });
+    if (!rows.length) { el.textContent = 'Nog geen nieuwsberichten.'; return; }
+    el.innerHTML = rows.map(n => '<div class="nieuws-item"><h3>' + n.titel + '</h3>' +
+      '<div class="details" style="margin-bottom:6px">' +
+      new Date(n.gepubliceerd_op).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) +
+      '</div><p>' + n.inhoud + '</p></div>').join('');
+  }
+
+  laadNieuws().catch(e => console.error(e));
+</script>
+</body>
+</html>

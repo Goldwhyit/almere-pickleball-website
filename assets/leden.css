@@ -1,0 +1,66 @@
+/* Almere Pickleball — gedeelde stijl voor het ledenportaal (alle pagina's
+   onder /leden/, behalve index.html dat zijn eigen losse look heeft). */
+:root {
+  --navy: #005bbf; --navy-deep: #003d82; --gold: #ffd23f; --gold-deep: #b8860a;
+  --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1);
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Manrope', -apple-system, sans-serif; background: var(--paper); color: var(--ink); }
+header {
+  background: linear-gradient(135deg, var(--navy), var(--navy-deep)); color: #fff;
+  padding: 22px 20px 30px; display: flex; align-items: center; gap: 12px;
+}
+header .merk { font-family: 'Unbounded', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #cfe0f0; }
+header h1 { font-family: 'Unbounded', sans-serif; font-size: 20px; margin: 4px 0 0; flex: 1; }
+main { max-width: 640px; margin: -16px auto 24px; padding: 0 18px; }
+.kaart {
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+  padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.kaart h2 { font-family: 'Unbounded', sans-serif; font-size: 14px; margin: 0 0 12px;
+  color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.status-regel { display: flex; align-items: center; gap: 12px; }
+.status-badge {
+  display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 700;
+  background: rgba(0,91,191,0.1); color: var(--navy);
+}
+@media (prefers-color-scheme: dark) { .status-badge { color: #8ab6ec; } }
+.status-badge.leeg { background: rgba(91,107,125,0.12); color: var(--ink-muted); }
+.speeldag-regel { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); gap: 10px; }
+.speeldag-regel:first-of-type { border-top: none; padding-top: 0; }
+.speeldag-regel .dag { font-weight: 700; font-size: 14.5px; }
+.speeldag-regel .locatie { font-weight: 400; color: var(--ink-muted); font-size: 12.5px; }
+.knop {
+  padding: 8px 14px; border-radius: 8px; border: none; font-size: 13px; font-weight: 700;
+  cursor: pointer; white-space: nowrap;
+}
+.knop.aanmelden { background: var(--gold); color: #241a02; }
+.knop.afmelden { background: rgba(179,38,30,0.1); color: #b3261e; }
+.knop.vol { background: rgba(91,107,125,0.12); color: var(--ink-muted); cursor: default; }
+.knop:disabled { opacity: 0.5; cursor: default; }
+.melding { font-size: 13px; margin-top: 10px; padding: 8px 10px; border-radius: 8px; }
+.melding.fout { background: rgba(179,38,30,0.1); color: #b3261e; }
+.melding.ok { background: rgba(0,91,191,0.1); color: var(--navy); }
+.nieuws-item { padding: 10px 0; border-top: 1px solid var(--line); }
+.nieuws-item:first-of-type { border-top: none; padding-top: 0; }
+.nieuws-item h3 { margin: 0 0 4px; font-size: 14.5px; }
+.nieuws-item p { margin: 0; font-size: 13.5px; color: var(--ink-muted); line-height: 1.5; }
+.laden { text-align: center; color: var(--ink-muted); padding: 30px; }
+.toernooi-regel { padding: 12px 0; border-top: 1px solid var(--line); }
+.toernooi-regel:first-of-type { border-top: none; padding-top: 0; }
+.toernooi-regel .naam { font-weight: 700; font-size: 14.5px; }
+.toernooi-regel .details { color: var(--ink-muted); font-size: 12.5px; margin-top: 2px; }
+.toernooi-regel .actie { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.toernooi-regel select {
+  padding: 8px 10px; border-radius: 8px; border: 1.5px solid var(--line);
+  background: var(--paper); color: var(--ink); font-size: 13px; flex: 1; min-width: 140px;
+}
+.pil-toggle { display: flex; gap: 6px; margin-bottom: 14px; background: rgba(0,91,191,0.06); border-radius: 999px; padding: 4px; }
+.pil-toggle button {
+  flex: 1; padding: 8px; border: none; border-radius: 999px; background: transparent; color: var(--ink-muted);
+  font-size: 13px; font-weight: 700; cursor: pointer;
+}
+.pil-toggle button.actief { background: var(--navy); color: #fff; }

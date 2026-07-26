@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mijn Almere Pickleball</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" type="image/png" href="/assets/img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/leden.css" />
+</head>
+<body>
+<header>
+  <img src="/assets/img/logo.png" alt="" width="40" height="39" style="border-radius: 8px;" />
+  <div style="flex: 1;">
+    <div class="merk">Almere Pickleball</div>
+    <h1 id="welkom">Welkom</h1>
+  </div>
+  <div id="account-plek"></div>
+</header>
+<main>
+  <div class="kaart">
+    <h2>Mijn abonnement</h2>
+    <div id="abonnement-inhoud" class="laden">Laden…</div>
+  </div>
+  <div class="kaart">
+    <h2>Eerstvolgende speelavond</h2>
+    <div id="volgende-speelavond-inhoud" class="laden">Laden…</div>
+  </div>
+  <div class="kaart">
+    <h2>Laatste nieuws</h2>
+    <div id="nieuws-inhoud" class="laden">Laden…</div>
+  </div>
+</main>
+<div id="nav-plek"></div>
+<script src="/assets/supabase.js"></script>
+<script src="/assets/nav.js"></script>
+<script>
+  const sessie = vereisSessie();
+  initNav('home');
+
+  const dagnamen = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
+
+  function berekenLeeftijd(geboortedatum) {
+    if (!geboortedatum) return null;
+    const nu = new Date(); const gd = new Date(geboortedatum);
+    let leeftijd = nu.getFullYear() - gd.getFullYear();
+    if (nu.getMonth() < gd.getMonth() || (nu.getMonth() === gd.getMonth() && nu.getDate() < gd.getDate())) leeftijd--;
+    return leeftijd;
+  }
+
+  async function laadProfiel() {
+    const rows = await haalOp('leden', { select: 'naam', id: 'eq.' + sessie.user_id });
+    if (rows.length) document.getElementById('welkom').textContent = 'Welkom, ' + rows[0].naam;
+  }
+
+  async function laadAbonnement() {
+    const el = document.getElementById('abonnement-inhoud');
+    const actief = await haalOp('lid_abonnementen', {
+      select: 'status,strippen_resterend,geldig_tot,abonnementen(naam,vorm)',
+      lid_id: 'eq.' + sessie.user_id, status: 'eq.actief', limit: '1',
+    });
+    if (actief.length) {
+      const naam = actief[0].abonnementen ? actief[0].abonnementen.naam : '';
+      el.innerHTML = '<div class="status-regel"><span class="status-badge">' + naam + '</span></div>' +
+        '<p style="margin-top:10px"><a href="/leden/profiel.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Beheren →</a></p>';
+      return;
+    }
+    const wachtend = await haalOp('lid_abonnementen', {
+      select: 'id', lid_id: 'eq.' + sessie.user_id, status: 'eq.in_afwachting', limit: '1',
+    });
+    if (wachtend.length) {
+      el.innerHTML = '<span class="status-badge leeg">In afwachting van betaling</span>' +
+        '<p style="margin-top:10px"><a href="/leden/profiel.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Afronden →</a></p>';
+      return;
+    }
+    el.innerHTML = '<span class="status-badge leeg">Geen actief abonnement</span>' +
+      '<p style="margin-top:10px"><a href="/leden/profiel.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Abonnement starten →</a></p>';
+  }
+
+  async function laadVolgendeSpeelavond() {
+    const el = document.getElementById('volgende-speelavond-inhoud');
+    const speeldagen = await haalOp('speeldagen', { select: 'weekdag,start_tijd,eind_tijd,locatie', actief: 'eq.true' });
+    if (!speeldagen.length) { el.textContent = 'Geen speelavonden gevonden.'; return; }
+    const nu = new Date();
+    let volgende = null;
+    for (let dag = new Date(nu.getFullYear(), nu.getMonth(), nu.getDate()); !volgende; dag.setDate(dag.getDate() + 1)) {
+      if (dag.getMonth() === 6) continue;
+      const isodow = dag.getDay() === 0 ? 7 : dag.getDay();
+      for (const sd of speeldagen) {
+        if (sd.weekdag !== isodow) continue;
+        const [suur, smin] = sd.start_tijd.split(':').map(Number);
+        const start = new Date(dag.getFullYear(), dag.getMonth(), dag.getDate(), suur, smin);
+        if (start < nu) continue;
+        volgende = { start, locatie: sd.locatie, eindTijd: sd.eind_tijd };
+        break;
+      }
+    }
+    el.innerHTML = '<div class="speeldag-regel"><span><span class="dag">' +
+      dagnamen[volgende.start.getDay() === 0 ? 6 : volgende.start.getDay() - 1] + ' ' +
+      volgende.start.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + ', ' +
+      volgende.start.toTimeString().slice(0, 5) + '–' + volgende.eindTijd.slice(0, 5) + '</span><br>' +
+      '<span class="locatie">' + volgende.locatie + '</span></span></div>' +
+      '<p style="margin-top:10px"><a href="/leden/reserveren.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Aanmelden/afmelden →</a></p>';
+  }
+
+  async function laadNieuws() {
+    const el = document.getElementById('nieuws-inhoud');
+    const rows = await haalOp('nieuws', { select: 'titel,inhoud,gepubliceerd_op', order: 'gepubliceerd_op.desc', limit: '2' });
+    if (!rows.length) { el.textContent = 'Nog geen nieuwsberichten.'; return; }
+    el.innerHTML = rows.map(n => '<div class="nieuws-item"><h3>' + n.titel + '</h3><p>' + n.inhoud + '</p></div>').join('') +
+      '<p style="margin-top:10px"><a href="/leden/nieuws.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Al het nieuws →</a></p>';
+  }
+
+  Promise.all([laadProfiel(), laadAbonnement(), laadVolgendeSpeelavond(), laadNieuws()])
+    .catch(e => console.error(e));
+</script>
+</body>
+</html>

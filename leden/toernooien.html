@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Toernooien — Almere Pickleball</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" type="image/png" href="/assets/img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/leden.css" />
+<style>
+  .flyer { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; background: var(--paper); flex-shrink: 0; }
+  .landelijk-badge {
+    display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700;
+    background: rgba(184,134,10,0.12); color: var(--gold-deep);
+  }
+  .toernooi-regel .kop { display: flex; align-items: flex-start; gap: 12px; }
+  .toernooi-regel .naamblok { flex: 1; }
+  .toernooi-regel .naam-rij { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .mail-knop { background: var(--navy); color: #fff; }
+  .link-knop { background: transparent; color: var(--navy); border: 1.5px solid var(--navy); }
+</style>
+</head>
+<body>
+<header>
+  <img src="/assets/img/logo.png" alt="" width="40" height="39" style="border-radius: 8px;" />
+  <div style="flex: 1;">
+    <div class="merk">Almere Pickleball</div>
+    <h1>Toernooien</h1>
+  </div>
+  <div id="account-plek"></div>
+</header>
+<main>
+  <div class="kaart">
+    <div class="pil-toggle">
+      <button id="pil-almere" class="actief">Almere</button>
+      <button id="pil-landelijk">Landelijk</button>
+    </div>
+    <div id="almere-inhoud" class="laden">Laden…</div>
+    <div id="landelijk-inhoud" class="laden" style="display:none">Laden…</div>
+  </div>
+</main>
+<div id="nav-plek"></div>
+<script src="/assets/supabase.js"></script>
+<script src="/assets/nav.js"></script>
+<script>
+  const sessie = vereisSessie();
+  initNav('toernooien');
+
+  document.getElementById('pil-almere').addEventListener('click', () => wisselWeergave('almere'));
+  document.getElementById('pil-landelijk').addEventListener('click', () => wisselWeergave('landelijk'));
+
+  function wisselWeergave(w) {
+    document.getElementById('pil-almere').classList.toggle('actief', w === 'almere');
+    document.getElementById('pil-landelijk').classList.toggle('actief', w === 'landelijk');
+    document.getElementById('almere-inhoud').style.display = w === 'almere' ? '' : 'none';
+    document.getElementById('landelijk-inhoud').style.display = w === 'landelijk' ? '' : 'none';
+    if (w === 'landelijk' && !window.__landelijkGeladen) { window.__landelijkGeladen = true; laadLandelijk(); }
+  }
+
+  // --- Almere-toernooien: eigen inschrijving + betaling ---
+
+  const klasseLabels = { open: 'Open', mix: 'Mix', vrouwen: 'Vrouwen', mannen: 'Mannen' };
+  const niveauLabels = { open: 'Alle niveaus', beginner: 'Beginner', gevorderd: 'Gevorderd', competitie: 'Competitie' };
+  let alleLeden = null;
+
+  async function laadToernooien() {
+    const el = document.getElementById('almere-inhoud');
+    const vandaag = new Date().toISOString().substring(0, 10);
+    const toernooien = await haalOp('toernooien', {
+      select: 'id,naam,datum,klasse,niveau,inschrijfwijze,inschrijfgeld,inschrijving_open',
+      datum: 'gte.' + vandaag, order: 'datum.asc',
+    });
+    if (!toernooien.length) { el.textContent = 'Geen aankomende toernooien.'; return; }
+
+    const ids = toernooien.map(t => t.id).join(',');
+    const mijnTeams = await haalOp('toernooi_teams', {
+      select: 'id,toernooi_id,speler1_id,speler2_id',
+      or: '(speler1_id.eq.' + sessie.user_id + ',speler2_id.eq.' + sessie.user_id + ')',
+      toernooi_id: 'in.(' + ids + ')',
+    });
+
+    el.innerHTML = toernooien.map((t, i) => {
+      const mijnTeam = mijnTeams.find(team => team.toernooi_id === t.id);
+      const details = klasseLabels[t.klasse] + ' · ' + niveauLabels[t.niveau] +
+        (t.inschrijfgeld > 0 ? ' · €' + Number(t.inschrijfgeld).toFixed(2) + ' inschrijfgeld' : '');
+      let actie;
+      if (mijnTeam) {
+        actie = '<button class="knop afmelden" data-actie="uitschrijven" data-team="' + mijnTeam.id + '" data-index="' + i + '">Uitschrijven</button>';
+      } else if (!t.inschrijving_open) {
+        actie = '<button class="knop vol" disabled>Inschrijving gesloten</button>';
+      } else if (t.inschrijfwijze === 'paar') {
+        actie = '<select data-partner-voor="' + i + '"><option value="">Kies je partner…</option></select>' +
+          '<button class="knop aanmelden" data-actie="inschrijven-paar" data-index="' + i + '">Inschrijven</button>';
+      } else {
+        actie = '<button class="knop aanmelden" data-actie="inschrijven" data-index="' + i + '">Inschrijven</button>';
+      }
+      return '<div class="toernooi-regel"><div class="naam">' + t.naam + '</div>' +
+        '<div class="details">' + new Date(t.datum).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) +
+        ' · ' + details + '</div><div class="actie">' + actie + '</div></div>';
+    }).join('') + '<div id="almere-melding"></div>';
+
+    window.__toernooien = toernooien;
+
+    const partnerSelects = el.querySelectorAll('[data-partner-voor]');
+    if (partnerSelects.length) {
+      if (!alleLeden) {
+        alleLeden = await haalOp('leden', { select: 'id,naam', order: 'naam.asc' });
+      }
+      partnerSelects.forEach(sel => {
+        alleLeden.filter(l => l.id !== sessie.user_id).forEach(l => {
+          const opt = document.createElement('option');
+          opt.value = l.id; opt.textContent = l.naam;
+          sel.appendChild(opt);
+        });
+      });
+    }
+
+    el.querySelectorAll('[data-actie]').forEach(btn => btn.addEventListener('click', () => {
+      const t = window.__toernooien[Number(btn.dataset.index)];
+      if (btn.dataset.actie === 'uitschrijven') uitschrijvenToernooi(btn.dataset.team, btn);
+      else if (btn.dataset.actie === 'inschrijven-paar') {
+        const sel = el.querySelector('[data-partner-voor="' + btn.dataset.index + '"]');
+        if (!sel.value) { toonToernooiMelding('Kies eerst een partner.', true); return; }
+        inschrijvenToernooi(t, sel.value, btn);
+      } else {
+        inschrijvenToernooi(t, null, btn);
+      }
+    }));
+  }
+
+  function toonToernooiMelding(tekst, isFout) {
+    const el = document.getElementById('almere-melding');
+    if (el) el.innerHTML = '<div class="melding ' + (isFout ? 'fout' : 'ok') + '">' + tekst + '</div>';
+  }
+
+  async function inschrijvenToernooi(toernooi, partnerId, btn) {
+    btn.disabled = true;
+    btn.textContent = 'Bezig…';
+    try {
+      const team = await voegToe('toernooi_teams', {
+        toernooi_id: toernooi.id,
+        speler1_id: sessie.user_id,
+        ...(partnerId ? { speler2_id: partnerId } : {}),
+      });
+      await laadToernooien();
+      if (toernooi.inschrijfgeld > 0) {
+        try {
+          const res = await functieAanroepen('create-mollie-payment', { type: 'toernooi', toernooi_team_id: team.id });
+          if (res.checkoutUrl) {
+            toonToernooiMelding('Ingeschreven! Je wordt doorgestuurd naar de betaalpagina…', false);
+            window.location.href = res.checkoutUrl;
+            return;
+          }
+        } catch (betaalFout) {
+          toonToernooiMelding('Ingeschreven, maar de betaling kon niet gestart worden: ' + betaalFout.message, true);
+          return;
+        }
+      }
+      toonToernooiMelding('Je bent ingeschreven.', false);
+    } catch (e) {
+      toonToernooiMelding(e.message, true);
+      btn.disabled = false;
+      btn.textContent = 'Inschrijven';
+    }
+  }
+
+  async function uitschrijvenToernooi(teamId, btn) {
+    btn.disabled = true;
+    btn.textContent = 'Bezig…';
+    try {
+      await verwijder('toernooi_teams', { id: 'eq.' + teamId });
+      await laadToernooien();
+      toonToernooiMelding('Je bent uitgeschreven.', false);
+    } catch (e) {
+      toonToernooiMelding(e.message, true);
+      btn.disabled = false;
+      btn.textContent = 'Uitschrijven';
+    }
+  }
+
+  // --- Landelijke toernooien: puur informatief, inschrijven via mail/externe link ---
+
+  const urlRegex = /https?:\/\/[^\s)]+/;
+  const domeinRegex = /\b[a-zA-Z0-9-]+\.(?:nl|com|org|net)(?:\/[^\s)]*)?/;
+
+  function externeLink(tekst) {
+    if (!tekst) return null;
+    const urlMatch = tekst.match(urlRegex);
+    if (urlMatch) return urlMatch[0];
+    const domeinMatch = tekst.match(domeinRegex);
+    if (domeinMatch) return 'https://' + domeinMatch[0];
+    return null;
+  }
+
+  async function inschrijvenPerMail(naam, email) {
+    const lid = await haalOp('leden', { select: 'naam,email,telefoon,niveau', id: 'eq.' + sessie.user_id });
+    const l = lid[0] || {};
+    const regels = ['Naam: ' + (l.naam || ''), 'E-mail: ' + (l.email || '')];
+    if (l.niveau) regels.push('Niveau: ' + (niveauLabels[l.niveau] || l.niveau));
+    if (l.telefoon) regels.push('Mobiel: ' + l.telefoon);
+    const params = new URLSearchParams({ subject: 'Inschrijving ' + naam, body: regels.join('\n') });
+    window.location.href = 'mailto:' + email + '?' + params.toString();
+  }
+
+  async function laadLandelijk() {
+    const el = document.getElementById('landelijk-inhoud');
+    const vandaag = new Date().toISOString().substring(0, 10);
+    const toernooien = await haalOp('landelijke_toernooien', {
+      select: '*', datum_start: 'gte.' + vandaag, order: 'volgorde.asc',
+    });
+    if (!toernooien.length) { el.textContent = 'Geen aankomende landelijke toernooien.'; return; }
+
+    window.__landelijk = toernooien;
+    el.innerHTML = toernooien.map((t, i) => {
+      const start = new Date(t.datum_start);
+      const datumTekst = t.datum_eind
+        ? start.getDate() + '–' + new Date(t.datum_eind).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
+        : start.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+      const email = t.email && t.email.trim() ? t.email.trim() : null;
+      const link = externeLink(t.aanmelden_via);
+      const flyer = t.flyer_url ? '<img class="flyer" src="' + t.flyer_url + '" alt="" />' : '';
+      const detailRegels = [
+        '<div class="details">📅 ' + datumTekst + (t.tijden ? ' · ' + t.tijden : '') + '</div>',
+        '<div class="details">📍 ' + t.plaats + (t.adres ? ' · ' + t.adres : '') + '</div>',
+      ];
+      if (t.toernooi_type) detailRegels.push('<div class="details">' + t.toernooi_type + '</div>');
+      if (t.kosten) detailRegels.push('<div class="details">Kosten: ' + t.kosten + '</div>');
+      if (t.sluiting_inschrijving) detailRegels.push('<div class="details">Sluiting inschrijving: ' + t.sluiting_inschrijving + '</div>');
+      let actie = '';
+      if (email || link) {
+        actie = '<div class="actie">' +
+          (email ? '<button class="knop mail-knop" data-mail-index="' + i + '">Inschrijven</button>' : '') +
+          (link ? '<a class="knop link-knop" href="' + link + '" target="_blank" rel="noopener" style="text-decoration:none;text-align:center">Bekijk</a>' : '') +
+          '</div>';
+      }
+      return '<div class="toernooi-regel"><div class="kop">' + flyer +
+        '<div class="naamblok"><div class="naam-rij"><span class="naam">' + t.naam + '</span>' +
+        '<span class="landelijk-badge">Landelijk</span></div>' +
+        detailRegels.join('') + '</div></div>' + actie + '</div>';
+    }).join('');
+
+    el.querySelectorAll('[data-mail-index]').forEach(btn => btn.addEventListener('click', () => {
+      const t = window.__landelijk[Number(btn.dataset.mailIndex)];
+      inschrijvenPerMail(t.naam, t.email.trim());
+    }));
+  }
+
+  laadToernooien().catch(e => console.error(e));
+</script>
+</body>
+</html>
