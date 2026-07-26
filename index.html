@@ -140,6 +140,35 @@
     font-size: 14.5px;
     color: var(--ink-muted);
   }
+  .speel-sectie { margin-top: 40px; }
+  .speel-sectie .let-op {
+    text-align: left;
+    background: rgba(255, 210, 63, 0.16);
+    border: 1px solid rgba(184, 134, 10, 0.3);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    color: var(--ink);
+    margin-bottom: 18px;
+  }
+  .speel-sectie .let-op strong { color: var(--gold-deep); }
+  @media (prefers-color-scheme: dark) { .speel-sectie .let-op strong { color: var(--gold); } }
+  .speel-regel {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--navy);
+  }
+  @media (prefers-color-scheme: dark) { .speel-regel { color: #8ab6ec; } }
+  .speel-regel .tijd { font-variant-numeric: tabular-nums; }
+  .speel-adres {
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--ink-muted);
+  }
   .store-knoppen {
     display: flex;
     gap: 12px;
@@ -204,6 +233,20 @@
     speelavonden, toernooien en lidmaatschap. Tot die tijd: bedankt voor je
     geduld, en tot snel op de baan.
   </p>
+
+  <div class="app-sectie speel-sectie">
+    <h2>Waar en wanneer we spelen</h2>
+    <p class="let-op">
+      Let op: we trainen op dit moment tijdelijk buiten. Vanaf
+      <strong>dinsdag 18 augustus, 19:30 uur</strong> spelen we weer
+      binnen in de sporthal.
+    </p>
+    <div class="speel-regel">
+      <span class="dag">Dinsdag</span>
+      <span class="tijd">19:30 – 21:30 uur</span>
+    </div>
+    <div class="speel-adres">Sporthal Almere Haven — Parkwerf 138, 1354 EB Almere</div>
+  </div>
 
   <div class="app-sectie">
     <h2>De clubapp</h2>
