@@ -49,16 +49,28 @@
   }
   label { font-size: 13px; color: var(--ink-muted); display: block; margin-top: 12px; }
   label:first-child { margin-top: 0; }
-  .datums { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
-  .datum-optie {
-    display: flex; justify-content: space-between; align-items: center;
-    border: 1.5px solid var(--line); border-radius: 10px; padding: 11px 14px;
-    cursor: pointer; background: transparent; color: var(--ink); font-size: 14.5px; text-align: left;
-    font-variant-numeric: tabular-nums; font-family: inherit; width: 100%;
+  .label-verplicht::after { content: ' *'; color: var(--danger); }
+  .maand-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .maand-nav .maand-titel { font-weight: 700; font-size: 14.5px; text-transform: capitalize; }
+  .maand-nav button {
+    border: 1.5px solid var(--line); background: transparent; color: var(--ink); border-radius: 8px;
+    width: 32px; height: 32px; font-size: 16px; cursor: pointer; font-family: inherit;
   }
-  .datum-optie.actief { border-color: var(--gold); background: rgba(255,210,63,0.16); font-weight: 600; }
-  .datum-optie:disabled { opacity: 0.35; cursor: not-allowed; }
-  .datum-optie .status { font-size: 12.5px; color: var(--ink-muted); }
+  .maand-nav button:disabled { opacity: 0.3; cursor: not-allowed; }
+  .dagen { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+  .dag-regel { border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .dag-regel .dag-naam { font-weight: 700; font-size: 14px; margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+  .slots { display: flex; gap: 8px; }
+  .slot-optie {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 6px;
+    cursor: pointer; background: transparent; color: var(--ink); font-size: 13px; font-family: inherit;
+    font-variant-numeric: tabular-nums;
+  }
+  .slot-optie.actief { border-color: var(--gold); background: rgba(255,210,63,0.16); font-weight: 700; }
+  .slot-optie:disabled { opacity: 0.35; cursor: not-allowed; }
+  .slot-optie .status { font-size: 11px; color: var(--ink-muted); }
+  .leeg-maand { color: var(--ink-muted); font-size: 13.5px; padding: 10px 0; }
   .prijs-regel { display: flex; justify-content: space-between; align-items: baseline; margin-top: 4px; font-variant-numeric: tabular-nums; }
   .prijs-regel .bedrag { font-size: 22px; font-weight: 700; color: var(--navy); }
   button.primair {
@@ -77,7 +89,7 @@
   <div>
     <div class="merk">Almere Pickleball</div>
     <h1>Baan huren</h1>
-    <p>Baan 6, 7 of 8 bij Sporthal Almere Haven, dinsdag 19:30–21:30 uur.</p>
+    <p>Baan 6, 7 of 8 bij Sporthal Almere Haven, dinsdagavond — per uur.</p>
   </div>
 </header>
 <main>
@@ -87,12 +99,15 @@
 <script src="/assets/supabase.js"></script>
 <script>
   const euro = new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' });
+  const maandFormat = new Intl.DateTimeFormat('nl-NL', { month: 'long', year: 'numeric' });
   const dagFormat = new Intl.DateTimeFormat('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
 
   let instellingen = [];
-  let bezetteDatums = [];
+  let bezetteTijdvakken = [];
   let gekozenBaan = null;
+  let weergaveMaand = null;
   let gekozenDatum = null;
+  let gekozenSlot = null;
 
   const app = document.getElementById('app');
 
@@ -100,54 +115,84 @@
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   }
 
-  // De eerstvolgende 8 data die op de juiste weekdag vallen (isodow: 1=ma .. 7=zo).
-  function volgendeData(weekdag) {
-    const data = [];
-    const nu = new Date();
-    nu.setHours(0, 0, 0, 0);
-    const cursor = new Date(nu);
-    while (data.length < 8) {
+  function tijdOpDatum(datum, tijdStr) {
+    const [u, m] = tijdStr.slice(0, 5).split(':').map(Number);
+    return new Date(datum.getFullYear(), datum.getMonth(), datum.getDate(), u, m);
+  }
+
+  function maandStart(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
+
+  // Alle dinsdagen (of welke weekdag de instelling ook aangeeft) in de
+  // gegeven maand die binnen het seizoen vallen en niet al voorbij zijn.
+  function dagenInMaand(baan, maand) {
+    const nu = new Date(); nu.setHours(0, 0, 0, 0);
+    const seizoenStart = new Date(baan.seizoen_start + 'T00:00:00');
+    const seizoenEind = new Date(baan.seizoen_eind + 'T00:00:00');
+    const dagen = [];
+    const cursor = new Date(maand.getFullYear(), maand.getMonth(), 1);
+    while (cursor.getMonth() === maand.getMonth()) {
       const isodow = cursor.getDay() === 0 ? 7 : cursor.getDay();
-      if (isodow === weekdag) data.push(new Date(cursor));
+      if (isodow === baan.weekdag && cursor >= nu && cursor >= seizoenStart && cursor <= seizoenEind) {
+        dagen.push(new Date(cursor));
+      }
       cursor.setDate(cursor.getDate() + 1);
     }
-    return data;
+    return dagen;
   }
 
-  function dagnaam(weekdag) {
-    return ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'][weekdag - 1];
+  function overlaptBezet(start, eind) {
+    return bezetteTijdvakken.some(b => new Date(b.start_tijd) < eind && new Date(b.eind_tijd) > start);
   }
 
-  function uren(baan) {
-    const [sh, sm] = baan.start_tijd.split(':').map(Number);
-    const [eh, em] = baan.eind_tijd.split(':').map(Number);
+  function urenTussen(startStr, eindStr) {
+    const [sh, sm] = startStr.slice(0, 5).split(':').map(Number);
+    const [eh, em] = eindStr.slice(0, 5).split(':').map(Number);
     return (eh * 60 + em - (sh * 60 + sm)) / 60;
+  }
+
+  function kanNaarVorigeMaand(baan) {
+    const nu = new Date();
+    const huidigeMaand = maandStart(nu);
+    const seizoenStartMaand = maandStart(new Date(baan.seizoen_start + 'T00:00:00'));
+    const vorige = new Date(weergaveMaand.getFullYear(), weergaveMaand.getMonth() - 1, 1);
+    return vorige >= huidigeMaand && vorige >= seizoenStartMaand;
+  }
+
+  function kanNaarVolgendeMaand(baan) {
+    const seizoenEindMaand = maandStart(new Date(baan.seizoen_eind + 'T00:00:00'));
+    const volgende = new Date(weergaveMaand.getFullYear(), weergaveMaand.getMonth() + 1, 1);
+    return volgende <= seizoenEindMaand;
   }
 
   function render() {
     const baan = instellingen.find(b => b.baan_id === gekozenBaan);
-    const tijdOmschrijving = baan
-      ? dagnaam(baan.weekdag) + ' ' + baan.start_tijd.slice(0, 5) + '–' + baan.eind_tijd.slice(0, 5)
-      : '';
+    const prijsPerSlot = euro.format(baan.prijs_per_uur * urenTussen(baan.vroeg_start, baan.vroeg_eind));
     app.className = '';
     app.innerHTML =
       '<div class="kaart"><h2>Kies een baan</h2>' +
-      '<p class="toelichting">Verhuur is alleen op ' + tijdOmschrijving + ' (zelfde moment als de clubtraining).</p>' +
+      '<p class="toelichting">Elk uur apart te huren: ' + baan.vroeg_start.slice(0, 5) + '–' + baan.vroeg_eind.slice(0, 5) +
+      ' of ' + baan.laat_start.slice(0, 5) + '–' + baan.laat_eind.slice(0, 5) + ', steeds ' + prijsPerSlot + ' per uur.</p>' +
       '<div class="banen">' +
       instellingen.map(b =>
         '<button type="button" class="baan-optie' + (b.baan_id === gekozenBaan ? ' actief' : '') + '" data-baan="' + b.baan_id + '">' +
-        b.baan_naam + '<small>' + euro.format(b.prijs_per_uur * uren(b)) + '</small></button>'
+        b.baan_naam + '</button>'
       ).join('') +
       '</div></div>' +
-      (gekozenBaan ? '<div class="kaart"><h2>Kies een datum</h2><div id="datums-houder" class="laden">Beschikbaarheid laden…</div></div>' : '') +
-      (gekozenBaan && gekozenDatum ?
+      '<div class="kaart"><h2>Kies een datum en tijd</h2>' +
+      '<div class="maand-nav">' +
+      '<button type="button" id="maand-vorige"' + (kanNaarVorigeMaand(baan) ? '' : ' disabled') + '>‹</button>' +
+      '<span class="maand-titel">' + maandFormat.format(weergaveMaand) + '</span>' +
+      '<button type="button" id="maand-volgende"' + (kanNaarVolgendeMaand(baan) ? '' : ' disabled') + '>›</button>' +
+      '</div>' +
+      '<div id="dagen-houder" class="laden">Beschikbaarheid laden…</div>' +
+      '</div>' +
+      (gekozenDatum && gekozenSlot ?
         '<div class="kaart">' +
         '<h2>Je gegevens</h2>' +
-        '<label>Naam<input type="text" id="naam-invoer" autocomplete="name" /></label>' +
-        '<label>E-mail<input type="email" id="email-invoer" autocomplete="email" /></label>' +
-        '<label>Telefoon (optioneel)<input type="tel" id="telefoon-invoer" autocomplete="tel" /></label>' +
-        '<div class="prijs-regel"><span>Te betalen</span><span class="bedrag">' +
-        euro.format(baan.prijs_per_uur * uren(baan)) + '</span></div>' +
+        '<label>Naam<input type="text" id="naam-invoer" autocomplete="name" required /></label>' +
+        '<label>E-mail<input type="email" id="email-invoer" autocomplete="email" required /></label>' +
+        '<label class="label-verplicht">Telefoon<input type="tel" id="telefoon-invoer" autocomplete="tel" required /></label>' +
+        '<div class="prijs-regel"><span>Te betalen</span><span class="bedrag">' + prijsPerSlot + '</span></div>' +
         '<button type="button" class="primair" id="boek-knop">Doorgaan naar betalen</button>' +
         '<div id="fout-melding"></div>' +
         '</div>' : '');
@@ -155,36 +200,64 @@
     app.querySelectorAll('.baan-optie').forEach(el => el.addEventListener('click', () => {
       gekozenBaan = Number(el.dataset.baan);
       gekozenDatum = null;
-      laadBezetteDatums().then(render);
+      gekozenSlot = null;
+      laadBezetteTijdvakken().then(render);
     }));
 
-    if (gekozenBaan) toonDatums();
+    document.getElementById('maand-vorige').addEventListener('click', () => {
+      weergaveMaand = new Date(weergaveMaand.getFullYear(), weergaveMaand.getMonth() - 1, 1);
+      gekozenDatum = null; gekozenSlot = null;
+      render();
+    });
+    document.getElementById('maand-volgende').addEventListener('click', () => {
+      weergaveMaand = new Date(weergaveMaand.getFullYear(), weergaveMaand.getMonth() + 1, 1);
+      gekozenDatum = null; gekozenSlot = null;
+      render();
+    });
+
+    toonDagen(baan);
     const boekKnop = document.getElementById('boek-knop');
     if (boekKnop) boekKnop.addEventListener('click', boekEnBetaal);
   }
 
-  async function laadBezetteDatums() {
-    bezetteDatums = await rpc('beschikbare_verhuur_datums', { p_baan_id: gekozenBaan });
+  async function laadBezetteTijdvakken() {
+    bezetteTijdvakken = await rpc('beschikbare_verhuur_datums', { p_baan_id: gekozenBaan });
   }
 
-  function toonDatums() {
-    const houder = document.getElementById('datums-houder');
+  function toonDagen(baan) {
+    const houder = document.getElementById('dagen-houder');
     if (!houder) return;
-    const baan = instellingen.find(b => b.baan_id === gekozenBaan);
-    const bezet = new Set(bezetteDatums.map(b => b.datum));
-    const opties = volgendeData(baan.weekdag);
-    houder.className = 'datums';
-    houder.innerHTML = opties.map(d => {
+    const dagen = dagenInMaand(baan, weergaveMaand);
+    if (!dagen.length) {
+      houder.className = '';
+      houder.innerHTML = '<div class="leeg-maand">Geen beschikbare dinsdagen in deze maand.</div>';
+      return;
+    }
+    houder.className = 'dagen';
+    houder.innerHTML = dagen.map(d => {
       const iso = isoDatum(d);
-      const isBezet = bezet.has(iso);
-      return '<button type="button" class="datum-optie' + (iso === gekozenDatum ? ' actief' : '') + '"' +
-        (isBezet ? ' disabled' : '') + ' data-datum="' + iso + '">' +
-        '<span>' + dagFormat.format(d) + '</span>' +
-        (isBezet ? '<span class="status">Bezet</span>' : '') +
-        '</button>';
+      const vroegStart = tijdOpDatum(d, baan.vroeg_start), vroegEind = tijdOpDatum(d, baan.vroeg_eind);
+      const laatStart = tijdOpDatum(d, baan.laat_start), laatEind = tijdOpDatum(d, baan.laat_eind);
+      const vroegBezet = overlaptBezet(vroegStart, vroegEind);
+      const laatBezet = overlaptBezet(laatStart, laatEind);
+      const slotKnop = (slot, bezet, startLabel, eindLabel) => {
+        const actief = gekozenDatum === iso && gekozenSlot === slot;
+        return '<button type="button" class="slot-optie' + (actief ? ' actief' : '') + '"' +
+          (bezet ? ' disabled' : '') + ' data-datum="' + iso + '" data-slot="' + slot + '">' +
+          '<span>' + startLabel + '–' + eindLabel + '</span>' +
+          (bezet ? '<span class="status">Bezet</span>' : '<span class="status">Beschikbaar</span>') +
+          '</button>';
+      };
+      return '<div class="dag-regel">' +
+        '<div class="dag-naam">' + dagFormat.format(d) + '</div>' +
+        '<div class="slots">' +
+        slotKnop('vroeg', vroegBezet, baan.vroeg_start.slice(0, 5), baan.vroeg_eind.slice(0, 5)) +
+        slotKnop('laat', laatBezet, baan.laat_start.slice(0, 5), baan.laat_eind.slice(0, 5)) +
+        '</div></div>';
     }).join('');
-    houder.querySelectorAll('.datum-optie:not(:disabled)').forEach(el => el.addEventListener('click', () => {
+    houder.querySelectorAll('.slot-optie:not(:disabled)').forEach(el => el.addEventListener('click', () => {
       gekozenDatum = el.dataset.datum;
+      gekozenSlot = el.dataset.slot;
       render();
     }));
   }
@@ -196,16 +269,16 @@
     const naam = document.getElementById('naam-invoer').value.trim();
     const email = document.getElementById('email-invoer').value.trim();
     const telefoon = document.getElementById('telefoon-invoer').value.trim();
-    if (!naam || !email) {
-      foutHouder.innerHTML = '<div class="fout">Vul je naam en e-mailadres in.</div>';
+    if (!naam || !email || !telefoon) {
+      foutHouder.innerHTML = '<div class="fout">Vul je naam, e-mailadres en telefoonnummer in.</div>';
       return;
     }
     knop.disabled = true;
     knop.textContent = 'Bezig…';
     try {
       const nieuweId = await rpc('boek_baan_verhuur', {
-        p_baan_id: gekozenBaan, p_datum: gekozenDatum,
-        p_naam: naam, p_email: email, p_telefoon: telefoon || null,
+        p_baan_id: gekozenBaan, p_datum: gekozenDatum, p_slot: gekozenSlot,
+        p_naam: naam, p_email: email, p_telefoon: telefoon,
       });
       const betaalData = await functieAanroepen('create-huur-betaling', { baan_verhuur_id: nieuweId });
       if (!betaalData.checkoutUrl) throw new Error(betaalData.error || 'Betaling starten is mislukt.');
@@ -226,7 +299,8 @@
         return;
       }
       gekozenBaan = instellingen[0].baan_id;
-      await laadBezetteDatums();
+      weergaveMaand = maandStart(new Date());
+      await laadBezetteTijdvakken();
       render();
     } catch (e) {
       app.className = 'laden';
