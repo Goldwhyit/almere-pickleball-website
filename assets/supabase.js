@@ -63,6 +63,31 @@ async function inloggen(email, wachtwoord) {
   return data;
 }
 
+/// Maakt een nieuw account aan (data = metadata voor de handle_new_user-
+/// trigger: naam, telefoon, taal, geboortedatum, ... — zie de app se
+/// login_screen.dart voor de volledige lijst). Bewaart meteen een sessie
+/// als het project e-mailbevestiging niet afdwingt (hier het geval).
+async function registreren(email, wachtwoord, metadata) {
+  const resp = await fetch(AUTH_BASE + '/signup', {
+    method: 'POST',
+    headers: { apikey: ANON_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password: wachtwoord, data: metadata || {} }),
+  });
+  const data = await resp.json();
+  if (!resp.ok) {
+    throw new Error(data.error_description || data.msg || data.error || data.message || 'Registreren is mislukt.');
+  }
+  if (!data.access_token) {
+    throw new Error('Account aangemaakt — check je e-mail om te bevestigen en log daarna in.');
+  }
+  bewaarSessie({
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+    user_id: data.user.id,
+  });
+  return data;
+}
+
 function uitloggen() {
   verwijderSessie();
   window.location.href = '/leden/';

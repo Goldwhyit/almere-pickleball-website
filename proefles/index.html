@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<script>(function(){try{var t=localStorage.getItem('pb_thema');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Proefles aanvragen — Almere Pickleball</title>
+<link rel="icon" type="image/png" href="/assets/img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --navy: #005bbf; --navy-deep: #003d82; --gold: #ffd23f; --gold-deep: #b8860a;
+    --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1);
+    --danger: #b3261e; --goed: #1e8a4c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  }
+  :root[data-theme="dark"] { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  :root[data-theme="light"] { --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1); }
+  .thema-knop {
+    background: rgba(255,255,255,0.15); border: none; border-radius: 8px; width: 34px; height: 34px;
+    font-size: 15px; cursor: pointer; color: inherit; flex-shrink: 0;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Manrope', -apple-system, sans-serif; background: var(--paper); color: var(--ink); }
+  header {
+    background: linear-gradient(135deg, rgba(0,91,191,0.82), rgba(0,61,130,0.82));
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    backdrop-filter: blur(24px) saturate(160%); color: #fff;
+    padding: 28px 20px 36px; display: flex; align-items: center; gap: 12px;
+    position: sticky; top: 0; z-index: 60;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(0,0,0,0.12);
+    border-radius: 0 0 32px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.22);
+  }
+  header .merk { font-family: 'Unbounded', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #cfe0f0; }
+  header h1 { font-family: 'Unbounded', sans-serif; font-size: 20px; margin: 4px 0 0; }
+  header p { margin: 4px 0 0; color: #cfe0ee; font-size: 13.5px; max-width: 100%; }
+  main { max-width: 480px; margin: -18px auto 40px; padding: 0 18px; }
+  .kaart {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .kaart h2 { font-family: 'Unbounded', sans-serif; font-size: 14px; margin: 0 0 4px;
+    color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .kaart .toelichting { font-size: 13px; color: var(--ink-muted); margin: 0 0 12px; }
+  label { font-size: 13px; color: var(--ink-muted); display: block; margin-top: 12px; }
+  label:first-child { margin-top: 0; }
+  .label-verplicht .label-tekst::after { content: ' *'; color: var(--danger); }
+  input[type=text], input[type=email], input[type=tel], input[type=password], input[type=date] {
+    width: 100%; padding: 11px 12px; border: 1.5px solid var(--line); border-radius: 10px;
+    background: var(--paper); color: var(--ink); font-size: 15px; margin-top: 6px; font-family: inherit;
+    max-width: 100%;
+  }
+  .keuze-opties { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+  .keuze-optie {
+    border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 14px; cursor: pointer;
+    display: flex; align-items: flex-start; gap: 10px; background: transparent; text-align: left;
+    color: var(--ink); font-family: inherit; width: 100%;
+  }
+  .keuze-optie.actief { border-color: var(--gold); background: rgba(255,210,63,0.14); }
+  .keuze-optie .stip {
+    width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--line); flex-shrink: 0; margin-top: 2px;
+  }
+  .keuze-optie.actief .stip { border-color: var(--gold-deep); background: var(--gold); }
+  .keuze-optie .titel { font-weight: 700; font-size: 14.5px; }
+  .keuze-optie .uitleg { font-size: 13px; color: var(--ink-muted); margin-top: 2px; }
+  .keuze-optie .prijs { font-weight: 700; color: var(--navy); }
+  @media (prefers-color-scheme: dark) { .keuze-optie .prijs { color: #8ab6ec; } }
+  :root[data-theme="dark"] .keuze-optie .prijs { color: #8ab6ec; }
+  button.primair {
+    width: 100%; padding: 14px; border: none; border-radius: 10px; margin-top: 16px;
+    background: var(--gold); color: #241a02; font-size: 15.5px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  button.primair:disabled { opacity: 0.45; cursor: not-allowed; }
+  .fout { color: var(--danger); font-size: 13.5px; margin-top: 10px; }
+  .laden { text-align: center; color: var(--ink-muted); padding: 30px; }
+  .terug { display: block; text-align: center; margin-top: 8px; font-size: 13px; color: var(--ink-muted); text-decoration: none; }
+  .mini-footer { text-align: center; font-size: 12px; color: var(--ink-muted); margin-top: 10px; }
+  .mini-footer a { color: var(--ink-muted); }
+  .gelukt { text-align: center; padding: 10px 0; }
+  .gelukt .icoon { font-size: 40px; color: var(--goed); }
+  .gelukt h2 { font-family: 'Unbounded', sans-serif; font-size: 17px; margin: 10px 0 6px; color: var(--ink); text-transform: none; letter-spacing: 0; }
+  .gelukt p { color: var(--ink-muted); font-size: 14px; }
+  .naam-rij { display: flex; gap: 10px; }
+  .naam-rij > div { flex: 1; }
+</style>
+</head>
+<body>
+<header>
+  <img src="/assets/img/logo.png" alt="" width="40" height="39" style="border-radius: 8px;" />
+  <div>
+    <div class="merk">Almere Pickleball</div>
+    <h1>Proefles aanvragen</h1>
+    <p>Kom vrijblijvend meespelen — wij nemen daarna contact op voor een datum.</p>
+  </div>
+  <div id="thema-plek"></div>
+</header>
+<main>
+  <form id="proef-form" class="kaart" autocomplete="on">
+    <h2>Je gegevens</h2>
+    <div class="naam-rij">
+      <div><label class="label-verplicht"><span class="label-tekst">Voornaam</span><input type="text" id="voornaam-invoer" autocomplete="given-name" required /></label></div>
+      <div><label class="label-verplicht"><span class="label-tekst">Achternaam</span><input type="text" id="achternaam-invoer" autocomplete="family-name" required /></label></div>
+    </div>
+    <label class="label-verplicht"><span class="label-tekst">E-mailadres</span><input type="email" id="email-invoer" autocomplete="email" required /></label>
+    <label class="label-verplicht"><span class="label-tekst">Telefoonnummer</span><input type="tel" id="telefoon-invoer" autocomplete="tel" required /></label>
+    <label><span class="label-tekst">Geboortedatum</span><input type="date" id="geboortedatum-invoer" autocomplete="bday" /></label>
+    <label class="label-verplicht"><span class="label-tekst">Wachtwoord (voor je ledenaccount)</span><input type="password" id="wachtwoord-invoer" autocomplete="new-password" minlength="6" required /></label>
+
+    <h2 style="margin-top: 20px;">Speelervaring</h2>
+    <p class="toelichting">Dit bepaalt of je proefles gratis is.</p>
+    <div class="keuze-opties" id="keuze-houder">
+      <button type="button" class="keuze-optie actief" data-keuze="nieuw">
+        <span class="stip"></span>
+        <span>
+          <span class="titel">Dit is de eerste keer dat ik pickleball speel</span>
+          <span class="uitleg">Gratis proefles — <span class="prijs">€0,00</span></span>
+        </span>
+      </button>
+      <button type="button" class="keuze-optie" data-keuze="ervaren">
+        <span class="stip"></span>
+        <span>
+          <span class="titel">Ik heb al eerder (of vaker) pickleball gespeeld</span>
+          <span class="uitleg">Per proefles — <span class="prijs">€4,25</span></span>
+        </span>
+      </button>
+    </div>
+
+    <button type="submit" class="primair" id="verstuur-knop">Aanmelden voor een proefles</button>
+    <div id="fout-melding"></div>
+  </form>
+
+  <div id="gelukt-kaart" class="kaart gelukt" style="display: none;"></div>
+
+  <a class="terug" href="/">← Terug naar de website</a>
+  <p class="mini-footer">Al lid? <a href="/leden/">Log hier in</a> · <a href="/veelgestelde-vragen/">Veelgestelde vragen</a></p>
+</main>
+<script src="/assets/supabase.js"></script>
+<script>
+  let gekozenKeuze = 'nieuw';
+  let proefAbo = null;
+  let ervarenAbo = null;
+
+  document.querySelectorAll('.keuze-optie').forEach(el => el.addEventListener('click', () => {
+    gekozenKeuze = el.dataset.keuze;
+    document.querySelectorAll('.keuze-optie').forEach(o => o.classList.toggle('actief', o === el));
+  }));
+
+  async function laadAbonnementen() {
+    const rijen = await haalOp('abonnementen', {
+      select: 'id,naam,vorm,categorie,prijs,strippen,geldig_maanden',
+      categorie: 'eq.alle',
+      vorm: 'in.(proef,sessie)',
+      actief: 'eq.true',
+    });
+    proefAbo = rijen.find(r => r.vorm === 'proef') || null;
+    ervarenAbo = rijen.find(r => r.vorm === 'sessie') || null;
+  }
+
+  document.getElementById('proef-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const foutHouder = document.getElementById('fout-melding');
+    const knop = document.getElementById('verstuur-knop');
+    foutHouder.textContent = '';
+
+    const voornaam = document.getElementById('voornaam-invoer').value.trim();
+    const achternaam = document.getElementById('achternaam-invoer').value.trim();
+    const email = document.getElementById('email-invoer').value.trim();
+    const telefoon = document.getElementById('telefoon-invoer').value.trim();
+    const geboortedatum = document.getElementById('geboortedatum-invoer').value;
+    const wachtwoord = document.getElementById('wachtwoord-invoer').value;
+
+    if (!voornaam || !achternaam || !email || !telefoon || !wachtwoord) {
+      foutHouder.innerHTML = '<div class="fout">Vul alle verplichte velden in.</div>';
+      return;
+    }
+    if (wachtwoord.length < 6) {
+      foutHouder.innerHTML = '<div class="fout">Je wachtwoord moet minstens 6 tekens hebben.</div>';
+      return;
+    }
+    if (!proefAbo || !ervarenAbo) {
+      foutHouder.innerHTML = '<div class="fout">De pagina kon niet volledig laden. Vernieuw en probeer opnieuw.</div>';
+      return;
+    }
+
+    knop.disabled = true;
+    knop.textContent = 'Bezig…';
+    try {
+      await registreren(email, wachtwoord, {
+        naam: voornaam + ' ' + achternaam,
+        telefoon,
+        taal: 'nl',
+        geboortedatum: geboortedatum || '',
+      });
+
+      if (gekozenKeuze === 'nieuw') {
+        const nu = new Date();
+        const geldigTot = new Date(nu.getFullYear(), nu.getMonth() + Number(proefAbo.geldig_maanden), nu.getDate());
+        await voegToe('lid_abonnementen', {
+          lid_id: huidigeSessie().user_id,
+          abonnement_id: proefAbo.id,
+          betaalwijze: 'gratis',
+          strippen_resterend: proefAbo.strippen,
+          geldig_tot: geldigTot.toISOString().substring(0, 10),
+        });
+        toonGelukt('Welkom bij Almere Pickleball! Je gratis proefles is vastgelegd — we nemen snel contact met je op voor een datum. Je kunt ook meteen inloggen in het ledenportaal.');
+      } else {
+        const betaalData = await functieAanroepen('create-mollie-payment', {
+          type: 'abonnement', abonnement_id: ervarenAbo.id, betaalwijze: 'per_sessie',
+        });
+        if (!betaalData.checkoutUrl) throw new Error(betaalData.error || 'Betaling starten is mislukt.');
+        window.location.href = betaalData.checkoutUrl;
+      }
+    } catch (err) {
+      foutHouder.innerHTML = '<div class="fout">' + err.message + '</div>';
+      knop.disabled = false;
+      knop.textContent = 'Aanmelden voor een proefles';
+    }
+  });
+
+  function toonGelukt(bericht) {
+    document.getElementById('proef-form').style.display = 'none';
+    const kaart = document.getElementById('gelukt-kaart');
+    kaart.style.display = 'block';
+    kaart.innerHTML = '<div class="icoon">✓</div><h2>Aanmelding gelukt</h2><p>' + bericht + '</p>' +
+      '<a class="terug" href="/leden/">Naar het ledenportaal →</a>';
+  }
+
+  laadAbonnementen().catch(() => {});
+</script>
+<script src="/assets/theme.js"></script>
+<script>initThemeKnop('thema-plek');</script>
+</body>
+</html>
