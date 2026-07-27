@@ -8,23 +8,23 @@
 
 const NAV_ITEMS = [
   {
-    pagina: 'home', href: '/leden/home.html', label: 'Home',
+    pagina: 'home', href: '/leden/home.html', taalSleutel: 'navHome',
     icoon: '<svg viewBox="0 0 24 24"><polygon points="12,3 21,10 19,10 19,20 5,20 5,10 3,10" fill="currentColor"/></svg>',
   },
   {
-    pagina: 'reserveren', href: '/leden/reserveren.html', label: 'Reserveren',
+    pagina: 'reserveren', href: '/leden/reserveren.html', taalSleutel: 'navReserveren',
     icoon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>',
   },
   {
-    pagina: 'toernooien', href: '/leden/toernooien.html', label: 'Toernooien',
+    pagina: 'toernooien', href: '/leden/toernooien.html', taalSleutel: 'navToernooien',
     icoon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M9 14L7 21l5-3 5 3-2-7" stroke-linejoin="round"/></svg>',
   },
   {
-    pagina: 'nieuws', href: '/leden/nieuws.html', label: 'Nieuws',
+    pagina: 'nieuws', href: '/leden/nieuws.html', taalSleutel: 'navNieuws',
     icoon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg>',
   },
   {
-    pagina: 'leden', href: '/leden/leden.html', label: 'Leden',
+    pagina: 'leden', href: '/leden/leden.html', taalSleutel: 'navLeden',
     icoon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M15 15.5c2.2.3 4 2 4 4.5"/></svg>',
   },
 ];
@@ -63,7 +63,7 @@ function initNav(actievePagina) {
   nav.className = 'onderbalk';
   nav.innerHTML = NAV_ITEMS.map(item =>
     '<a href="' + item.href + '"' + (item.pagina === actievePagina ? ' class="actief"' : '') + '>' +
-    item.icoon + '<span>' + item.label + '</span></a>'
+    item.icoon + '<span data-i18n="' + item.taalSleutel + '"></span></a>'
   ).join('');
   const navPlek = document.getElementById('nav-plek');
   (navPlek || document.body).appendChild(nav);
@@ -71,18 +71,21 @@ function initNav(actievePagina) {
   const accountPlek = document.getElementById('account-plek');
   if (accountPlek) {
     accountPlek.innerHTML = '<div class="account-knoppen" id="account-knoppen-rij">' +
-      (actievePagina === 'profiel' ? '' : '<a href="/leden/profiel.html">Profiel</a>') +
-      '<button id="nav-uitlog-knop">Uitloggen</button></div>';
+      (actievePagina === 'profiel' ? '' : '<a href="/leden/profiel.html" data-i18n="navProfiel"></a>') +
+      '<button id="nav-uitlog-knop" data-i18n="uitloggen"></button></div>';
     document.getElementById('nav-uitlog-knop').addEventListener('click', uitloggen);
     if (typeof initThemeKnop === 'function') initThemeKnop('account-knoppen-rij');
+    if (typeof initTaalKnop === 'function') initTaalKnop('account-knoppen-rij');
+    if (typeof pasTaalToe === 'function') pasTaalToe();
 
     if (actievePagina !== 'beheer') {
       haalOp('leden', { select: 'is_admin', id: 'eq.' + huidigeSessie().user_id }).then(rows => {
         if (rows[0] && rows[0].is_admin) {
           const link = document.createElement('a');
           link.href = '/leden/beheer.html';
-          link.textContent = 'Beheer';
+          link.setAttribute('data-i18n', 'navBeheer');
           accountPlek.querySelector('.account-knoppen').prepend(link);
+          if (typeof pasTaalToe === 'function') pasTaalToe();
         }
       }).catch(() => {});
     }

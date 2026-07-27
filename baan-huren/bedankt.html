@@ -25,6 +25,22 @@
     font-size: 15px; cursor: pointer; color: inherit; flex-shrink: 0;
   }
 
+  .taal-wrap { position: relative; flex-shrink: 0; margin-left: 8px; }
+  .taal-knop {
+    background: rgba(255,255,255,0.15); border: none; border-radius: 8px; height: 34px; min-width: 34px;
+    padding: 0 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; color: inherit; font-family: inherit;
+    letter-spacing: 0.02em;
+  }
+  .taal-menu {
+    position: absolute; top: 40px; right: 0; z-index: 70; display: flex; flex-direction: column;
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 6px; min-width: 88px; box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+  }
+  .taal-item {
+    background: transparent; border: none; border-radius: 8px; padding: 8px 10px; text-align: left;
+    font-size: 13.5px; font-weight: 600; cursor: pointer; color: var(--ink); font-family: inherit;
+  }
+  .taal-item:hover { background: rgba(127,127,127,0.14); }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: 'Manrope', -apple-system, sans-serif; background: var(--paper); color: var(--ink); }
   header {
@@ -79,7 +95,7 @@
   <img src="/assets/img/logo.png" alt="" width="40" height="39" style="border-radius: 8px;" />
   <div>
     <div class="merk">Almere Pickleball</div>
-    <h1>Je ticket</h1>
+    <h1 data-i18n="titelJeTicket">Je ticket</h1>
   </div>
   <div id="thema-plek"></div>
 </header>
@@ -165,7 +181,9 @@
 
   haalTicketOp(8);
 </script>
+<script src="/assets/i18n.js"></script>
 <script src="/assets/theme.js"></script>
 <script>initThemeKnop('thema-plek');</script>
+<script>initTaalKnop('thema-plek');</script>
 </body>
 </html>
