@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Beheer — Almere Pickleball</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" type="image/png" href="/assets/img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/leden.css" />
+<style>
+  details.sectie {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 4px 20px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  details.sectie summary {
+    padding: 16px 0; font-family: 'Unbounded', sans-serif; font-size: 14px; cursor: pointer;
+    list-style: none; display: flex; justify-content: space-between; align-items: center;
+  }
+  details.sectie summary::-webkit-details-marker { display: none; }
+  details.sectie summary::after { content: '+'; font-size: 20px; color: var(--navy); }
+  @media (prefers-color-scheme: dark) { details.sectie summary::after { color: #8ab6ec; } }
+  details.sectie[open] summary::after { transform: rotate(45deg); }
+  .sectie-inhoud { padding-bottom: 18px; }
+  .veld-rij { margin-bottom: 10px; }
+  .veld-rij label { display: block; font-size: 12px; color: var(--ink-muted); margin-bottom: 4px; font-weight: 600; }
+  .veld-rij input, .veld-rij select, .veld-rij textarea {
+    width: 100%; padding: 9px 11px; border-radius: 8px; border: 1.5px solid var(--line);
+    background: var(--paper); color: var(--ink); font-size: 13.5px; font-family: inherit;
+  }
+  .veld-twee { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .rij {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    padding: 10px 0; border-top: 1px solid var(--line);
+  }
+  .rij:first-of-type { border-top: none; padding-top: 0; }
+  .rij .naam { font-weight: 700; font-size: 13.5px; }
+  .rij .sub { font-size: 12px; color: var(--ink-muted); }
+  .mini-knop {
+    padding: 6px 12px; border-radius: 8px; border: none; font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+  .mini-knop.goed { background: rgba(20,140,90,0.12); color: #148c5a; }
+  .mini-knop.fout { background: rgba(179,38,30,0.1); color: #b3261e; }
+  .prijs-invoer { width: 90px; padding: 6px 8px; border-radius: 6px; border: 1.5px solid var(--line); background: var(--paper); color: var(--ink); font-size: 13px; }
+  .badge-status {
+    padding: 2px 9px; border-radius: 999px; font-size: 10.5px; font-weight: 700;
+  }
+  .badge-status.in_behandeling { background: rgba(255,210,63,0.16); color: var(--gold-deep); }
+  @media (prefers-color-scheme: dark) { .badge-status.in_behandeling { color: var(--gold); } }
+  .badge-status.geslaagd, .badge-status.goedgekeurd, .badge-status.verwerkt { background: rgba(20,140,90,0.12); color: #148c5a; }
+  .badge-status.afgekeurd, .badge-status.mislukt { background: rgba(179,38,30,0.1); color: #b3261e; }
+  .toegang-geweigerd { text-align: center; padding: 60px 20px; color: var(--ink-muted); }
+</style>
+</head>
+<body>
+<header>
+  <img src="/assets/img/logo.png" alt="" width="40" height="39" style="border-radius: 8px;" />
+  <div style="flex: 1;">
+    <div class="merk">Almere Pickleball</div>
+    <h1>Beheer</h1>
+  </div>
+  <div id="account-plek"></div>
+</header>
+<main id="hoofd">
+  <div class="laden">Toegang controleren…</div>
+</main>
+<div id="nav-plek"></div>
+<script src="/assets/supabase.js"></script>
+<script src="/assets/nav.js"></script>
+<script>
+  const sessie = vereisSessie();
+  initNav('beheer');
+  const hoofd = document.getElementById('hoofd');
+
+  const niveauLabels = { beginner: 'Beginner', gevorderd: 'Gevorderd', competitie: 'Competitie' };
+  const klasseLabels = { open: 'Open', mix: 'Mix', vrouwen: 'Vrouwen', mannen: 'Mannen' };
+  const dagnamen = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
+
+  function melding(el, tekst, isFout) {
+    el.innerHTML = '<div class="melding ' + (isFout ? 'fout' : 'ok') + '">' + tekst + '</div>';
+  }
+
+  async function checkToegang() {
+    const rows = await haalOp('leden', { select: 'is_admin', id: 'eq.' + sessie.user_id });
+    if (!rows.length || !rows[0].is_admin) {
+      hoofd.innerHTML = '<div class="toegang-geweigerd">Dit gedeelte is alleen voor beheerders.<br>' +
+        '<a href="/leden/home.html" style="color:var(--navy)">← Terug naar Home</a></div>';
+      return false;
+    }
+    return true;
+  }
+
+  function bouwPagina() {
+    hoofd.innerHTML = `
+      <details class="sectie" open><summary>Proefleden goedkeuren <span id="badge-proefleden"></span></summary>
+        <div class="sectie-inhoud" id="proefleden-inhoud" class="laden">Laden…</div></details>
+      <details class="sectie"><summary>Nieuws plaatsen</summary>
+        <div class="sectie-inhoud" id="nieuws-form"></div></details>
+      <details class="sectie"><summary>Toernooien</summary>
+        <div class="sectie-inhoud" id="toernooien-beheer"></div></details>
+      <details class="sectie"><summary>Speeldagen &amp; feestdagen blokkeren</summary>
+        <div class="sectie-inhoud" id="speeldagen-beheer"></div></details>
+      <details class="sectie"><summary>Abonnementen — prijzen</summary>
+        <div class="sectie-inhoud" id="prijzen-inhoud" class="laden">Laden…</div></details>
+      <details class="sectie"><summary>Club-instellingen</summary>
+        <div class="sectie-inhoud" id="instellingen-inhoud" class="laden">Laden…</div></details>
+      <details class="sectie"><summary>Baanverhuur</summary>
+        <div class="sectie-inhoud" id="baanverhuur-inhoud" class="laden">Laden…</div></details>
+      <details class="sectie"><summary>Betalingen</summary>
+        <div class="sectie-inhoud" id="betalingen-inhoud" class="laden">Laden…</div></details>
+      <details class="sectie"><summary>Abonnement-upgrades (2x per week)</summary>
+        <div class="sectie-inhoud" id="upgrades-inhoud" class="laden">Laden…</div></details>
+      <details class="sectie"><summary>Gemelde wedstrijden <span id="badge-wedstrijden"></span></summary>
+        <div class="sectie-inhoud" id="wedstrijden-inhoud" class="laden">Laden…</div></details>
+    `;
+  }
+
+  // ---------- Proefleden ----------
+  async function laadProefleden() {
+    const el = document.getElementById('proefleden-inhoud');
+    const rows = await haalOp('lid_abonnementen', {
+      select: 'lid_id,goedgekeurd,leden(naam,email),abonnementen!inner(vorm)',
+      status: 'eq.actief', 'abonnementen.vorm': 'eq.proef',
+    });
+    const wachtend = rows.filter(r => !r.goedgekeurd);
+    document.getElementById('badge-proefleden').textContent = wachtend.length ? '(' + wachtend.length + ')' : '';
+    el.className = '';
+    if (!wachtend.length) { el.innerHTML = '<p class="details">Geen proefleden in afwachting.</p>'; return; }
+    el.innerHTML = wachtend.map(r => '<div class="rij"><div><div class="naam">' + r.leden.naam + '</div>' +
+      '<div class="sub">' + r.leden.email + '</div></div>' +
+      '<button class="mini-knop goed" data-lid="' + r.lid_id + '">Goedkeuren</button></div>').join('');
+    el.querySelectorAll('[data-lid]').forEach(btn => btn.addEventListener('click', async () => {
+      try { await rpc('keur_proef_goed', { p_lid: btn.dataset.lid }); await laadProefleden(); }
+      catch (e) { alert(e.message); }
+    }));
+  }
+
+  // ---------- Nieuws plaatsen ----------
+  function bouwNieuwsForm() {
+    const el = document.getElementById('nieuws-form');
+    el.innerHTML =
+      '<div class="veld-rij"><label>Titel</label><input type="text" id="n-titel" /></div>' +
+      '<div class="veld-rij"><label>Inhoud</label><textarea id="n-inhoud" rows="4"></textarea></div>' +
+      '<div class="veld-twee">' +
+      '<div class="veld-rij"><label>Categorie</label><select id="n-categorie">' +
+      '<option value="club">Club</option><option value="toernooi">Toernooi</option><option value="bond">Bond</option>' +
+      '<option value="jeugd">Jeugd</option><option value="algemeen">Algemeen</option></select></div>' +
+      '<div class="veld-rij"><label>Vervaldatum (optioneel)</label><input type="date" id="n-vervaldatum" /></div>' +
+      '</div>' +
+      '<div class="veld-twee">' +
+      '<div class="veld-rij"><label>Afbeelding-URL (optioneel)</label><input type="text" id="n-afbeelding" /></div>' +
+      '<div class="veld-rij"><label>Link (optioneel)</label><input type="text" id="n-link" /></div>' +
+      '</div>' +
+      '<button class="knop aanmelden" id="n-plaatsen-knop" type="button">Plaatsen</button>' +
+      '<div id="n-melding"></div>';
+    document.getElementById('n-plaatsen-knop').addEventListener('click', async () => {
+      const titel = document.getElementById('n-titel').value.trim();
+      const inhoud = document.getElementById('n-inhoud').value.trim();
+      const meldingEl = document.getElementById('n-melding');
+      if (!titel || !inhoud) { melding(meldingEl, 'Titel en inhoud zijn verplicht.', true); return; }
+      try {
+        await voegToe('nieuws', {
+          titel, inhoud, auteur_id: sessie.user_id,
+          categorie: document.getElementById('n-categorie').value,
+          vervaldatum: document.getElementById('n-vervaldatum').value || null,
+          afbeelding_url: document.getElementById('n-afbeelding').value.trim() || null,
+          link: document.getElementById('n-link').value.trim() || null,
+        });
+        melding(meldingEl, 'Nieuwsbericht geplaatst.', false);
+        document.getElementById('n-titel').value = '';
+        document.getElementById('n-inhoud').value = '';
+      } catch (e) { melding(meldingEl, e.message, true); }
+    });
+  }
+
+  // ---------- Toernooien ----------
+  async function bouwToernooienBeheer() {
+    const el = document.getElementById('toernooien-beheer');
+    el.innerHTML =
+      '<div class="veld-rij"><label>Naam</label><input type="text" id="t-naam" /></div>' +
+      '<div class="veld-twee">' +
+      '<div class="veld-rij"><label>Datum</label><input type="date" id="t-datum" /></div>' +
+      '<div class="veld-rij"><label>Max. deelnemers</label><input type="number" id="t-max" value="32" /></div>' +
+      '</div>' +
+      '<div class="veld-twee">' +
+      '<div class="veld-rij"><label>Klasse</label><select id="t-klasse">' +
+      Object.keys(klasseLabels).map(k => '<option value="' + k + '">' + klasseLabels[k] + '</option>').join('') + '</select></div>' +
+      '<div class="veld-rij"><label>Niveau</label><select id="t-niveau"><option value="open">Alle niveaus</option>' +
+      Object.keys(niveauLabels).map(n => '<option value="' + n + '">' + niveauLabels[n] + '</option>').join('') + '</select></div>' +
+      '</div>' +
+      '<div class="veld-twee">' +
+      '<div class="veld-rij"><label>Inschrijfwijze</label><select id="t-inschrijfwijze"><option value="paar">Per paar</option><option value="individueel">Individueel</option></select></div>' +
+      '<div class="veld-rij"><label>Inschrijfgeld (leeg = gratis)</label><input type="number" step="0.01" id="t-inschrijfgeld" /></div>' +
+      '</div>' +
+      '<div class="veld-rij"><label>Omschrijving (optioneel)</label><textarea id="t-omschrijving" rows="2"></textarea></div>' +
+      '<button class="knop aanmelden" id="t-plaatsen-knop" type="button">Toernooi aanmaken</button>' +
+      '<div id="t-melding"></div>' +
+      '<div id="t-lijst" style="margin-top:16px"></div>';
+    document.getElementById('t-plaatsen-knop').addEventListener('click', async () => {
+      const meldingEl = document.getElementById('t-melding');
+      const naam = document.getElementById('t-naam').value.trim();
+      const datum = document.getElementById('t-datum').value;
+      if (!naam || !datum) { melding(meldingEl, 'Naam en datum zijn verplicht.', true); return; }
+      try {
+        await voegToe('toernooien', {
+          naam, datum,
+          max_deelnemers: Number(document.getElementById('t-max').value) || 32,
+          klasse: document.getElementById('t-klasse').value,
+          niveau: document.getElementById('t-niveau').value,
+          inschrijfwijze: document.getElementById('t-inschrijfwijze').value,
+          inschrijfgeld: document.getElementById('t-inschrijfgeld').value ? Number(document.getElementById('t-inschrijfgeld').value) : null,
+          omschrijving: document.getElementById('t-omschrijving').value.trim() || null,
+        });
+        melding(meldingEl, 'Toernooi aangemaakt.', false);
+        document.getElementById('t-naam').value = '';
+        await laadToernooienLijst();
+      } catch (e) { melding(meldingEl, e.message, true); }
+    });
+    await laadToernooienLijst();
+  }
+
+  async function laadToernooienLijst() {
+    const el = document.getElementById('t-lijst');
+    const vandaag = new Date().toISOString().substring(0, 10);
+    const rows = await haalOp('toernooien', { select: 'id,naam,datum,inschrijving_open', datum: 'gte.' + vandaag, order: 'datum.asc' });
+    if (!rows.length) { el.innerHTML = '<p class="details">Geen aankomende toernooien.</p>'; return; }
+    el.innerHTML = rows.map(t => '<div class="rij"><div><div class="naam">' + t.naam + '</div>' +
+      '<div class="sub">' + new Date(t.datum).toLocaleDateString('nl-NL') + '</div></div>' +
+      '<button class="mini-knop ' + (t.inschrijving_open ? 'fout' : 'goed') + '" data-t="' + t.id + '" data-open="' + t.inschrijving_open + '">' +
+      (t.inschrijving_open ? 'Inschrijving sluiten' : 'Inschrijving openen') + '</button></div>').join('');
+    el.querySelectorAll('[data-t]').forEach(btn => btn.addEventListener('click', async () => {
+      await werkBij('toernooien', { id: 'eq.' + btn.dataset.t }, { inschrijving_open: btn.dataset.open !== 'true' });
+      await laadToernooienLijst();
+    }));
+  }
+
+  // ---------- Speeldagen & blokkeren ----------
+  async function laadSpeeldagenBeheer() {
+    const el = document.getElementById('speeldagen-beheer');
+    const speeldagen = await haalOp('speeldagen', { select: 'id,weekdag,start_tijd,eind_tijd,locatie', actief: 'eq.true', order: 'weekdag.asc' });
+    const vandaag = new Date().toISOString().substring(0, 10);
+    const blokkades = await haalOp('speeldag_uitzonderingen', { select: 'id,speeldag_id,datum,reden', datum: 'gte.' + vandaag, order: 'datum.asc' });
+
+    el.innerHTML =
+      '<div class="veld-rij"><label>Speelavond</label><select id="b-speeldag">' +
+      speeldagen.map(sd => '<option value="' + sd.id + '">' + sd.locatie + ' (' + dagnamen[sd.weekdag - 1] + ')</option>').join('') +
+      '</select></div>' +
+      '<div class="veld-twee">' +
+      '<div class="veld-rij"><label>Datum</label><input type="date" id="b-datum" /></div>' +
+      '<div class="veld-rij"><label>Reden</label><input type="text" id="b-reden" placeholder="bijv. Eerste kerstdag" /></div>' +
+      '</div>' +
+      '<button class="knop afmelden" id="b-blokkeer-knop" type="button">Datum blokkeren</button>' +
+      '<div id="b-melding"></div>' +
+      '<div style="margin-top:16px"><h2 style="margin-bottom:8px">Geblokkeerde data</h2>' +
+      (blokkades.length
+        ? blokkades.map(b => {
+            const sd = speeldagen.find(s => s.id === b.speeldag_id);
+            return '<div class="rij"><div><div class="naam">' + new Date(b.datum).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) + '</div>' +
+              '<div class="sub">' + (sd ? sd.locatie : '?') + ' · ' + b.reden + '</div></div>' +
+              '<button class="mini-knop fout" data-verwijder="' + b.id + '">Verwijderen</button></div>';
+          }).join('')
+        : '<p class="details">Geen geblokkeerde data.</p>') +
+      '</div>';
+
+    document.getElementById('b-blokkeer-knop').addEventListener('click', async () => {
+      const meldingEl = document.getElementById('b-melding');
+      const datum = document.getElementById('b-datum').value;
+      const reden = document.getElementById('b-reden').value.trim();
+      if (!datum || !reden) { melding(meldingEl, 'Datum en reden zijn verplicht.', true); return; }
+      try {
+        await voegToe('speeldag_uitzonderingen', { speeldag_id: Number(document.getElementById('b-speeldag').value), datum, reden });
+        await laadSpeeldagenBeheer();
+      } catch (e) { melding(meldingEl, e.message, true); }
+    });
+    el.querySelectorAll('[data-verwijder]').forEach(btn => btn.addEventListener('click', async () => {
+      await verwijder('speeldag_uitzonderingen', { id: 'eq.' + btn.dataset.verwijder });
+      await laadSpeeldagenBeheer();
+    }));
+  }
+
+  // ---------- Abonnementen prijzen ----------
+  async function laadPrijzen() {
+    const el = document.getElementById('prijzen-inhoud');
+    const rows = await haalOp('abonnementen', { select: 'id,naam,vorm,categorie,sessies_per_week,prijs,actief', order: 'categorie.asc,vorm.asc' });
+    el.className = '';
+    el.innerHTML = rows.map(a => '<div class="rij"><div><div class="naam">' + a.naam + '</div>' +
+      '<div class="sub">' + a.categorie + ' · ' + a.vorm + (a.sessies_per_week ? ' · ' + a.sessies_per_week + 'x/week' : '') + '</div></div>' +
+      '<span>€ <input type="number" step="0.01" class="prijs-invoer" data-abo="' + a.id + '" value="' + Number(a.prijs).toFixed(2) + '" /></span></div>').join('') +
+      '<button class="knop aanmelden" id="prijzen-opslaan-knop" type="button" style="margin-top:12px">Prijzen opslaan</button>' +
+      '<div id="prijzen-melding"></div>';
+    document.getElementById('prijzen-opslaan-knop').addEventListener('click', async () => {
+      const meldingEl = document.getElementById('prijzen-melding');
+      try {
+        const invoeren = el.querySelectorAll('[data-abo]');
+        for (const invoer of invoeren) {
+          await werkBij('abonnementen', { id: 'eq.' + invoer.dataset.abo }, { prijs: Number(invoer.value) });
+        }
+        melding(meldingEl, 'Prijzen opgeslagen.', false);
+      } catch (e) { melding(meldingEl, e.message, true); }
+    });
+  }
+
+  // ---------- Club-instellingen ----------
+  async function laadInstellingen() {
+    const el = document.getElementById('instellingen-inhoud');
+    const rows = await haalOp('club_instellingen', { select: 'betaalinstructies,seizoen_start,seizoen_eind', id: 'eq.true' });
+    const ci = rows[0] || {};
+    el.className = '';
+    el.innerHTML =
+      '<div class="veld-twee">' +
+      '<div class="veld-rij"><label>Seizoen start</label><input type="date" id="i-seizoen-start" value="' + (ci.seizoen_start || '') + '" /></div>' +
+      '<div class="veld-rij"><label>Seizoen eind</label><input type="date" id="i-seizoen-eind" value="' + (ci.seizoen_eind || '') + '" /></div>' +
+      '</div>' +
+      '<div class="veld-rij"><label>Betaalinstructies</label><textarea id="i-betaalinstructies" rows="4">' + (ci.betaalinstructies || '') + '</textarea></div>' +
+      '<button class="knop aanmelden" id="i-opslaan-knop" type="button">Opslaan</button>' +
+      '<div id="i-melding"></div>';
+    document.getElementById('i-opslaan-knop').addEventListener('click', async () => {
+      const meldingEl = document.getElementById('i-melding');
+      try {
+        await werkBij('club_instellingen', { id: 'eq.true' }, {
+          seizoen_start: document.getElementById('i-seizoen-start').value,
+          seizoen_eind: document.getElementById('i-seizoen-eind').value,
+          betaalinstructies: document.getElementById('i-betaalinstructies').value.trim() || null,
+        });
+        melding(meldingEl, 'Instellingen opgeslagen.', false);
+      } catch (e) { melding(meldingEl, e.message, true); }
+    });
+  }
+
+  // ---------- Baanverhuur ----------
+  async function laadBaanverhuur() {
+    const el = document.getElementById('baanverhuur-inhoud');
+    const rows = await haalOp('baan_verhuur', {
+      select: 'id,naam,email,telefoon,start_tijd,eind_tijd,prijs,status,banen(naam)',
+      order: 'start_tijd.desc', limit: '50',
+    });
+    el.className = '';
+    if (!rows.length) { el.innerHTML = '<p class="details">Nog geen boekingen.</p>'; return; }
+    el.innerHTML = rows.map(r => {
+      const start = new Date(r.start_tijd), eind = new Date(r.eind_tijd);
+      return '<div class="rij"><div><div class="naam">' + (r.banen ? r.banen.naam : '?') + ' · ' + r.naam + '</div>' +
+        '<div class="sub">' + start.toLocaleDateString('nl-NL') + ' ' + start.toTimeString().slice(0, 5) + '–' + eind.toTimeString().slice(0, 5) +
+        ' · €' + Number(r.prijs).toFixed(2) + ' · ' + r.telefoon + '</div></div>' +
+        '<span class="badge-status ' + r.status + '">' + r.status + '</span></div>';
+    }).join('');
+  }
+
+  // ---------- Betalingen ----------
+  async function laadBetalingen() {
+    const el = document.getElementById('betalingen-inhoud');
+    const rows = await haalOp('lid_abonnementen', {
+      select: 'id,status,betaald,leden(naam),abonnementen(naam)',
+      status: 'in.(actief,in_afwachting)', order: 'created_at.desc', limit: '50',
+    });
+    el.className = '';
+    if (!rows.length) { el.innerHTML = '<p class="details">Geen actieve abonnementen.</p>'; return; }
+    el.innerHTML = rows.map(r => '<div class="rij"><div><div class="naam">' + (r.leden ? r.leden.naam : '?') + '</div>' +
+      '<div class="sub">' + (r.abonnementen ? r.abonnementen.naam : '') + '</div></div>' +
+      (r.status === 'in_afwachting'
+        ? '<span class="badge-status in_behandeling">wacht op Mollie</span>'
+        : '<button class="mini-knop ' + (r.betaald ? 'goed' : 'fout') + '" data-la="' + r.id + '" data-betaald="' + r.betaald + '">' + (r.betaald ? 'Betaald' : 'Niet betaald') + '</button>')
+      + '</div>').join('');
+    el.querySelectorAll('[data-la]').forEach(btn => btn.addEventListener('click', async () => {
+      await werkBij('lid_abonnementen', { id: 'eq.' + btn.dataset.la }, { betaald: btn.dataset.betaald !== 'true' });
+      await laadBetalingen();
+    }));
+  }
+
+  // ---------- Abonnement-upgrades log ----------
+  async function laadUpgrades() {
+    const el = document.getElementById('upgrades-inhoud');
+    const rows = await haalOp('betalingen', {
+      select: 'bedrag,status,created_at,omschrijving,leden(naam)',
+      type: 'eq.abonnement_upgrade', order: 'created_at.desc', limit: '30',
+    });
+    el.className = '';
+    if (!rows.length) { el.innerHTML = '<p class="details">Nog geen overstappen naar 2x per week.</p>'; return; }
+    el.innerHTML = rows.map(r => '<div class="rij"><div><div class="naam">' + (r.leden ? r.leden.naam : '?') + '</div>' +
+      '<div class="sub">' + r.omschrijving + ' · €' + Number(r.bedrag).toFixed(2) + ' · ' +
+      new Date(r.created_at).toLocaleDateString('nl-NL') + '</div></div>' +
+      '<span class="badge-status ' + (r.status === 'geslaagd' ? 'verwerkt' : r.status) + '">' + r.status + '</span></div>').join('');
+  }
+
+  // ---------- Gemelde wedstrijden ----------
+  const typeLabels = { enkel: 'Enkel', dubbel_gemixed: 'Dubbel gemixed', dubbel_vrouwen: 'Dubbel vrouwen', dubbel_mannen: 'Dubbel mannen' };
+
+  async function laadWedstrijden() {
+    const el = document.getElementById('wedstrijden-inhoud');
+    const rows = await haalOp('gemelde_wedstrijden', {
+      select: 'id,datum,type,eigen_score,tegen_score,leden!gemelde_wedstrijden_melder_id_fkey(naam)',
+      status: 'eq.in_behandeling', order: 'created_at.asc',
+    });
+    document.getElementById('badge-wedstrijden').textContent = rows.length ? '(' + rows.length + ')' : '';
+    el.className = '';
+    if (!rows.length) { el.innerHTML = '<p class="details">Geen wedstrijden in behandeling.</p>'; return; }
+    el.innerHTML = rows.map(w => '<div class="rij"><div><div class="naam">' + (w.leden ? w.leden.naam : '?') + '</div>' +
+      '<div class="sub">' + new Date(w.datum).toLocaleDateString('nl-NL') + ' · ' + typeLabels[w.type] + ' · ' + w.eigen_score + '-' + w.tegen_score + '</div></div>' +
+      '<span><button class="mini-knop goed" data-goed="' + w.id + '">Goedkeuren</button> ' +
+      '<button class="mini-knop fout" data-af="' + w.id + '">Afkeuren</button></span></div>').join('');
+    el.querySelectorAll('[data-goed]').forEach(btn => btn.addEventListener('click', async () => {
+      try { await rpc('keur_gemelde_wedstrijd_goed', { p_wedstrijd_id: btn.dataset.goed }); await laadWedstrijden(); }
+      catch (e) { alert(e.message); }
+    }));
+    el.querySelectorAll('[data-af]').forEach(btn => btn.addEventListener('click', async () => {
+      await werkBij('gemelde_wedstrijden', { id: 'eq.' + btn.dataset.af }, {
+        status: 'afgekeurd', beoordeeld_door: sessie.user_id, beoordeeld_op: new Date().toISOString(),
+      });
+      await laadWedstrijden();
+    }));
+  }
+
+  (async () => {
+    const toegestaan = await checkToegang();
+    if (!toegestaan) return;
+    bouwPagina();
+    bouwNieuwsForm();
+    await Promise.all([
+      laadProefleden(), bouwToernooienBeheer(), laadSpeeldagenBeheer(), laadPrijzen(),
+      laadInstellingen(), laadBaanverhuur(), laadBetalingen(), laadUpgrades(), laadWedstrijden(),
+    ]);
+  })().catch(e => { hoofd.innerHTML = '<p class="fout">Kon beheer niet laden: ' + e.message + '</p>'; });
+</script>
+</body>
+</html>

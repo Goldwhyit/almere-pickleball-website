@@ -25,6 +25,29 @@
   }
   .locatie-detail.open { display: block; }
   .locatie-detail div { padding: 2px 0; }
+  .banner {
+    padding: 12px 14px; border-radius: 10px; font-size: 13px; margin-bottom: 14px;
+    background: rgba(179,38,30,0.08); color: #b3261e; border: 1px solid rgba(179,38,30,0.2);
+  }
+  .speeldag-regel.geblokkeerd { opacity: 0.65; }
+  .speeldag-regel .off-dag-actie { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+  .speeldag-regel .off-dag-actie a { font-size: 11px; color: var(--navy); text-decoration: none; font-weight: 700; }
+  @media (prefers-color-scheme: dark) { .speeldag-regel .off-dag-actie a { color: #8ab6ec; } }
+  .popup-overlay {
+    position: fixed; inset: 0; background: rgba(4,27,51,0.5); z-index: 100;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .popup-kaart {
+    background: var(--card); border-radius: 18px; width: 100%; max-width: 420px;
+    max-height: 85vh; overflow-y: auto; padding: 22px;
+  }
+  .popup-kaart h3 { margin: 0 0 10px; font-size: 16px; }
+  .dag-keuze { display: flex; gap: 10px; margin-top: 14px; }
+  .dag-keuze button {
+    flex: 1; padding: 14px; border-radius: 10px; border: 1.5px solid var(--line); background: transparent;
+    color: var(--ink); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; text-transform: capitalize;
+  }
+  .dag-keuze button:hover { border-color: var(--navy); }
 </style>
 </head>
 <body>
@@ -82,9 +105,79 @@
 
   async function laadAbonnement() {
     const rows = await haalOp('lid_abonnementen', {
-      select: 'abonnementen(vorm)', lid_id: 'eq.' + sessie.user_id, status: 'eq.actief', limit: '1',
+      select: 'id,vaste_dag,abonnementen(vorm,sessies_per_week)', lid_id: 'eq.' + sessie.user_id, status: 'eq.actief', limit: '1',
     });
     mijnAbonnement = rows.length ? rows[0] : null;
+  }
+
+  function isEenxPerWeek(abo) {
+    return !!(abo && abo.abonnementen && ['jaar', 'maand'].includes(abo.abonnementen.vorm) && abo.abonnementen.sessies_per_week === 1);
+  }
+
+  function toonPopup(html) {
+    const bestaand = document.getElementById('reserveren-popup');
+    if (bestaand) bestaand.remove();
+    const overlay = document.createElement('div');
+    overlay.className = 'popup-overlay';
+    overlay.id = 'reserveren-popup';
+    overlay.innerHTML = '<div class="popup-kaart">' + html + '</div>';
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+
+  /// Bestaande en nieuwe 1x-per-week-leden moeten een vaste dag kiezen
+  /// vóórdat ze de speelavonden kunnen zien (verplicht, geen "later"-optie).
+  async function dwingVasteDagAf(speeldagen) {
+    if (!isEenxPerWeek(mijnAbonnement) || mijnAbonnement.vaste_dag) return;
+    const weekdagen = [...new Set(speeldagen.map(sd => sd.weekdag))].sort();
+    const overlay = toonPopup(
+      '<h3>Kies je vaste speeldag</h3>' +
+      '<p class="details">Je abonnement is voor 1x per week. Kies of je op dinsdag of donderdag speelt — ' +
+      'spelen op de andere dag kan altijd nog, tegen het losse sessietarief, of door over te stappen naar 2x per week.</p>' +
+      '<div class="dag-keuze">' +
+      weekdagen.map(w => '<button type="button" data-dag="' + w + '">' + dagnamen[w - 1] + '</button>').join('') +
+      '</div><div id="vaste-dag-melding"></div>'
+    );
+    overlay.querySelectorAll('[data-dag]').forEach(btn => btn.addEventListener('click', async () => {
+      try {
+        await rpc('kies_vaste_dag', { p_dag: Number(btn.dataset.dag) });
+        mijnAbonnement.vaste_dag = Number(btn.dataset.dag);
+        overlay.remove();
+        await laadSpeeldagen();
+      } catch (e) {
+        document.getElementById('vaste-dag-melding').innerHTML = '<div class="melding fout">' + e.message + '</div>';
+      }
+    }));
+  }
+
+  async function toonUpgradePopup() {
+    const overlay = toonPopup('<h3>Overstappen naar 2x per week</h3><p class="details">Even het bedrag berekenen…</p>');
+    try {
+      const rows = await rpc('bereken_upgrade_bedrag', { p_lid_abonnement_id: mijnAbonnement.id });
+      const info = Array.isArray(rows) ? rows[0] : rows;
+      overlay.querySelector('.popup-kaart').innerHTML =
+        '<h3>Overstappen naar 2x per week</h3>' +
+        '<p class="details">Je stapt over naar <strong>' + info.nieuw_abonnement_naam + '</strong>. ' +
+        'Voor de rest van de huidige periode betaal je het geprorateerde verschil:</p>' +
+        '<p style="font-size:24px;font-weight:700;color:var(--navy);margin:10px 0">€' + Number(info.bedrag).toFixed(2) + '</p>' +
+        '<button class="knop aanmelden" id="upgrade-betaal-knop" style="display:block;width:100%">Betalen en overstappen</button>' +
+        '<button class="knop" id="upgrade-annuleer-knop" style="display:block;width:100%;margin-top:8px;background:transparent">Annuleren</button>' +
+        '<div id="upgrade-melding"></div>';
+      document.getElementById('upgrade-annuleer-knop').addEventListener('click', () => overlay.remove());
+      document.getElementById('upgrade-betaal-knop').addEventListener('click', async (e) => {
+        e.target.disabled = true; e.target.textContent = 'Bezig…';
+        try {
+          const res = await functieAanroepen('create-mollie-payment', { type: 'abonnement_upgrade', lid_abonnement_id: mijnAbonnement.id });
+          if (res.checkoutUrl) { window.location.href = res.checkoutUrl; return; }
+          throw new Error(res.error || 'Kon betaling niet starten.');
+        } catch (fout) {
+          document.getElementById('upgrade-melding').innerHTML = '<div class="melding fout">' + fout.message + '</div>';
+          e.target.disabled = false; e.target.textContent = 'Betalen en overstappen';
+        }
+      });
+    } catch (e) {
+      overlay.querySelector('.popup-kaart').innerHTML = '<h3>Overstappen naar 2x per week</h3><div class="melding fout">' + e.message + '</div>';
+    }
   }
 
   function toonLocaties(speeldagen) {
@@ -110,15 +203,19 @@
     const speeldagen = await haalOp('speeldagen', { select: 'id,weekdag,start_tijd,eind_tijd,locatie,adres,aantal_banen,max_spelers', actief: 'eq.true', order: 'weekdag.asc' });
     if (!speeldagen.length) { el.textContent = 'Geen speelavonden gevonden.'; return; }
     toonLocaties(speeldagen);
+    await dwingVasteDagAf(speeldagen);
     const sessies = volgendeSessies(speeldagen, 5).slice(0, 8);
     if (!sessies.length) { el.textContent = 'Geen aankomende speelavonden binnen het seizoen.'; return; }
 
     const vanaf = sessies[0].start.toISOString();
     const tot = sessies[sessies.length - 1].eind.toISOString();
-    const reserveringen = await haalOp('reserveringen', {
-      select: 'id,lid_id,start_tijd',
-      and: '(start_tijd.gte.' + vanaf + ',start_tijd.lte.' + tot + ')',
-    });
+    const vandaag = new Date().toISOString().substring(0, 10);
+    const [reserveringen, blokkades] = await Promise.all([
+      haalOp('reserveringen', { select: 'id,lid_id,start_tijd', and: '(start_tijd.gte.' + vanaf + ',start_tijd.lte.' + tot + ')' }),
+      haalOp('speeldag_uitzonderingen', { select: 'speeldag_id,datum,reden', datum: 'gte.' + vandaag }),
+    ]);
+
+    const isOffDag = isEenxPerWeek(mijnAbonnement);
 
     el.innerHTML = sessies.map((s, i) => {
       // Vergelijk als Date, niet als string: PostgREST geeft "+00:00" terug,
@@ -128,25 +225,41 @@
       const opDezeAvond = reserveringen.filter(r => new Date(r.start_tijd).getTime() === s.start.getTime());
       const mijnReservering = opDezeAvond.find(r => r.lid_id === sessie.user_id);
       const vol = opDezeAvond.length >= s.maxSpelers;
+      const iso = s.start.toISOString().substring(0, 10);
+      const blokkade = blokkades.find(b => b.speeldag_id === s.speeldagId && b.datum === iso);
+      const weekdag = s.start.getDay() === 0 ? 7 : s.start.getDay();
+      const isOpNietVasteDag = isOffDag && mijnAbonnement.vaste_dag && weekdag !== mijnAbonnement.vaste_dag;
+
       let knop;
-      if (mijnReservering) {
+      if (blokkade) {
+        knop = '<button class="knop vol" disabled>Geblokkeerd</button>';
+      } else if (mijnReservering) {
         knop = '<button class="knop afmelden" data-actie="afmelden" data-index="' + i + '" data-id="' + mijnReservering.id + '">Afmelden</button>';
       } else if (vol) {
         knop = '<button class="knop vol" disabled>Vol</button>';
+      } else if (isOpNietVasteDag) {
+        knop = '<div class="off-dag-actie">' +
+          '<button class="knop aanmelden" data-actie="aanmelden-bijbetalen" data-index="' + i + '">Aanmelden (+ eenmalig €8,50)</button>' +
+          '<a href="#" data-upgrade="1">of overstappen naar 2x/week</a></div>';
       } else {
         knop = '<button class="knop aanmelden" data-actie="aanmelden" data-index="' + i + '">Aanmelden</button>';
       }
-      return '<div class="speeldag-regel">' +
-        '<span><span class="dag">' + dagnamen[s.start.getDay() === 0 ? 6 : s.start.getDay() - 1] + ' ' +
+      return '<div class="speeldag-regel' + (blokkade ? ' geblokkeerd' : '') + '">' +
+        '<span><span class="dag">' + dagnamen[weekdag - 1] + ' ' +
         s.start.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + '</span><br>' +
-        '<span class="locatie">' + s.locatie + ' · ' + opDezeAvond.length + '/' + s.maxSpelers + '</span></span>' +
-        knop + '</div>';
+        '<span class="locatie">' + s.locatie + ' · ' + opDezeAvond.length + '/' + s.maxSpelers + '</span>' +
+        (blokkade ? '<div class="banner" style="margin:6px 0 0">🚫 Geannuleerd: ' + blokkade.reden + '</div>' : '') +
+        '</span>' + knop + '</div>';
     }).join('') + '<div id="speeldagen-melding"></div>';
 
     window.__sessies = sessies;
     el.querySelectorAll('[data-actie]').forEach(btn => btn.addEventListener('click', () => {
-      if (btn.dataset.actie === 'aanmelden') aanmelden(window.__sessies[Number(btn.dataset.index)], btn);
-      else afmelden(btn.dataset.id, btn);
+      if (btn.dataset.actie === 'afmelden') afmelden(btn.dataset.id, btn);
+      else aanmelden(window.__sessies[Number(btn.dataset.index)], btn, btn.dataset.actie === 'aanmelden-bijbetalen');
+    }));
+    el.querySelectorAll('[data-upgrade]').forEach(a => a.addEventListener('click', (e) => {
+      e.preventDefault();
+      toonUpgradePopup();
     }));
   }
 
@@ -155,7 +268,7 @@
     if (el) el.innerHTML = '<div class="melding ' + (isFout ? 'fout' : 'ok') + '">' + tekst + '</div>';
   }
 
-  async function aanmelden(sessieInfo, btn) {
+  async function aanmelden(sessieInfo, btn, bijbetalen) {
     btn.disabled = true;
     btn.textContent = 'Bezig…';
     try {
@@ -166,7 +279,7 @@
         eind_tijd: sessieInfo.eind.toISOString(),
       });
       await laadSpeeldagen();
-      if (mijnAbonnement && mijnAbonnement.abonnementen && mijnAbonnement.abonnementen.vorm === 'sessie') {
+      if (bijbetalen || (mijnAbonnement && mijnAbonnement.abonnementen && mijnAbonnement.abonnementen.vorm === 'sessie')) {
         try {
           const res = await functieAanroepen('create-mollie-payment', { type: 'sessie', reservering_id: nieuw.id });
           if (res.checkoutUrl) {

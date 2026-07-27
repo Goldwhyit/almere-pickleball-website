@@ -133,6 +133,34 @@
   const betaalwijzePerVorm = { jaar: 'jaarlijks_vooruit', maand: 'maandelijkse_incasso', strippenkaart: 'eenmalig', sessie: 'per_sessie', proef: 'eenmalig' };
   const niveauLabels = { beginner: 'Beginner', gevorderd: 'Gevorderd', competitie: 'Competitie' };
   const geslachtLabels = { m: 'Man', v: 'Vrouw', x: 'Anders' };
+  const dagnamenKort = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
+
+  async function toonUpgradePopup() {
+    toonPopup('Overstappen naar 2x per week', '<p class="details">Even het bedrag berekenen…</p>');
+    try {
+      const rows = await rpc('bereken_upgrade_bedrag', { p_lid_abonnement_id: mijnAbonnement.id });
+      const info = Array.isArray(rows) ? rows[0] : rows;
+      toonPopup('Overstappen naar 2x per week',
+        '<p class="details">Je stapt over naar <strong>' + info.nieuw_abonnement_naam + '</strong>. ' +
+        'Voor de rest van de huidige periode betaal je het geprorateerde verschil:</p>' +
+        '<p style="font-size:24px;font-weight:700;color:var(--navy);margin:10px 0">€' + Number(info.bedrag).toFixed(2) + '</p>' +
+        '<button class="knop aanmelden" id="upgrade-betaal-knop" style="display:block;width:100%">Betalen en overstappen</button>' +
+        '<div id="upgrade-melding"></div>');
+      document.getElementById('upgrade-betaal-knop').addEventListener('click', async (e) => {
+        e.target.disabled = true; e.target.textContent = 'Bezig…';
+        try {
+          const res = await functieAanroepen('create-mollie-payment', { type: 'abonnement_upgrade', lid_abonnement_id: mijnAbonnement.id });
+          if (res.checkoutUrl) { window.location.href = res.checkoutUrl; return; }
+          throw new Error(res.error || 'Kon betaling niet starten.');
+        } catch (fout) {
+          document.getElementById('upgrade-melding').innerHTML = '<div class="melding fout">' + fout.message + '</div>';
+          e.target.disabled = false; e.target.textContent = 'Betalen en overstappen';
+        }
+      });
+    } catch (e) {
+      toonPopup('Overstappen naar 2x per week', '<div class="melding fout">' + e.message + '</div>');
+    }
+  }
   const datumFormat = new Intl.DateTimeFormat('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
 
   function berekenLeeftijd(geboortedatum) {
@@ -434,7 +462,7 @@
     const el = document.getElementById('abonnement-inhoud');
 
     const actief = await haalOp('lid_abonnementen', {
-      select: 'id,status,strippen_resterend,geldig_tot,start_datum,opgezegd_op,eind_datum,abonnementen(naam,vorm)',
+      select: 'id,status,strippen_resterend,geldig_tot,start_datum,opgezegd_op,eind_datum,vaste_dag,abonnementen(naam,vorm,sessies_per_week)',
       lid_id: 'eq.' + sessie.user_id, status: 'eq.actief', limit: '1',
     });
     if (actief.length) {
@@ -451,12 +479,18 @@
       if (mijnAbonnement.opgezegd_op && mijnAbonnement.eind_datum) {
         extra += '<p style="margin:4px 0 0;font-size:13.5px;color:var(--gold-deep)">Opgezegd — blijft geldig tot ' + datumFormat.format(new Date(mijnAbonnement.eind_datum)) + '</p>';
       }
+      const eenxPerWeek = mijnAbonnement.abonnementen && ['jaar', 'maand'].includes(mijnAbonnement.abonnementen.vorm) && mijnAbonnement.abonnementen.sessies_per_week === 1;
+      if (eenxPerWeek && mijnAbonnement.vaste_dag) {
+        extra += '<p style="margin:4px 0 0;font-size:13.5px;color:var(--ink-muted)">Vaste speeldag: ' + dagnamenKort[mijnAbonnement.vaste_dag - 1] + '</p>';
+      }
       el.innerHTML = '<div class="status-regel"><span class="status-badge">' + naam + '</span></div>' + extra +
         (mijnAbonnement.opgezegd_op ? '' : '<button class="knop afmelden" id="opzeg-knop" style="margin-top:12px">Abonnement opzeggen</button>') +
         '<button type="button" class="vergelijk-knop" id="vergelijk-knop">Vergelijk abonnementen →</button>' +
+        (eenxPerWeek ? '<button type="button" class="vergelijk-knop" id="upgrade-2x-knop" style="display:block;margin-top:6px">Overstappen naar 2x per week →</button>' : '') +
         '<div id="abonnement-melding"></div>';
       if (document.getElementById('opzeg-knop')) document.getElementById('opzeg-knop').addEventListener('click', opzeggen);
       document.getElementById('vergelijk-knop').addEventListener('click', toonVergelijking);
+      if (document.getElementById('upgrade-2x-knop')) document.getElementById('upgrade-2x-knop').addEventListener('click', toonUpgradePopup);
       return;
     }
 

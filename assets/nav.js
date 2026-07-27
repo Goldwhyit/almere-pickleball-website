@@ -32,21 +32,23 @@ const NAV_ITEMS = [
 function initNav(actievePagina) {
   const stijl = document.createElement('style');
   stijl.textContent = `
-    body { padding-bottom: 76px; }
+    body { padding-bottom: 100px; }
     .onderbalk {
-      position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+      position: fixed; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); left: 14px; right: 14px; z-index: 50;
       display: flex; background: var(--card, #fff);
-      border-top: 1px solid var(--line, rgba(4,27,51,0.1));
-      padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
-      box-shadow: 0 -2px 12px rgba(0,0,0,0.04);
+      border: 1px solid var(--line, rgba(4,27,51,0.1));
+      border-radius: 999px;
+      padding: 7px 8px;
+      box-shadow: 0 8px 24px rgba(4,27,51,0.16);
+      max-width: 480px; margin: 0 auto;
     }
     .onderbalk a {
       flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
       text-decoration: none; color: var(--ink-muted, #5b6b7d); font-size: 10.5px; font-weight: 600;
-      padding: 5px 0 3px; border-radius: 10px;
+      padding: 6px 0 5px; border-radius: 999px;
     }
-    .onderbalk a.actief { color: var(--navy, #005bbf); background: rgba(0,91,191,0.08); }
-    .onderbalk a svg { width: 22px; height: 22px; }
+    .onderbalk a.actief { color: var(--navy, #005bbf); background: rgba(0,91,191,0.1); }
+    .onderbalk a svg { width: 21px; height: 21px; }
     .account-knoppen { display: flex; gap: 8px; align-items: center; }
     .account-knoppen a, .account-knoppen button {
       background: rgba(255,255,255,0.15); color: inherit; border: none; border-radius: 8px;
@@ -70,5 +72,16 @@ function initNav(actievePagina) {
       (actievePagina === 'profiel' ? '' : '<a href="/leden/profiel.html">Profiel</a>') +
       '<button id="nav-uitlog-knop">Uitloggen</button></div>';
     document.getElementById('nav-uitlog-knop').addEventListener('click', uitloggen);
+
+    if (actievePagina !== 'beheer') {
+      haalOp('leden', { select: 'is_admin', id: 'eq.' + huidigeSessie().user_id }).then(rows => {
+        if (rows[0] && rows[0].is_admin) {
+          const link = document.createElement('a');
+          link.href = '/leden/beheer.html';
+          link.textContent = 'Beheer';
+          accountPlek.querySelector('.account-knoppen').prepend(link);
+        }
+      }).catch(() => {});
+    }
   }
 }
