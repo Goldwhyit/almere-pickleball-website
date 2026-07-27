@@ -2,6 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8" />
+<script>(function(){try{var t=localStorage.getItem('pb_thema');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Je ticket — Almere Pickleball</title>
 <link rel="icon" type="image/png" href="/assets/img/logo.png" />
@@ -17,6 +18,13 @@
   @media (prefers-color-scheme: dark) {
     :root { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
   }
+  :root[data-theme="dark"] { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  :root[data-theme="light"] { --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1); }
+  .thema-knop {
+    background: rgba(255,255,255,0.15); border: none; border-radius: 8px; width: 34px; height: 34px;
+    font-size: 15px; cursor: pointer; color: inherit; flex-shrink: 0;
+  }
+
   * { box-sizing: border-box; }
   body { margin: 0; font-family: 'Manrope', -apple-system, sans-serif; background: var(--paper); color: var(--ink); }
   header {
@@ -73,6 +81,7 @@
     <div class="merk">Almere Pickleball</div>
     <h1>Je ticket</h1>
   </div>
+  <div id="thema-plek"></div>
 </header>
 <main>
   <div id="app" class="kaart"><div class="laden">Even je boeking ophalen…</div></div>
@@ -156,5 +165,7 @@
 
   haalTicketOp(8);
 </script>
+<script src="/assets/theme.js"></script>
+<script>initThemeKnop('thema-plek');</script>
 </body>
 </html>

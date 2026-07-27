@@ -2,6 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8" />
+<script>(function(){try{var t=localStorage.getItem('pb_thema');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Veelgestelde vragen — Almere Pickleball</title>
 <meta name="description" content="Antwoorden op veelgestelde vragen over lidmaatschap, speelavonden, toernooien en baanverhuur bij Almere Pickleball." />
@@ -16,6 +17,12 @@
   }
   @media (prefers-color-scheme: dark) {
     :root { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  }
+  :root[data-theme="dark"] { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  :root[data-theme="light"] { --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1); }
+  .thema-knop {
+    background: rgba(255,255,255,0.15); border: none; border-radius: 8px; width: 34px; height: 34px;
+    font-size: 15px; cursor: pointer; color: inherit;
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: 'Manrope', -apple-system, sans-serif; background: var(--paper); color: var(--ink); }
@@ -63,6 +70,7 @@
 <body>
 <header>
   <a class="terug" href="/"><img src="/assets/img/logo.png" alt="" width="28" height="27" /> Almere Pickleball</a>
+  <div id="thema-plek" style="position:absolute;top:20px;right:20px;"></div>
   <h1>Veelgestelde vragen</h1>
   <p>Alles wat je wilt weten over spelen, lidmaatschap en toernooien.</p>
 </header>
@@ -168,5 +176,7 @@
 
   <p class="voettekst">Staat je vraag er niet bij? <a href="mailto:info@pickleballalmere.nl">Stuur ons een mail</a>.</p>
 </main>
+<script src="/assets/theme.js"></script>
+<script>initThemeKnop('thema-plek');</script>
 </body>
 </html>

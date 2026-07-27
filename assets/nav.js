@@ -70,10 +70,11 @@ function initNav(actievePagina) {
 
   const accountPlek = document.getElementById('account-plek');
   if (accountPlek) {
-    accountPlek.innerHTML = '<div class="account-knoppen">' +
+    accountPlek.innerHTML = '<div class="account-knoppen" id="account-knoppen-rij">' +
       (actievePagina === 'profiel' ? '' : '<a href="/leden/profiel.html">Profiel</a>') +
       '<button id="nav-uitlog-knop">Uitloggen</button></div>';
     document.getElementById('nav-uitlog-knop').addEventListener('click', uitloggen);
+    if (typeof initThemeKnop === 'function') initThemeKnop('account-knoppen-rij');
 
     if (actievePagina !== 'beheer') {
       haalOp('leden', { select: 'is_admin', id: 'eq.' + huidigeSessie().user_id }).then(rows => {

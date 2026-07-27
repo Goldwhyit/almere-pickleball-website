@@ -13,7 +13,23 @@
     --glas-hooglicht-boven: rgba(255,255,255,0.16); --glas-hooglicht-onder: rgba(0,0,0,0.3);
   }
 }
+/* Handmatige thema-keuze (assets/theme.js) wint altijd van de
+   systeeminstelling hierboven, in beide richtingen. */
+:root[data-theme="dark"] {
+  --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12);
+  --glas-oppervlak: rgba(28,28,30,0.55); --glas-rand: rgba(255,255,255,0.14);
+  --glas-hooglicht-boven: rgba(255,255,255,0.16); --glas-hooglicht-onder: rgba(0,0,0,0.3);
+}
+:root[data-theme="light"] {
+  --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1);
+  --glas-oppervlak: rgba(255,255,255,0.55); --glas-rand: rgba(255,255,255,0.6);
+  --glas-hooglicht-boven: rgba(255,255,255,0.55); --glas-hooglicht-onder: rgba(0,0,0,0.1);
+}
 * { box-sizing: border-box; }
+.thema-knop {
+  background: rgba(255,255,255,0.15); border: none; border-radius: 8px; width: 34px; height: 34px;
+  font-size: 15px; cursor: pointer; color: inherit; flex-shrink: 0;
+}
 body { margin: 0; font-family: 'Manrope', -apple-system, sans-serif; background: var(--paper); color: var(--ink); }
 
 /* "Liquid Glass" — zelfde recept als lib/widgets/glass.dart: backdrop-blur,
