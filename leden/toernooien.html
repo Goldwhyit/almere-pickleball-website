@@ -104,6 +104,7 @@
 <div id="nav-plek"></div>
 <script src="/assets/supabase.js"></script>
 <script src="/assets/nav.js"></script>
+<script src="/assets/swipe-deck.js"></script>
 <script>
   const sessie = vereisSessie();
   initNav('toernooien');
@@ -320,7 +321,7 @@
     if (!toernooien.length) { el.textContent = 'Geen aankomende landelijke toernooien.'; return; }
 
     window.__landelijk = toernooien;
-    el.innerHTML = toernooien.map((t, i) => {
+    const kaarten = toernooien.map((t, i) => {
       const start = new Date(t.datum_start);
       const datumTekst = t.datum_eind
         ? start.getDate() + '–' + new Date(t.datum_eind).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -346,17 +347,22 @@
         '<span class="landelijk-badge">Landelijk</span></div>' +
         detailRegels.join('') + actie + '</div>';
       if (t.flyer_url) {
-        return '<div class="landelijk-kaart met-foto">' +
+        return '<div class="landelijk-kaart met-foto" style="border-top:none">' +
           '<div class="foto-helft"><img src="' + t.flyer_url + '" alt="" /></div>' +
           tekstHelft + '</div>';
       }
-      return '<div class="landelijk-kaart zonder-foto">' + tekstHelft + '</div>';
-    }).join('');
+      return '<div class="landelijk-kaart zonder-foto" style="border-top:none">' + tekstHelft + '</div>';
+    });
 
-    el.querySelectorAll('[data-mail-index]').forEach(btn => btn.addEventListener('click', () => {
-      const t = window.__landelijk[Number(btn.dataset.mailIndex)];
-      inschrijvenPerMail(t.naam, t.email.trim());
-    }));
+    initSwipeDeck(el, kaarten, {
+      leegTekst: 'Geen aankomende landelijke toernooien.',
+      onRender: (kaartEl) => {
+        kaartEl.querySelectorAll('[data-mail-index]').forEach(btn => btn.addEventListener('click', () => {
+          const t = window.__landelijk[Number(btn.dataset.mailIndex)];
+          inschrijvenPerMail(t.naam, t.email.trim());
+        }));
+      },
+    });
   }
 
   // --- Training: eerstvolgende trainingsavond + ranglijst-top-10 ---

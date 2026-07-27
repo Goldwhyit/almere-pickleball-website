@@ -66,12 +66,14 @@
   </div>
   <div class="kaart">
     <h2>Speelavonden</h2>
-    <div id="speeldagen-inhoud" class="laden">Laden…</div>
+    <div id="speeldagen-deck" class="laden">Laden…</div>
+    <div id="speeldagen-melding"></div>
   </div>
 </main>
 <div id="nav-plek"></div>
 <script src="/assets/supabase.js"></script>
 <script src="/assets/nav.js"></script>
+<script src="/assets/swipe-deck.js"></script>
 <script>
   const sessie = vereisSessie();
   initNav('reserveren');
@@ -198,13 +200,16 @@
     }));
   }
 
+  let speeldagenDeck = null;
+
   async function laadSpeeldagen() {
-    const el = document.getElementById('speeldagen-inhoud');
+    const el = document.getElementById('speeldagen-deck');
     const speeldagen = await haalOp('speeldagen', { select: 'id,weekdag,start_tijd,eind_tijd,locatie,adres,aantal_banen,max_spelers', actief: 'eq.true', order: 'weekdag.asc' });
     if (!speeldagen.length) { el.textContent = 'Geen speelavonden gevonden.'; return; }
     toonLocaties(speeldagen);
     await dwingVasteDagAf(speeldagen);
     const sessies = volgendeSessies(speeldagen, 5).slice(0, 8);
+    window.__sessies = sessies;
     if (!sessies.length) { el.textContent = 'Geen aankomende speelavonden binnen het seizoen.'; return; }
 
     const vanaf = sessies[0].start.toISOString();
@@ -217,7 +222,7 @@
 
     const isOffDag = isEenxPerWeek(mijnAbonnement);
 
-    el.innerHTML = sessies.map((s, i) => {
+    const kaarten = sessies.map((s, i) => {
       // Vergelijk als Date, niet als string: PostgREST geeft "+00:00" terug,
       // Date.toISOString() geeft altijd "Z" — twee verschillende strings
       // voor hetzelfde moment, dus een tekstvergelijking mist een bestaande
@@ -244,23 +249,36 @@
       } else {
         knop = '<button class="knop aanmelden" data-actie="aanmelden" data-index="' + i + '">Aanmelden</button>';
       }
-      return '<div class="speeldag-regel' + (blokkade ? ' geblokkeerd' : '') + '">' +
-        '<span><span class="dag">' + dagnamen[weekdag - 1] + ' ' +
+      return '<div class="speeldag-regel' + (blokkade ? ' geblokkeerd' : '') + '" style="border-top:none;padding-top:0">' +
+        '<span><span class="dag" style="font-size:17px">' + dagnamen[weekdag - 1] + ' ' +
         s.start.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + '</span><br>' +
         '<span class="locatie">' + s.locatie + ' · ' + opDezeAvond.length + '/' + s.maxSpelers + '</span>' +
         (blokkade ? '<div class="banner" style="margin:6px 0 0">🚫 Geannuleerd: ' + blokkade.reden + '</div>' : '') +
         '</span>' + knop + '</div>';
-    }).join('') + '<div id="speeldagen-melding"></div>';
+    });
 
-    window.__sessies = sessies;
-    el.querySelectorAll('[data-actie]').forEach(btn => btn.addEventListener('click', () => {
-      if (btn.dataset.actie === 'afmelden') afmelden(btn.dataset.id, btn);
-      else aanmelden(window.__sessies[Number(btn.dataset.index)], btn, btn.dataset.actie === 'aanmelden-bijbetalen');
-    }));
-    el.querySelectorAll('[data-upgrade]').forEach(a => a.addEventListener('click', (e) => {
-      e.preventDefault();
-      toonUpgradePopup();
-    }));
+    function koppelKaartEvents(kaartEl) {
+      kaartEl.querySelectorAll('[data-actie]').forEach(btn => btn.addEventListener('click', () => {
+        if (btn.dataset.actie === 'afmelden') afmelden(btn.dataset.id, btn);
+        else aanmelden(window.__sessies[Number(btn.dataset.index)], btn, btn.dataset.actie === 'aanmelden-bijbetalen');
+      }));
+      kaartEl.querySelectorAll('[data-upgrade]').forEach(a => a.addEventListener('click', (e) => {
+        e.preventDefault();
+        toonUpgradePopup();
+      }));
+    }
+
+    // initSwipeDeck's onRender-callback (hieronder ingesteld) koppelt de
+    // knop-events al opnieuw bij elke render, dus herlaad() alleen is genoeg
+    // — geen aparte handmatige koppeling nodig (zou dubbele listeners geven).
+    if (speeldagenDeck) {
+      speeldagenDeck.herlaad(kaarten);
+    } else {
+      speeldagenDeck = initSwipeDeck(el, kaarten, {
+        leegTekst: 'Geen aankomende speelavonden.',
+        onRender: koppelKaartEvents,
+      });
+    }
   }
 
   function toonSpeeldagMelding(tekst, isFout) {

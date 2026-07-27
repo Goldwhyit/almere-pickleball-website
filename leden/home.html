@@ -10,6 +10,41 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/assets/leden.css" />
+<style>
+  .mini-stat-rij { display: flex; gap: 10px; margin-top: 12px; }
+  .mini-stat { flex: 1; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; text-align: center; }
+  .mini-stat .waarde { font-size: 17px; font-weight: 700; color: var(--navy); }
+  @media (prefers-color-scheme: dark) { .mini-stat .waarde { color: #8ab6ec; } }
+  .mini-stat .label { font-size: 10.5px; color: var(--ink-muted); }
+  .aanmelders-knop {
+    display: flex; align-items: center; gap: 6px; margin-top: 10px; padding: 0; background: none; border: none;
+    color: var(--navy); font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+  }
+  @media (prefers-color-scheme: dark) { .aanmelders-knop { color: #8ab6ec; } }
+  .aangemeld-badge {
+    display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700;
+    background: rgba(20,140,90,0.12); color: #148c5a; margin-left: 8px;
+  }
+  .landelijk-item { padding: 10px 0; border-top: 1px solid var(--line); }
+  .landelijk-item:first-of-type { border-top: none; padding-top: 0; }
+  .landelijk-item .naam { font-weight: 700; font-size: 13.5px; }
+  .landelijk-item .sub { font-size: 12px; color: var(--ink-muted); margin-top: 1px; }
+  .popup-overlay {
+    position: fixed; inset: 0; background: rgba(4,27,51,0.5); z-index: 100;
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+  }
+  .popup-kaart { background: var(--card); border-radius: 18px; width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto; padding: 20px; }
+  .popup-kop { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .popup-kop h3 { margin: 0; font-size: 15.5px; }
+  .popup-sluit { background: rgba(91,107,125,0.12); border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 14px; cursor: pointer; color: var(--ink-muted); }
+  .lid-regel { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+  .lid-regel:first-of-type { border-top: none; padding-top: 0; }
+  .lid-avatar {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; object-fit: cover;
+    background: linear-gradient(135deg, var(--navy), var(--navy-deep)); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;
+  }
+</style>
 </head>
 <body>
 <header>
@@ -51,6 +86,29 @@
     return leeftijd;
   }
 
+  function initialen(naam) {
+    return naam.split(' ').filter(Boolean).slice(0, 2).map(n => n[0].toUpperCase()).join('');
+  }
+
+  function toonLedenPopup(titel, leden) {
+    const bestaand = document.getElementById('home-popup');
+    if (bestaand) bestaand.remove();
+    const overlay = document.createElement('div');
+    overlay.className = 'popup-overlay';
+    overlay.id = 'home-popup';
+    overlay.innerHTML = '<div class="popup-kaart"><div class="popup-kop"><h3>' + titel + '</h3>' +
+      '<button type="button" class="popup-sluit" aria-label="Sluiten">✕</button></div>' +
+      (leden.length
+        ? leden.map(l => '<div class="lid-regel">' +
+            (l.avatar_url ? '<img class="lid-avatar" src="' + l.avatar_url + '" alt="" />' : '<span class="lid-avatar">' + initialen(l.naam) + '</span>') +
+            '<span>' + l.naam + '</span></div>').join('')
+        : '<p class="details">Nog niemand aangemeld.</p>') +
+      '</div>';
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+    overlay.querySelector('.popup-sluit').addEventListener('click', () => overlay.remove());
+    document.body.appendChild(overlay);
+  }
+
   async function laadProfiel() {
     const rows = await haalOp('leden', { select: 'naam', id: 'eq.' + sessie.user_id });
     if (rows.length) document.getElementById('welkom').textContent = 'Welkom, ' + rows[0].naam;
@@ -58,13 +116,23 @@
 
   async function laadAbonnement() {
     const el = document.getElementById('abonnement-inhoud');
-    const actief = await haalOp('lid_abonnementen', {
-      select: 'status,strippen_resterend,geldig_tot,abonnementen(naam,vorm)',
-      lid_id: 'eq.' + sessie.user_id, status: 'eq.actief', limit: '1',
-    });
+    const [actief, avond] = await Promise.all([
+      haalOp('lid_abonnementen', {
+        select: 'status,strippen_resterend,geldig_tot,abonnementen(naam,vorm)',
+        lid_id: 'eq.' + sessie.user_id, status: 'eq.actief', limit: '1',
+      }),
+      haalOp('lid_avond_statistieken', { select: 'gespeeld,gewonnen', lid_id: 'eq.' + sessie.user_id }),
+    ]);
+    const stats = avond[0] || { gespeeld: 0, gewonnen: 0 };
+    const winrate = stats.gespeeld > 0 ? Math.round((stats.gewonnen / stats.gespeeld) * 100) : null;
+    const statsHtml = '<div class="mini-stat-rij">' +
+      '<div class="mini-stat"><div class="waarde">' + stats.gespeeld + '</div><div class="label">Speelavonden</div></div>' +
+      '<div class="mini-stat"><div class="waarde">' + (winrate === null ? '–' : winrate + '%') + '</div><div class="label">Win-%</div></div>' +
+      '</div>';
+
     if (actief.length) {
       const naam = actief[0].abonnementen ? actief[0].abonnementen.naam : '';
-      el.innerHTML = '<div class="status-regel"><span class="status-badge">' + naam + '</span></div>' +
+      el.innerHTML = '<div class="status-regel"><span class="status-badge">' + naam + '</span></div>' + statsHtml +
         '<p style="margin-top:10px"><a href="/leden/profiel.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Beheren →</a></p>';
       return;
     }
@@ -72,17 +140,17 @@
       select: 'id', lid_id: 'eq.' + sessie.user_id, status: 'eq.in_afwachting', limit: '1',
     });
     if (wachtend.length) {
-      el.innerHTML = '<span class="status-badge leeg">In afwachting van betaling</span>' +
+      el.innerHTML = '<span class="status-badge leeg">In afwachting van betaling</span>' + statsHtml +
         '<p style="margin-top:10px"><a href="/leden/profiel.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Afronden →</a></p>';
       return;
     }
-    el.innerHTML = '<span class="status-badge leeg">Geen actief abonnement</span>' +
+    el.innerHTML = '<span class="status-badge leeg">Geen actief abonnement</span>' + statsHtml +
       '<p style="margin-top:10px"><a href="/leden/profiel.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Abonnement starten →</a></p>';
   }
 
   async function laadVolgendeSpeelavond() {
     const el = document.getElementById('volgende-speelavond-inhoud');
-    const speeldagen = await haalOp('speeldagen', { select: 'weekdag,start_tijd,eind_tijd,locatie', actief: 'eq.true' });
+    const speeldagen = await haalOp('speeldagen', { select: 'id,weekdag,start_tijd,eind_tijd,locatie,max_spelers', actief: 'eq.true' });
     if (!speeldagen.length) { el.textContent = 'Geen speelavonden gevonden.'; return; }
     const nu = new Date();
     let volgende = null;
@@ -94,29 +162,54 @@
         const [suur, smin] = sd.start_tijd.split(':').map(Number);
         const start = new Date(dag.getFullYear(), dag.getMonth(), dag.getDate(), suur, smin);
         if (start < nu) continue;
-        volgende = { start, locatie: sd.locatie, eindTijd: sd.eind_tijd };
+        volgende = { speeldagId: sd.id, start, locatie: sd.locatie, eindTijd: sd.eind_tijd, maxSpelers: sd.max_spelers };
         break;
       }
     }
+
+    const reserveringen = await haalOp('reserveringen', {
+      select: 'lid_id,leden(naam,avatar_url)', speeldag_id: 'eq.' + volgende.speeldagId, start_tijd: 'eq.' + volgende.start.toISOString(),
+    });
+    const benIkAangemeld = reserveringen.some(r => r.lid_id === sessie.user_id);
+
     el.innerHTML = '<div class="speeldag-regel"><span><span class="dag">' +
       dagnamen[volgende.start.getDay() === 0 ? 6 : volgende.start.getDay() - 1] + ' ' +
       volgende.start.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + ', ' +
-      volgende.start.toTimeString().slice(0, 5) + '–' + volgende.eindTijd.slice(0, 5) + '</span><br>' +
+      volgende.start.toTimeString().slice(0, 5) + '–' + volgende.eindTijd.slice(0, 5) +
+      (benIkAangemeld ? '<span class="aangemeld-badge">✓ Aangemeld</span>' : '') + '</span><br>' +
       '<span class="locatie">' + volgende.locatie + '</span></span></div>' +
+      '<button type="button" class="aanmelders-knop" id="zie-aanmelders-knop">👥 ' + reserveringen.length + '/' + volgende.maxSpelers + ' aangemeld — bekijk wie →</button>' +
       '<p style="margin-top:10px"><a href="/leden/reserveren.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Aanmelden/afmelden →</a></p>';
+
+    document.getElementById('zie-aanmelders-knop').addEventListener('click', () => {
+      const leden = reserveringen.map(r => r.leden).filter(Boolean);
+      toonLedenPopup('Aangemeld voor deze speelavond', leden);
+    });
   }
 
   async function laadNieuws() {
     const el = document.getElementById('nieuws-inhoud');
     const vandaag = new Date().toISOString().substring(0, 10);
-    const rows = await haalOp('nieuws', {
-      select: 'titel,inhoud,gepubliceerd_op',
-      or: '(vervaldatum.is.null,vervaldatum.gte.' + vandaag + ')',
-      order: 'gepubliceerd_op.desc', limit: '2',
-    });
-    if (!rows.length) { el.textContent = 'Nog geen nieuwsberichten.'; return; }
-    el.innerHTML = rows.map(n => '<div class="nieuws-item"><h3>' + n.titel + '</h3><p>' + n.inhoud + '</p></div>').join('') +
-      '<p style="margin-top:10px"><a href="/leden/nieuws.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Al het nieuws →</a></p>';
+    const [nieuws, landelijk] = await Promise.all([
+      haalOp('nieuws', {
+        select: 'titel,inhoud,gepubliceerd_op',
+        or: '(vervaldatum.is.null,vervaldatum.gte.' + vandaag + ')',
+        order: 'gepubliceerd_op.desc', limit: '2',
+      }),
+      haalOp('landelijke_toernooien', { select: 'naam,datum_start,plaats', datum_start: 'gte.' + vandaag, order: 'volgorde.asc', limit: '1' }),
+    ]);
+
+    let html = '';
+    if (!nieuws.length && !landelijk.length) { el.textContent = 'Nog geen nieuwsberichten.'; return; }
+    html += nieuws.map(n => '<div class="nieuws-item"><h3>' + n.titel + '</h3><p>' + n.inhoud + '</p></div>').join('');
+    if (landelijk.length) {
+      const t = landelijk[0];
+      html += '<div class="landelijk-item"><div class="naam">🏆 ' + t.naam + '</div>' +
+        '<div class="sub">' + new Date(t.datum_start).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + ' · ' + t.plaats + ' · landelijk toernooi</div></div>';
+    }
+    html += '<p style="margin-top:10px"><a href="/leden/nieuws.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Al het nieuws →</a>' +
+      ' <a href="/leden/toernooien.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none;margin-left:10px">Landelijke toernooien →</a></p>';
+    el.innerHTML = html;
   }
 
   Promise.all([laadProfiel(), laadAbonnement(), laadVolgendeSpeelavond(), laadNieuws()])

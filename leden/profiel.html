@@ -11,6 +11,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/assets/leden.css" />
 <style>
+  .pil-knop {
+    padding: 9px 18px; border-radius: 999px; border: none; font-size: 13px; font-weight: 700;
+    cursor: pointer; font-family: inherit; background: var(--navy); color: #fff;
+  }
+  .pil-knop.secundair { background: transparent; color: var(--navy); border: 1.5px solid var(--navy); }
+  @media (prefers-color-scheme: dark) { .pil-knop.secundair { color: #8ab6ec; border-color: #8ab6ec; } }
+  .pil-knoppen-rij { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .gegevens-weergave-rij {
+    display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 13.5px;
+  }
+  .gegevens-weergave-rij:first-of-type { border-top: none; padding-top: 0; }
+  .gegevens-weergave-rij .label { color: var(--ink-muted); flex-shrink: 0; }
+  .gegevens-weergave-rij .waarde { font-weight: 600; text-align: right; word-break: break-word; }
   .veld-rij { margin-bottom: 12px; }
   .veld-rij label { display: block; font-size: 12.5px; color: var(--ink-muted); margin-bottom: 4px; font-weight: 600; }
   .veld-rij input, .veld-rij select, .veld-rij textarea {
@@ -200,7 +213,30 @@
     mijnLid = rows[0];
     document.getElementById('welkom').textContent = 'Welkom, ' + mijnLid.naam;
     mijnLeeftijd = berekenLeeftijd(mijnLid.geboortedatum);
-    toonGegevensFormulier();
+    toonGegevensWeergave();
+  }
+
+  /// Standaard afgeschermde weergave — alleen-lezen totdat "Wijzigen"
+  /// wordt aangetikt (voorkomt dat iemand per ongeluk een veld aanpast).
+  function toonGegevensWeergave() {
+    const el = document.getElementById('gegevens-inhoud');
+    const lid = mijnLid;
+    const regel = (label, waarde) => '<div class="gegevens-weergave-rij"><span class="label">' + label + '</span><span class="waarde">' + (waarde || '–') + '</span></div>';
+    el.className = '';
+    el.innerHTML =
+      regel('Naam', lid.naam) +
+      regel('E-mail', lid.email) +
+      regel('Telefoon', lid.telefoon) +
+      regel('Geboortedatum', lid.geboortedatum ? datumFormat.format(new Date(lid.geboortedatum)) : null) +
+      regel('Geslacht', lid.geslacht ? geslachtLabels[lid.geslacht] : null) +
+      regel('Niveau', niveauLabels[lid.niveau] || lid.niveau) +
+      regel('Adres', lid.adres) +
+      regel('Speelervaring', lid.ervaring) +
+      regel('Noodcontact', lid.noodcontact_naam ? lid.noodcontact_naam + (lid.noodcontact_telefoon ? ' · ' + lid.noodcontact_telefoon : '') : null) +
+      regel('Medische info', lid.medische_info) +
+      (lid.lid_sinds ? regel('Lid sinds', datumFormat.format(new Date(lid.lid_sinds))) : '') +
+      '<div class="pil-knoppen-rij"><button type="button" class="pil-knop" id="gegevens-wijzig-knop">Wijzigen</button></div>';
+    document.getElementById('gegevens-wijzig-knop').addEventListener('click', toonGegevensFormulier);
   }
 
   function toonGegevensFormulier() {
@@ -231,9 +267,13 @@
       '</div>' +
       '<div class="veld-rij"><label>Medische info (bijv. blessures/allergieën)</label><textarea id="veld-medische-info">' + (lid.medische_info || '') + '</textarea></div>' +
       (lid.lid_sinds ? '<p class="details">Lid sinds ' + datumFormat.format(new Date(lid.lid_sinds)) + '</p>' : '') +
-      '<button class="knop aanmelden" id="gegevens-opslaan-knop">Wijzigingen opslaan</button>' +
+      '<div class="pil-knoppen-rij">' +
+      '<button type="button" class="pil-knop" id="gegevens-opslaan-knop">Opslaan</button>' +
+      '<button type="button" class="pil-knop secundair" id="gegevens-annuleer-knop">Annuleren</button>' +
+      '</div>' +
       '<div id="gegevens-melding"></div>';
     document.getElementById('gegevens-opslaan-knop').addEventListener('click', slaGegevensOp);
+    document.getElementById('gegevens-annuleer-knop').addEventListener('click', toonGegevensWeergave);
   }
 
   function leegOfWaarde(id) {
@@ -261,12 +301,12 @@
         noodcontact_telefoon: leegOfWaarde('veld-noodcontact-telefoon'),
         medische_info: leegOfWaarde('veld-medische-info'),
       });
-      meldingEl.innerHTML = '<div class="melding ok">Opgeslagen.</div>';
       await laadProfiel();
+      toonGegevensWeergave();
     } catch (e) {
       meldingEl.innerHTML = '<div class="melding fout">' + e.message + '</div>';
       btn.disabled = false;
-      btn.textContent = 'Wijzigingen opslaan';
+      btn.textContent = 'Opslaan';
     }
   }
 
@@ -461,32 +501,39 @@
   async function laadAbonnement() {
     const el = document.getElementById('abonnement-inhoud');
 
+    const vormLabels = { jaar: 'Jaarlijks', maand: 'Maandelijks', strippenkaart: 'Strippenkaart', sessie: 'Per sessie', proef: 'Proeflidmaatschap' };
     const actief = await haalOp('lid_abonnementen', {
-      select: 'id,status,strippen_resterend,geldig_tot,start_datum,opgezegd_op,eind_datum,vaste_dag,abonnementen(naam,vorm,sessies_per_week)',
+      select: 'id,status,strippen_resterend,geldig_tot,start_datum,opgezegd_op,eind_datum,vaste_dag,abonnementen(naam,vorm,prijs,sessies_per_week)',
       lid_id: 'eq.' + sessie.user_id, status: 'eq.actief', limit: '1',
     });
     if (actief.length) {
       mijnAbonnement = actief[0];
-      const naam = mijnAbonnement.abonnementen ? mijnAbonnement.abonnementen.naam : '';
-      let extra = '';
-      if (mijnAbonnement.abonnementen && (mijnAbonnement.abonnementen.vorm === 'strippenkaart' || mijnAbonnement.abonnementen.vorm === 'proef') && mijnAbonnement.geldig_tot) {
-        extra += '<p style="margin:4px 0 0;font-size:13.5px;color:var(--ink-muted)">' +
-          (mijnAbonnement.strippen_resterend ?? 0) + ' over, geldig tot ' + datumFormat.format(new Date(mijnAbonnement.geldig_tot)) + '</p>';
+      const abo = mijnAbonnement.abonnementen;
+      const naam = abo ? abo.naam : '';
+      const regel = (label, waarde) => waarde ? '<div class="gegevens-weergave-rij"><span class="label">' + label + '</span><span class="waarde">' + waarde + '</span></div>' : '';
+      let details = '';
+      if (abo) {
+        details += regel('Vorm', vormLabels[abo.vorm] || abo.vorm);
+        details += regel('Prijs', '€' + Number(abo.prijs).toFixed(2) + (abo.vorm === 'jaar' ? ' / jaar' : abo.vorm === 'maand' ? ' / maand' : abo.vorm === 'sessie' ? ' / keer' : ''));
+        if (abo.sessies_per_week) details += regel('Speelfrequentie', abo.sessies_per_week + 'x per week');
       }
-      if (mijnAbonnement.start_datum) {
-        extra += '<p style="margin:4px 0 0;font-size:13.5px;color:var(--ink-muted)">Gestart op ' + datumFormat.format(new Date(mijnAbonnement.start_datum)) + '</p>';
+      if (mijnAbonnement.start_datum) details += regel('Gestart op', datumFormat.format(new Date(mijnAbonnement.start_datum)));
+      if (abo && (abo.vorm === 'strippenkaart' || abo.vorm === 'proef') && mijnAbonnement.geldig_tot) {
+        details += regel('Strippen resterend', (mijnAbonnement.strippen_resterend ?? 0) + ' over, geldig tot ' + datumFormat.format(new Date(mijnAbonnement.geldig_tot)));
       }
+      const eenxPerWeek = abo && ['jaar', 'maand'].includes(abo.vorm) && abo.sessies_per_week === 1;
+      if (eenxPerWeek && mijnAbonnement.vaste_dag) details += regel('Vaste speeldag', dagnamenKort[mijnAbonnement.vaste_dag - 1]);
       if (mijnAbonnement.opgezegd_op && mijnAbonnement.eind_datum) {
-        extra += '<p style="margin:4px 0 0;font-size:13.5px;color:var(--gold-deep)">Opgezegd — blijft geldig tot ' + datumFormat.format(new Date(mijnAbonnement.eind_datum)) + '</p>';
+        details += '<div class="gegevens-weergave-rij"><span class="label">Status</span><span class="waarde" style="color:var(--gold-deep)">Opgezegd — geldig tot ' + datumFormat.format(new Date(mijnAbonnement.eind_datum)) + '</span></div>';
       }
-      const eenxPerWeek = mijnAbonnement.abonnementen && ['jaar', 'maand'].includes(mijnAbonnement.abonnementen.vorm) && mijnAbonnement.abonnementen.sessies_per_week === 1;
-      if (eenxPerWeek && mijnAbonnement.vaste_dag) {
-        extra += '<p style="margin:4px 0 0;font-size:13.5px;color:var(--ink-muted)">Vaste speeldag: ' + dagnamenKort[mijnAbonnement.vaste_dag - 1] + '</p>';
-      }
-      el.innerHTML = '<div class="status-regel"><span class="status-badge">' + naam + '</span></div>' + extra +
-        (mijnAbonnement.opgezegd_op ? '' : '<button class="knop afmelden" id="opzeg-knop" style="margin-top:12px">Abonnement opzeggen</button>') +
-        '<button type="button" class="vergelijk-knop" id="vergelijk-knop">Vergelijk abonnementen →</button>' +
-        (eenxPerWeek ? '<button type="button" class="vergelijk-knop" id="upgrade-2x-knop" style="display:block;margin-top:6px">Overstappen naar 2x per week →</button>' : '') +
+
+      el.innerHTML = '<div class="status-regel"><span class="status-badge">' + naam + '</span></div>' +
+        '<div style="margin-top:10px">' + details + '</div>' +
+        '<div class="pil-knoppen-rij">' +
+        '<button type="button" class="pil-knop" id="vergelijk-knop">Vergelijk abonnementen</button>' +
+        (eenxPerWeek ? '<button type="button" class="pil-knop" id="upgrade-2x-knop">Overstappen naar 2x/week</button>' : '') +
+        (mijnAbonnement.opgezegd_op ? '' : '<button type="button" class="pil-knop secundair" id="opzeg-knop">Opzeggen</button>') +
+        '</div>' +
         '<div id="abonnement-melding"></div>';
       if (document.getElementById('opzeg-knop')) document.getElementById('opzeg-knop').addEventListener('click', opzeggen);
       document.getElementById('vergelijk-knop').addEventListener('click', toonVergelijking);

@@ -39,8 +39,12 @@
     display: flex; justify-content: space-between; align-items: center; gap: 10px;
     font-size: 12px; color: var(--ink-muted); border-top: 1px solid var(--line); padding-top: 10px;
   }
-  .nieuws-kaart .voetregel a { color: var(--navy); font-weight: 700; text-decoration: none; }
-  @media (prefers-color-scheme: dark) { .nieuws-kaart .voetregel a { color: #8ab6ec; } }
+  .nieuws-kaart .voetregel a {
+    display: inline-block; padding: 5px 14px; border-radius: 999px; font-weight: 700; text-decoration: none;
+    background: var(--navy); color: #fff; white-space: nowrap;
+  }
+  .foto-placeholder svg { width: 30px; height: 30px; color: var(--navy); }
+  @media (prefers-color-scheme: dark) { .foto-placeholder svg { color: #8ab6ec; } }
 </style>
 </head>
 <body>
@@ -53,30 +57,36 @@
   <div id="account-plek"></div>
 </header>
 <main>
-  <div id="nieuws-inhoud" class="laden">Laden…</div>
+  <div id="nieuws-deck" class="laden">Laden…</div>
 </main>
 <div id="nav-plek"></div>
 <script src="/assets/supabase.js"></script>
 <script src="/assets/nav.js"></script>
+<script src="/assets/swipe-deck.js"></script>
 <script>
   const sessie = vereisSessie();
   initNav('nieuws');
 
   const categorieLabels = { club: 'Club', toernooi: 'Toernooi', bond: 'Bond', jeugd: 'Jeugd', algemeen: 'Algemeen' };
-  const categorieIconen = { club: '🏓', toernooi: '🏆', bond: '📣', jeugd: '🧒', algemeen: '📰' };
+  // Sportpassende iconen i.p.v. algemene emoji — zelfde stroke-stijl als assets/nav.js.
+  const categorieIconen = {
+    club: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="13" rx="5"/><circle cx="18.5" cy="6" r="1.4" fill="currentColor" stroke="none"/><line x1="12" y1="15" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/></svg>',
+    toernooi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M9 14L7 21l5-3 5 3-2-7" stroke-linejoin="round"/></svg>',
+    bond: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11v2a2 2 0 0 0 2 2h1l2 5h2l-1-5h2l9 4V6l-9 4H8a2 2 0 0 0-2 2z" stroke-linejoin="round"/></svg>',
+    jeugd: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M15 15.5c2.2.3 4 2 4 4.5"/></svg>',
+    algemeen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg>',
+  };
 
   async function laadNieuws() {
-    const el = document.getElementById('nieuws-inhoud');
+    const el = document.getElementById('nieuws-deck');
     const vandaag = new Date().toISOString().substring(0, 10);
     const rows = await haalOp('nieuws', {
       select: 'titel,inhoud,gepubliceerd_op,categorie,bron,link,datum_tekst,afbeelding_url,vervaldatum',
       or: '(vervaldatum.is.null,vervaldatum.gte.' + vandaag + ')',
       order: 'gepubliceerd_op.desc,volgorde.asc',
     });
-    el.className = '';
-    if (!rows.length) { el.innerHTML = '<p class="details">Nog geen nieuwsberichten.</p>'; return; }
 
-    el.innerHTML = rows.map(n => {
+    const kaarten = rows.map(n => {
       const categorie = n.categorie && categorieLabels[n.categorie] ? n.categorie : 'algemeen';
       const datumWeergave = n.datum_tekst ||
         new Date(n.gepubliceerd_op).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -86,18 +96,20 @@
       const bronLink = n.link
         ? '<a href="' + n.link + '" target="_blank" rel="noopener">Meer lezen →</a>'
         : '';
-      return '<div class="nieuws-kaart">' + foto +
+      return '<div class="nieuws-kaart" style="border:none;box-shadow:none">' + foto +
         '<div class="inhoud-vlak">' +
         '<span class="categorie-badge categorie-' + categorie + '">' + categorieLabels[categorie] + '</span>' +
         '<h3>' + n.titel + '</h3>' +
         '<p class="lichaam">' + n.inhoud + '</p>' +
         '<div class="voetregel"><span>' + (n.bron ? n.bron + ' · ' : '') + datumWeergave + '</span>' + bronLink + '</div>' +
         '</div></div>';
-    }).join('');
+    });
+
+    initSwipeDeck(el, kaarten, { leegTekst: 'Nog geen nieuwsberichten.' });
   }
 
   laadNieuws().catch(e => {
-    document.getElementById('nieuws-inhoud').textContent = 'Kon nieuws niet laden: ' + e.message;
+    document.getElementById('nieuws-deck').textContent = 'Kon nieuws niet laden: ' + e.message;
   });
 </script>
 </body>

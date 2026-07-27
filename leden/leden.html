@@ -24,7 +24,7 @@
   .lid-regel { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
   .lid-regel:first-of-type { border-top: none; padding-top: 0; }
   .avatar {
-    width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+    width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; object-fit: cover;
     background: linear-gradient(135deg, var(--navy), var(--navy-deep)); color: #fff;
     display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px;
   }
@@ -33,6 +33,35 @@
   .lid-rating { font-weight: 700; font-size: 15px; color: var(--navy); min-width: 40px; text-align: right; }
   @media (prefers-color-scheme: dark) { .lid-rating { color: #8ab6ec; } }
   .rang-nummer { width: 22px; text-align: center; font-weight: 700; color: var(--ink-muted); font-size: 13px; }
+
+  .lid-kaart { text-align: center; padding: 10px; }
+  .lid-kaart .avatar-groot {
+    width: 96px; height: 96px; border-radius: 50%; object-fit: cover; margin: 0 auto 12px;
+    background: linear-gradient(135deg, var(--navy), var(--navy-deep)); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 32px;
+  }
+  .lid-kaart .naam { font-size: 18px; font-weight: 700; }
+  .lid-kaart .niveau-badge {
+    display: inline-block; margin-top: 6px; padding: 3px 12px; border-radius: 999px; font-size: 12px; font-weight: 700;
+    background: rgba(0,91,191,0.1); color: var(--navy);
+  }
+  @media (prefers-color-scheme: dark) { .lid-kaart .niveau-badge { color: #8ab6ec; } }
+  .lid-kaart .stat-rij { display: flex; gap: 10px; margin-top: 16px; }
+  .lid-kaart .stat-tegel { flex: 1; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
+  .lid-kaart .stat-tegel .waarde { font-size: 18px; font-weight: 700; color: var(--navy); }
+  @media (prefers-color-scheme: dark) { .lid-kaart .stat-tegel .waarde { color: #8ab6ec; } }
+  .lid-kaart .stat-tegel .label { font-size: 10.5px; color: var(--ink-muted); }
+  .lid-kaart .details-knop {
+    margin-top: 14px; padding: 9px 18px; border-radius: 999px; border: none; background: var(--navy); color: #fff;
+    font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  .popup-overlay {
+    position: fixed; inset: 0; background: rgba(4,27,51,0.5); z-index: 100;
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+  }
+  .popup-kaart { background: var(--card); border-radius: 18px; width: 100%; max-width: 380px; padding: 22px; text-align: center; }
+  .popup-sluit-rij { text-align: right; }
+  .popup-sluit { background: rgba(91,107,125,0.12); border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 14px; cursor: pointer; color: var(--ink-muted); }
 </style>
 </head>
 <body>
@@ -65,6 +94,7 @@
 <div id="nav-plek"></div>
 <script src="/assets/supabase.js"></script>
 <script src="/assets/nav.js"></script>
+<script src="/assets/swipe-deck.js"></script>
 <script>
   const sessie = vereisSessie();
   initNav('leden');
@@ -76,6 +106,7 @@
   let zoek = '';
   let niveauFilter = '';
   let toonRanglijst = false;
+  let ledenDeck = null;
 
   function initialen(naam) {
     return naam.split(' ').filter(Boolean).slice(0, 2).map(n => n[0].toUpperCase()).join('');
@@ -97,27 +128,68 @@
     });
   }
 
+  function toonWedstrijdDetails(lid) {
+    const s = statsMap[lid.id] || { gespeeld: 0, gewonnen: 0 };
+    const winrate = s.gespeeld > 0 ? Math.round((s.gewonnen / s.gespeeld) * 100) : null;
+    const bestaand = document.getElementById('lid-popup');
+    if (bestaand) bestaand.remove();
+    const overlay = document.createElement('div');
+    overlay.className = 'popup-overlay';
+    overlay.id = 'lid-popup';
+    overlay.innerHTML = '<div class="popup-kaart">' +
+      '<div class="popup-sluit-rij"><button type="button" class="popup-sluit" aria-label="Sluiten">✕</button></div>' +
+      (lid.avatar_url ? '<img class="avatar-groot" src="' + lid.avatar_url + '" alt="" />' : '<div class="avatar-groot">' + initialen(lid.naam) + '</div>') +
+      '<div class="naam">' + lid.naam + '</div>' +
+      '<span class="niveau-badge">' + (niveauLabels[lid.niveau] || lid.niveau || '') + '</span>' +
+      '<div class="stat-rij">' +
+      '<div class="stat-tegel"><div class="waarde">' + (lid.rating != null ? Number(lid.rating).toFixed(2) : '–') + '</div><div class="label">Rating</div></div>' +
+      '<div class="stat-tegel"><div class="waarde">' + s.gespeeld + '</div><div class="label">Speelavonden</div></div>' +
+      '<div class="stat-tegel"><div class="waarde">' + (winrate === null ? '–' : winrate + '%') + '</div><div class="label">Win-%</div></div>' +
+      '</div></div>';
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+    overlay.querySelector('.popup-sluit').addEventListener('click', () => overlay.remove());
+    document.body.appendChild(overlay);
+  }
+
   function render() {
     const el = document.getElementById('leden-inhoud');
     const lijst = gefilterdeLeden();
-    if (!lijst.length) { el.innerHTML = 'Geen leden gevonden.'; return; }
+    el.className = '';
+    if (!lijst.length) { el.innerHTML = '<p class="details">Geen leden gevonden.</p>'; ledenDeck = null; return; }
 
     if (toonRanglijst) {
       const gesorteerd = [...lijst].sort((a, b) => (Number(b.rating) || 0) - (Number(a.rating) || 0));
       el.innerHTML = gesorteerd.map((l, i) => {
         const rating = l.rating != null ? Number(l.rating).toFixed(2) : '–';
-        return '<div class="lid-regel"><span class="rang-nummer">' + (i + 1) + '</span>' +
-          '<span class="avatar">' + initialen(l.naam) + '</span>' +
+        return '<div class="lid-regel">' +
+          '<span class="rang-nummer">' + (i + 1) + '</span>' +
+          (l.avatar_url ? '<img class="avatar" src="' + l.avatar_url + '" alt="" />' : '<span class="avatar">' + initialen(l.naam) + '</span>') +
           '<span style="flex:1"><span class="lid-naam">' + l.naam + '</span>' +
           '<div class="lid-sub">' + subtitel(l) + '</div></span>' +
           '<span class="lid-rating">' + rating + '</span></div>';
       }).join('');
+      ledenDeck = null;
+      return;
+    }
+
+    // Leden-weergave: tinder-stijl swipe-kaarten met foto, klik voor wedstrijddetails.
+    const kaarten = lijst.map((l, i) => '<div class="lid-kaart">' +
+      (l.avatar_url ? '<img class="avatar-groot" src="' + l.avatar_url + '" alt="" />' : '<div class="avatar-groot">' + initialen(l.naam) + '</div>') +
+      '<div class="naam">' + l.naam + '</div>' +
+      '<span class="niveau-badge">' + (niveauLabels[l.niveau] || l.niveau || '') + '</span>' +
+      '<button type="button" class="details-knop" data-details-index="' + i + '">Bekijk wedstrijddetails</button>' +
+      '</div>');
+
+    function koppel(kaartEl) {
+      const btn = kaartEl.querySelector('[data-details-index]');
+      if (btn) btn.addEventListener('click', () => toonWedstrijdDetails(lijst[Number(btn.dataset.detailsIndex)]));
+    }
+
+    if (ledenDeck) {
+      ledenDeck.herlaad(kaarten);
     } else {
-      el.innerHTML = lijst.map(l =>
-        '<div class="lid-regel"><span class="avatar">' + initialen(l.naam) + '</span>' +
-        '<span style="flex:1"><span class="lid-naam">' + l.naam + '</span>' +
-        '<div class="lid-sub">' + subtitel(l) + '</div></span></div>'
-      ).join('');
+      el.innerHTML = '';
+      ledenDeck = initSwipeDeck(el, kaarten, { leegTekst: 'Geen leden gevonden.', onRender: koppel });
     }
   }
 
@@ -142,12 +214,13 @@
     document.getElementById('pil-leden').classList.toggle('actief', !ranglijst);
     document.getElementById('pil-ranglijst').classList.toggle('actief', ranglijst);
     document.getElementById('kop-titel').textContent = ranglijst ? 'Ranglijst' : 'Leden';
+    ledenDeck = null;
     render();
   }
 
   async function laadLeden() {
     const [leden, stats] = await Promise.all([
-      haalOp('leden', { select: 'id,naam,niveau,rating', order: 'naam.asc' }),
+      haalOp('leden', { select: 'id,naam,niveau,rating,avatar_url', order: 'naam.asc' }),
       haalOp('lid_avond_statistieken', { select: 'lid_id,gespeeld,gewonnen' }),
     ]);
     alleLeden = leden;
