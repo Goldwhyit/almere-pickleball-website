@@ -10,6 +10,38 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/assets/leden.css" />
+<style>
+  #nieuws-inhoud { display: flex; flex-direction: column; gap: 14px; }
+  .nieuws-kaart {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .nieuws-kaart .foto { width: 100%; height: 170px; object-fit: cover; display: block; background: var(--paper); }
+  .nieuws-kaart .foto-placeholder {
+    width: 100%; height: 90px; display: flex; align-items: center; justify-content: center;
+    font-size: 32px; background: rgba(0,91,191,0.06);
+  }
+  .nieuws-kaart .inhoud-vlak { padding: 16px 18px; }
+  .categorie-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 8px;
+  }
+  .categorie-club { background: rgba(0,91,191,0.12); color: var(--navy); }
+  @media (prefers-color-scheme: dark) { .categorie-club { color: #8ab6ec; } }
+  .categorie-toernooi { background: rgba(184,134,10,0.14); color: var(--gold-deep); }
+  @media (prefers-color-scheme: dark) { .categorie-toernooi { color: var(--gold); } }
+  .categorie-bond { background: rgba(179,38,30,0.1); color: #b3261e; }
+  .categorie-jeugd { background: rgba(20,140,90,0.12); color: #148c5a; }
+  .categorie-algemeen { background: rgba(91,107,125,0.12); color: var(--ink-muted); }
+  .nieuws-kaart h3 { margin: 0 0 6px; font-size: 16px; }
+  .nieuws-kaart .lichaam { margin: 0 0 10px; font-size: 14px; line-height: 1.6; color: var(--ink); white-space: pre-line; }
+  .nieuws-kaart .voetregel {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    font-size: 12px; color: var(--ink-muted); border-top: 1px solid var(--line); padding-top: 10px;
+  }
+  .nieuws-kaart .voetregel a { color: var(--navy); font-weight: 700; text-decoration: none; }
+  @media (prefers-color-scheme: dark) { .nieuws-kaart .voetregel a { color: #8ab6ec; } }
+</style>
 </head>
 <body>
 <header>
@@ -21,9 +53,7 @@
   <div id="account-plek"></div>
 </header>
 <main>
-  <div class="kaart">
-    <div id="nieuws-inhoud" class="laden">Laden…</div>
-  </div>
+  <div id="nieuws-inhoud" class="laden">Laden…</div>
 </main>
 <div id="nav-plek"></div>
 <script src="/assets/supabase.js"></script>
@@ -32,17 +62,43 @@
   const sessie = vereisSessie();
   initNav('nieuws');
 
+  const categorieLabels = { club: 'Club', toernooi: 'Toernooi', bond: 'Bond', jeugd: 'Jeugd', algemeen: 'Algemeen' };
+  const categorieIconen = { club: '🏓', toernooi: '🏆', bond: '📣', jeugd: '🧒', algemeen: '📰' };
+
   async function laadNieuws() {
     const el = document.getElementById('nieuws-inhoud');
-    const rows = await haalOp('nieuws', { select: 'titel,inhoud,gepubliceerd_op', order: 'gepubliceerd_op.desc' });
-    if (!rows.length) { el.textContent = 'Nog geen nieuwsberichten.'; return; }
-    el.innerHTML = rows.map(n => '<div class="nieuws-item"><h3>' + n.titel + '</h3>' +
-      '<div class="details" style="margin-bottom:6px">' +
-      new Date(n.gepubliceerd_op).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) +
-      '</div><p>' + n.inhoud + '</p></div>').join('');
+    const vandaag = new Date().toISOString().substring(0, 10);
+    const rows = await haalOp('nieuws', {
+      select: 'titel,inhoud,gepubliceerd_op,categorie,bron,link,datum_tekst,afbeelding_url,vervaldatum',
+      or: '(vervaldatum.is.null,vervaldatum.gte.' + vandaag + ')',
+      order: 'gepubliceerd_op.desc,volgorde.asc',
+    });
+    el.className = '';
+    if (!rows.length) { el.innerHTML = '<p class="details">Nog geen nieuwsberichten.</p>'; return; }
+
+    el.innerHTML = rows.map(n => {
+      const categorie = n.categorie && categorieLabels[n.categorie] ? n.categorie : 'algemeen';
+      const datumWeergave = n.datum_tekst ||
+        new Date(n.gepubliceerd_op).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+      const foto = n.afbeelding_url
+        ? '<img class="foto" src="' + n.afbeelding_url + '" alt="" loading="lazy" />'
+        : '<div class="foto-placeholder">' + categorieIconen[categorie] + '</div>';
+      const bronLink = n.link
+        ? '<a href="' + n.link + '" target="_blank" rel="noopener">Meer lezen →</a>'
+        : '';
+      return '<div class="nieuws-kaart">' + foto +
+        '<div class="inhoud-vlak">' +
+        '<span class="categorie-badge categorie-' + categorie + '">' + categorieLabels[categorie] + '</span>' +
+        '<h3>' + n.titel + '</h3>' +
+        '<p class="lichaam">' + n.inhoud + '</p>' +
+        '<div class="voetregel"><span>' + (n.bron ? n.bron + ' · ' : '') + datumWeergave + '</span>' + bronLink + '</div>' +
+        '</div></div>';
+    }).join('');
   }
 
-  laadNieuws().catch(e => console.error(e));
+  laadNieuws().catch(e => {
+    document.getElementById('nieuws-inhoud').textContent = 'Kon nieuws niet laden: ' + e.message;
+  });
 </script>
 </body>
 </html>

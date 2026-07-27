@@ -108,7 +108,12 @@
 
   async function laadNieuws() {
     const el = document.getElementById('nieuws-inhoud');
-    const rows = await haalOp('nieuws', { select: 'titel,inhoud,gepubliceerd_op', order: 'gepubliceerd_op.desc', limit: '2' });
+    const vandaag = new Date().toISOString().substring(0, 10);
+    const rows = await haalOp('nieuws', {
+      select: 'titel,inhoud,gepubliceerd_op',
+      or: '(vervaldatum.is.null,vervaldatum.gte.' + vandaag + ')',
+      order: 'gepubliceerd_op.desc', limit: '2',
+    });
     if (!rows.length) { el.textContent = 'Nog geen nieuwsberichten.'; return; }
     el.innerHTML = rows.map(n => '<div class="nieuws-item"><h3>' + n.titel + '</h3><p>' + n.inhoud + '</p></div>').join('') +
       '<p style="margin-top:10px"><a href="/leden/nieuws.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Al het nieuws →</a></p>';

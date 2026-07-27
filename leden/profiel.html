@@ -10,6 +10,78 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/assets/leden.css" />
+<style>
+  .veld-rij { margin-bottom: 12px; }
+  .veld-rij label { display: block; font-size: 12.5px; color: var(--ink-muted); margin-bottom: 4px; font-weight: 600; }
+  .veld-rij input, .veld-rij select, .veld-rij textarea {
+    width: 100%; padding: 10px 12px; border-radius: 10px; border: 1.5px solid var(--line);
+    background: var(--paper); color: var(--ink); font-size: 14.5px; font-family: inherit;
+  }
+  .veld-rij textarea { resize: vertical; min-height: 60px; }
+  .veld-rij input:disabled { opacity: 0.6; }
+  .veld-twee { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 6px; }
+  .stat-tegel {
+    background: var(--paper); border: 1px solid var(--line); border-radius: 10px;
+    padding: 12px 10px; text-align: center;
+  }
+  .stat-tegel .waarde { font-size: 22px; font-weight: 700; color: var(--navy); }
+  @media (prefers-color-scheme: dark) { .stat-tegel .waarde { color: #8ab6ec; } }
+  .stat-tegel .label { font-size: 11px; color: var(--ink-muted); margin-top: 2px; }
+  .podium-rij { display: flex; gap: 14px; margin-top: 12px; font-size: 13.5px; }
+  .rating-badge {
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 12px;
+    background: rgba(255,210,63,0.14); margin-bottom: 4px;
+  }
+  .rating-badge .cijfer { font-size: 24px; font-weight: 700; color: var(--gold-deep); }
+  @media (prefers-color-scheme: dark) { .rating-badge .cijfer { color: var(--gold); } }
+  .rating-badge .wedstrijden { font-size: 12px; color: var(--ink-muted); }
+  .speler-slot { margin-bottom: 10px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; }
+  .speler-slot label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+  .speler-slot select { width: 100%; margin-bottom: 6px; }
+  .extern-invoer { display: flex; gap: 6px; }
+  .extern-invoer input, .extern-invoer select { flex: 1; }
+  .wedstrijd-item {
+    padding: 10px 0; border-top: 1px solid var(--line); font-size: 13.5px; display: flex;
+    justify-content: space-between; align-items: center; gap: 8px;
+  }
+  .wedstrijd-item:first-of-type { border-top: none; padding-top: 0; }
+  .wedstrijd-status {
+    padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
+  .wedstrijd-status.in_behandeling { background: rgba(255,210,63,0.16); color: var(--gold-deep); }
+  @media (prefers-color-scheme: dark) { .wedstrijd-status.in_behandeling { color: var(--gold); } }
+  .wedstrijd-status.goedgekeurd { background: rgba(20,140,90,0.12); color: #148c5a; }
+  .wedstrijd-status.afgekeurd { background: rgba(179,38,30,0.1); color: #b3261e; }
+  .vergelijk-knop {
+    background: none; border: none; color: var(--navy); font-family: inherit; font-size: 12.5px;
+    font-weight: 700; cursor: pointer; padding: 0; margin-top: 8px;
+  }
+  @media (prefers-color-scheme: dark) { .vergelijk-knop { color: #8ab6ec; } }
+  .popup-overlay {
+    position: fixed; inset: 0; background: rgba(4,27,51,0.45); z-index: 100;
+    display: flex; align-items: flex-end; justify-content: center;
+  }
+  .popup-kaart {
+    background: var(--card); border-radius: 18px 18px 0 0; width: 100%; max-width: 480px;
+    max-height: 80vh; overflow-y: auto; padding: 20px;
+  }
+  @media (min-width: 560px) {
+    .popup-overlay { align-items: center; }
+    .popup-kaart { border-radius: 18px; }
+  }
+  .popup-kop { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .popup-kop h3 { margin: 0; font-size: 16px; }
+  .popup-sluit { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--ink-muted); }
+  .plan-regel {
+    padding: 12px 0; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 10px;
+  }
+  .plan-regel:first-of-type { border-top: none; padding-top: 0; }
+  .plan-regel .naam { font-weight: 700; font-size: 14px; }
+  .plan-regel .sub { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+  .plan-regel .prijs { font-weight: 700; font-size: 14px; color: var(--navy); white-space: nowrap; }
+  @media (prefers-color-scheme: dark) { .plan-regel .prijs { color: #8ab6ec; } }
+</style>
 </head>
 <body>
 <header>
@@ -25,6 +97,22 @@
     <h2>Mijn abonnement</h2>
     <div id="abonnement-inhoud" class="laden">Laden…</div>
   </div>
+
+  <div class="kaart">
+    <h2>Mijn gegevens</h2>
+    <div id="gegevens-inhoud" class="laden">Laden…</div>
+  </div>
+
+  <div class="kaart">
+    <h2>Spelersstatistieken</h2>
+    <div id="statistieken-inhoud" class="laden">Laden…</div>
+  </div>
+
+  <div class="kaart">
+    <h2>DUPR / rating</h2>
+    <div id="rating-inhoud" class="laden">Laden…</div>
+  </div>
+
   <p style="text-align:center;font-size:12.5px;color:var(--ink-muted)">
     <a href="/veelgestelde-vragen/" style="color:inherit">Veelgestelde vragen</a>
     <span> · </span>
@@ -40,8 +128,12 @@
 
   let mijnLeeftijd = null;
   let mijnAbonnement = null;
+  let alleLeden = null;
 
   const betaalwijzePerVorm = { jaar: 'jaarlijks_vooruit', maand: 'maandelijkse_incasso', strippenkaart: 'eenmalig', sessie: 'per_sessie', proef: 'eenmalig' };
+  const niveauLabels = { beginner: 'Beginner', gevorderd: 'Gevorderd', competitie: 'Competitie' };
+  const geslachtLabels = { m: 'Man', v: 'Vrouw', x: 'Anders' };
+  const datumFormat = new Intl.DateTimeFormat('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
 
   function berekenLeeftijd(geboortedatum) {
     if (!geboortedatum) return null;
@@ -51,19 +143,298 @@
     return leeftijd;
   }
 
+  function sluitPopups() {
+    document.querySelectorAll('.popup-overlay').forEach(el => el.remove());
+  }
+
+  function toonPopup(titel, inhoudHtml) {
+    sluitPopups();
+    const overlay = document.createElement('div');
+    overlay.className = 'popup-overlay';
+    overlay.innerHTML = '<div class="popup-kaart"><div class="popup-kop"><h3>' + titel + '</h3>' +
+      '<button type="button" class="popup-sluit" aria-label="Sluiten">✕</button></div>' + inhoudHtml + '</div>';
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+    overlay.querySelector('.popup-sluit').addEventListener('click', () => overlay.remove());
+    document.body.appendChild(overlay);
+  }
+
+  // ---------- Mijn gegevens ----------
+
+  let mijnLid = null;
+
   async function laadProfiel() {
-    const rows = await haalOp('leden', { select: 'naam,geboortedatum', id: 'eq.' + sessie.user_id });
-    if (rows.length) {
-      document.getElementById('welkom').textContent = 'Welkom, ' + rows[0].naam;
-      mijnLeeftijd = berekenLeeftijd(rows[0].geboortedatum);
+    const rows = await haalOp('leden', {
+      select: 'naam,email,telefoon,geboortedatum,geslacht,niveau,adres,ervaring,medische_info,' +
+        'noodcontact_naam,noodcontact_telefoon,lid_sinds,rating,matches_played',
+      id: 'eq.' + sessie.user_id,
+    });
+    if (!rows.length) return;
+    mijnLid = rows[0];
+    document.getElementById('welkom').textContent = 'Welkom, ' + mijnLid.naam;
+    mijnLeeftijd = berekenLeeftijd(mijnLid.geboortedatum);
+    toonGegevensFormulier();
+  }
+
+  function toonGegevensFormulier() {
+    const el = document.getElementById('gegevens-inhoud');
+    const lid = mijnLid;
+    el.className = '';
+    el.innerHTML =
+      '<div class="veld-rij"><label>Naam *</label><input type="text" id="veld-naam" value="' + (lid.naam || '') + '" /></div>' +
+      '<div class="veld-rij"><label>E-mail</label><input type="email" value="' + (lid.email || '') + '" disabled /></div>' +
+      '<div class="veld-twee">' +
+      '<div class="veld-rij"><label>Telefoon</label><input type="tel" id="veld-telefoon" value="' + (lid.telefoon || '') + '" /></div>' +
+      '<div class="veld-rij"><label>Geboortedatum</label><input type="date" id="veld-geboortedatum" value="' + (lid.geboortedatum || '') + '" /></div>' +
+      '</div>' +
+      '<div class="veld-twee">' +
+      '<div class="veld-rij"><label>Geslacht</label><select id="veld-geslacht">' +
+      '<option value="">Kies…</option>' +
+      ['m', 'v', 'x'].map(g => '<option value="' + g + '"' + (lid.geslacht === g ? ' selected' : '') + '>' + geslachtLabels[g] + '</option>').join('') +
+      '</select></div>' +
+      '<div class="veld-rij"><label>Niveau</label><select id="veld-niveau">' +
+      Object.keys(niveauLabels).map(n => '<option value="' + n + '"' + (lid.niveau === n ? ' selected' : '') + '>' + niveauLabels[n] + '</option>').join('') +
+      '</select></div>' +
+      '</div>' +
+      '<div class="veld-rij"><label>Adres</label><input type="text" id="veld-adres" value="' + (lid.adres || '') + '" /></div>' +
+      '<div class="veld-rij"><label>Speelervaring</label><textarea id="veld-ervaring">' + (lid.ervaring || '') + '</textarea></div>' +
+      '<div class="veld-twee">' +
+      '<div class="veld-rij"><label>Noodcontact naam</label><input type="text" id="veld-noodcontact-naam" value="' + (lid.noodcontact_naam || '') + '" /></div>' +
+      '<div class="veld-rij"><label>Noodcontact telefoon</label><input type="tel" id="veld-noodcontact-telefoon" value="' + (lid.noodcontact_telefoon || '') + '" /></div>' +
+      '</div>' +
+      '<div class="veld-rij"><label>Medische info (bijv. blessures/allergieën)</label><textarea id="veld-medische-info">' + (lid.medische_info || '') + '</textarea></div>' +
+      (lid.lid_sinds ? '<p class="details">Lid sinds ' + datumFormat.format(new Date(lid.lid_sinds)) + '</p>' : '') +
+      '<button class="knop aanmelden" id="gegevens-opslaan-knop">Wijzigingen opslaan</button>' +
+      '<div id="gegevens-melding"></div>';
+    document.getElementById('gegevens-opslaan-knop').addEventListener('click', slaGegevensOp);
+  }
+
+  function leegOfWaarde(id) {
+    const v = document.getElementById(id).value.trim();
+    return v === '' ? null : v;
+  }
+
+  async function slaGegevensOp() {
+    const meldingEl = document.getElementById('gegevens-melding');
+    const naam = document.getElementById('veld-naam').value.trim();
+    if (!naam) { meldingEl.innerHTML = '<div class="melding fout">Naam is verplicht.</div>'; return; }
+    const btn = document.getElementById('gegevens-opslaan-knop');
+    btn.disabled = true;
+    btn.textContent = 'Bezig…';
+    try {
+      await werkBij('leden', { id: 'eq.' + sessie.user_id }, {
+        naam,
+        telefoon: leegOfWaarde('veld-telefoon'),
+        geboortedatum: leegOfWaarde('veld-geboortedatum'),
+        geslacht: document.getElementById('veld-geslacht').value || null,
+        niveau: document.getElementById('veld-niveau').value,
+        adres: leegOfWaarde('veld-adres'),
+        ervaring: leegOfWaarde('veld-ervaring'),
+        noodcontact_naam: leegOfWaarde('veld-noodcontact-naam'),
+        noodcontact_telefoon: leegOfWaarde('veld-noodcontact-telefoon'),
+        medische_info: leegOfWaarde('veld-medische-info'),
+      });
+      meldingEl.innerHTML = '<div class="melding ok">Opgeslagen.</div>';
+      await laadProfiel();
+    } catch (e) {
+      meldingEl.innerHTML = '<div class="melding fout">' + e.message + '</div>';
+      btn.disabled = false;
+      btn.textContent = 'Wijzigingen opslaan';
     }
   }
+
+  // ---------- Spelersstatistieken ----------
+
+  async function laadSpelersStatistieken() {
+    const el = document.getElementById('statistieken-inhoud');
+    const [avondRows, teams] = await Promise.all([
+      haalOp('lid_avond_statistieken', { select: 'gespeeld,gewonnen', lid_id: 'eq.' + sessie.user_id }),
+      haalOp('toernooi_teams', { select: 'id', or: '(speler1_id.eq.' + sessie.user_id + ',speler2_id.eq.' + sessie.user_id + ')' }),
+    ]);
+    const avond = avondRows[0] || { gespeeld: 0, gewonnen: 0 };
+    const teamIds = teams.map(t => t.id);
+    let eerste = 0, tweede = 0, derde = 0;
+    if (teamIds.length) {
+      const ids = teamIds.join(',');
+      const podiumToernooien = await haalOp('toernooien', {
+        select: 'podium_1,podium_2,podium_3',
+        or: '(podium_1.in.(' + ids + '),podium_2.in.(' + ids + '),podium_3.in.(' + ids + '))',
+      });
+      podiumToernooien.forEach(t => {
+        if (teamIds.includes(t.podium_1)) eerste++;
+        if (teamIds.includes(t.podium_2)) tweede++;
+        if (teamIds.includes(t.podium_3)) derde++;
+      });
+    }
+    const gespeeld = avond.gespeeld || 0;
+    const gewonnen = avond.gewonnen || 0;
+    const winrate = gespeeld > 0 ? Math.round((gewonnen / gespeeld) * 100) : null;
+
+    el.className = '';
+    el.innerHTML =
+      '<div class="stat-grid">' +
+      '<div class="stat-tegel"><div class="waarde">' + gespeeld + '</div><div class="label">Speelavonden</div></div>' +
+      '<div class="stat-tegel"><div class="waarde">' + (winrate === null ? '–' : winrate + '%') + '</div><div class="label">Win-percentage</div></div>' +
+      '<div class="stat-tegel"><div class="waarde">' + teamIds.length + '</div><div class="label">Toernooien</div></div>' +
+      '</div>' +
+      (eerste || tweede || derde
+        ? '<div class="podium-rij">' +
+          (eerste ? '<span>🥇 ' + eerste + '</span>' : '') +
+          (tweede ? '<span>🥈 ' + tweede + '</span>' : '') +
+          (derde ? '<span>🥉 ' + derde + '</span>' : '') +
+          '</div>'
+        : '');
+  }
+
+  // ---------- DUPR / rating + wedstrijd melden ----------
+
+  function slotHtml(slotNaam, label) {
+    const opties = (alleLeden || []).filter(l => l.id !== sessie.user_id)
+      .map(l => '<option value="' + l.id + '">' + l.naam + '</option>').join('');
+    return '<div class="speler-slot" data-slot-wrap="' + slotNaam + '">' +
+      '<label>' + label + '</label>' +
+      '<select data-slot-select="' + slotNaam + '">' +
+      '<option value="">Kies clublid…</option>' + opties +
+      '<option value="__extern__">Extern (geen lid)</option></select>' +
+      '<div class="extern-invoer" data-slot-extern="' + slotNaam + '" style="display:none">' +
+      '<input type="text" placeholder="Naam" data-slot-naam="' + slotNaam + '" />' +
+      '<select data-slot-niveau="' + slotNaam + '">' +
+      Object.keys(niveauLabels).map(n => '<option value="' + n + '">' + niveauLabels[n] + '</option>').join('') +
+      '</select></div></div>';
+  }
+
+  function leesSlot(slotNaam) {
+    const select = document.querySelector('[data-slot-select="' + slotNaam + '"]');
+    if (!select || !select.value) return { lid_id: null, naam: null, niveau: null };
+    if (select.value === '__extern__') {
+      const naam = document.querySelector('[data-slot-naam="' + slotNaam + '"]').value.trim();
+      const niveau = document.querySelector('[data-slot-niveau="' + slotNaam + '"]').value;
+      return { lid_id: null, naam: naam || null, niveau: naam ? niveau : null };
+    }
+    return { lid_id: select.value, naam: null, niveau: null };
+  }
+
+  function toonWedstrijdFormulier() {
+    const houder = document.getElementById('wedstrijd-formulier');
+    houder.style.display = houder.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function wisselTypeSlots() {
+    const type = document.getElementById('wedstrijd-type').value;
+    const enkel = type === 'enkel';
+    document.querySelector('[data-slot-wrap="partner"]').style.display = enkel ? 'none' : 'block';
+    document.querySelector('[data-slot-wrap="tegenstander2"]').style.display = enkel ? 'none' : 'block';
+  }
+
+  async function meldWedstrijd() {
+    const meldingEl = document.getElementById('wedstrijd-melding');
+    meldingEl.innerHTML = '';
+    const type = document.getElementById('wedstrijd-type').value;
+    const datum = document.getElementById('wedstrijd-datum').value;
+    const eigenScore = Number(document.getElementById('eigen-score').value);
+    const tegenScore = Number(document.getElementById('tegen-score').value);
+    if (!datum) { meldingEl.innerHTML = '<div class="melding fout">Vul een datum in.</div>'; return; }
+    if (Number.isNaN(eigenScore) || Number.isNaN(tegenScore) || eigenScore === tegenScore) {
+      meldingEl.innerHTML = '<div class="melding fout">Vul geldige, verschillende scores in.</div>';
+      return;
+    }
+    const tegenstander1 = leesSlot('tegenstander1');
+    if (!tegenstander1.lid_id && !tegenstander1.naam) {
+      meldingEl.innerHTML = '<div class="melding fout">Vul een tegenstander in.</div>';
+      return;
+    }
+    const payload = { datum, type, eigen_score: eigenScore, tegen_score: tegenScore, melder_id: sessie.user_id };
+    if (type !== 'enkel') {
+      const partner = leesSlot('partner');
+      if (!partner.lid_id && !partner.naam) {
+        meldingEl.innerHTML = '<div class="melding fout">Vul je partner in.</div>';
+        return;
+      }
+      payload.partner_lid_id = partner.lid_id;
+      payload.partner_naam = partner.naam;
+      payload.partner_niveau = partner.niveau;
+      const tegenstander2 = leesSlot('tegenstander2');
+      if (!tegenstander2.lid_id && !tegenstander2.naam) {
+        meldingEl.innerHTML = '<div class="melding fout">Vul de tweede tegenstander in.</div>';
+        return;
+      }
+      payload.tegenstander2_lid_id = tegenstander2.lid_id;
+      payload.tegenstander2_naam = tegenstander2.naam;
+      payload.tegenstander2_niveau = tegenstander2.niveau;
+    }
+    payload.tegenstander1_lid_id = tegenstander1.lid_id;
+    payload.tegenstander1_naam = tegenstander1.naam;
+    payload.tegenstander1_niveau = tegenstander1.niveau;
+
+    try {
+      await voegToe('gemelde_wedstrijden', payload);
+      meldingEl.innerHTML = '<div class="melding ok">Wedstrijd gemeld — een beheerder beoordeelt deze.</div>';
+      await laadRatingSectie();
+    } catch (e) {
+      meldingEl.innerHTML = '<div class="melding fout">' + e.message + '</div>';
+    }
+  }
+
+  function wedstrijdStatusLabel(status) {
+    return { in_behandeling: 'In behandeling', goedgekeurd: 'Goedgekeurd', afgekeurd: 'Afgekeurd' }[status] || status;
+  }
+
+  const typeLabels = { enkel: 'Enkel', dubbel_gemixed: 'Dubbel gemixed', dubbel_vrouwen: 'Dubbel vrouwen', dubbel_mannen: 'Dubbel mannen' };
+
+  async function laadRatingSectie() {
+    const el = document.getElementById('rating-inhoud');
+    if (!alleLeden) {
+      alleLeden = await haalOp('leden', { select: 'id,naam', order: 'naam.asc' });
+    }
+    const gemeld = await haalOp('gemelde_wedstrijden', {
+      select: 'id,datum,type,eigen_score,tegen_score,status,nieuwe_rating',
+      melder_id: 'eq.' + sessie.user_id, order: 'created_at.desc', limit: '10',
+    });
+
+    const rating = mijnLid.rating != null ? Number(mijnLid.rating).toFixed(2) : '3.00';
+    const wedstrijdenHtml = gemeld.length
+      ? gemeld.map(w => '<div class="wedstrijd-item"><span>' +
+          new Date(w.datum).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) + ' · ' +
+          typeLabels[w.type] + ' · ' + w.eigen_score + '-' + w.tegen_score +
+          (w.status === 'goedgekeurd' && w.nieuwe_rating ? ' · nieuw: ' + Number(w.nieuwe_rating).toFixed(2) : '') +
+          '</span><span class="wedstrijd-status ' + w.status + '">' + wedstrijdStatusLabel(w.status) + '</span></div>').join('')
+      : '<p class="details">Nog geen wedstrijden gemeld.</p>';
+
+    el.className = '';
+    el.innerHTML =
+      '<div class="rating-badge"><span class="cijfer">' + rating + '</span>' +
+      '<span class="wedstrijden">' + (mijnLid.matches_played || 0) + ' partijen meegeteld</span></div>' +
+      '<p class="details">Meld een gespeelde wedstrijd (buiten de reguliere speelavond/toernooi om) om je rating bij te werken. Een beheerder beoordeelt elke melding.</p>' +
+      '<button class="knop aanmelden" id="wedstrijd-melden-knop" type="button">Wedstrijd melden</button>' +
+      '<div id="wedstrijd-formulier" style="display:none;margin-top:14px">' +
+      '<div class="veld-rij"><label>Datum</label><input type="date" id="wedstrijd-datum" max="' + new Date().toISOString().substring(0, 10) + '" /></div>' +
+      '<div class="veld-rij"><label>Type</label><select id="wedstrijd-type">' +
+      Object.keys(typeLabels).map(t => '<option value="' + t + '">' + typeLabels[t] + '</option>').join('') +
+      '</select></div>' +
+      slotHtml('partner', 'Partner') +
+      slotHtml('tegenstander1', 'Tegenstander 1') +
+      slotHtml('tegenstander2', 'Tegenstander 2') +
+      '<div class="veld-twee">' +
+      '<div class="veld-rij"><label>Score (jij/jullie)</label><input type="number" id="eigen-score" min="0" /></div>' +
+      '<div class="veld-rij"><label>Score (tegenstander)</label><input type="number" id="tegen-score" min="0" /></div>' +
+      '</div>' +
+      '<button class="knop aanmelden" id="wedstrijd-versturen-knop" type="button">Melding versturen</button>' +
+      '<div id="wedstrijd-melding"></div>' +
+      '</div>' +
+      '<div style="margin-top:16px"><h2 style="margin-bottom:8px">Mijn gemelde wedstrijden</h2>' + wedstrijdenHtml + '</div>';
+
+    document.getElementById('wedstrijd-melden-knop').addEventListener('click', toonWedstrijdFormulier);
+    document.getElementById('wedstrijd-versturen-knop').addEventListener('click', meldWedstrijd);
+    document.getElementById('wedstrijd-type').addEventListener('change', wisselTypeSlots);
+    wisselTypeSlots();
+  }
+
+  // ---------- Abonnement ----------
 
   async function laadAbonnement() {
     const el = document.getElementById('abonnement-inhoud');
 
     const actief = await haalOp('lid_abonnementen', {
-      select: 'id,status,strippen_resterend,geldig_tot,abonnementen(naam,vorm)',
+      select: 'id,status,strippen_resterend,geldig_tot,start_datum,opgezegd_op,eind_datum,abonnementen(naam,vorm)',
       lid_id: 'eq.' + sessie.user_id, status: 'eq.actief', limit: '1',
     });
     if (actief.length) {
@@ -71,14 +442,21 @@
       const naam = mijnAbonnement.abonnementen ? mijnAbonnement.abonnementen.naam : '';
       let extra = '';
       if (mijnAbonnement.abonnementen && (mijnAbonnement.abonnementen.vorm === 'strippenkaart' || mijnAbonnement.abonnementen.vorm === 'proef') && mijnAbonnement.geldig_tot) {
-        extra = (mijnAbonnement.strippen_resterend ?? 0) + ' over, geldig tot ' +
-          new Date(mijnAbonnement.geldig_tot).toLocaleDateString('nl-NL');
+        extra += '<p style="margin:4px 0 0;font-size:13.5px;color:var(--ink-muted)">' +
+          (mijnAbonnement.strippen_resterend ?? 0) + ' over, geldig tot ' + datumFormat.format(new Date(mijnAbonnement.geldig_tot)) + '</p>';
       }
-      el.innerHTML = '<div class="status-regel"><span class="status-badge">' + naam + '</span></div>' +
-        (extra ? '<p style="margin:10px 0 0;font-size:13.5px;color:var(--ink-muted)">' + extra + '</p>' : '') +
-        '<button class="knop afmelden" id="opzeg-knop" style="margin-top:12px">Abonnement opzeggen</button>' +
+      if (mijnAbonnement.start_datum) {
+        extra += '<p style="margin:4px 0 0;font-size:13.5px;color:var(--ink-muted)">Gestart op ' + datumFormat.format(new Date(mijnAbonnement.start_datum)) + '</p>';
+      }
+      if (mijnAbonnement.opgezegd_op && mijnAbonnement.eind_datum) {
+        extra += '<p style="margin:4px 0 0;font-size:13.5px;color:var(--gold-deep)">Opgezegd — blijft geldig tot ' + datumFormat.format(new Date(mijnAbonnement.eind_datum)) + '</p>';
+      }
+      el.innerHTML = '<div class="status-regel"><span class="status-badge">' + naam + '</span></div>' + extra +
+        (mijnAbonnement.opgezegd_op ? '' : '<button class="knop afmelden" id="opzeg-knop" style="margin-top:12px">Abonnement opzeggen</button>') +
+        '<button type="button" class="vergelijk-knop" id="vergelijk-knop">Vergelijk abonnementen →</button>' +
         '<div id="abonnement-melding"></div>';
-      document.getElementById('opzeg-knop').addEventListener('click', opzeggen);
+      if (document.getElementById('opzeg-knop')) document.getElementById('opzeg-knop').addEventListener('click', opzeggen);
+      document.getElementById('vergelijk-knop').addEventListener('click', toonVergelijking);
       return;
     }
 
@@ -98,6 +476,35 @@
 
     mijnAbonnement = null;
     await toonAbonnementKiezer(el);
+  }
+
+  function prijsLabel(a) {
+    if (a.vorm === 'jaar') return '€' + Number(a.prijs).toFixed(2) + ' / jaar';
+    if (a.vorm === 'maand') return '€' + Number(a.prijs).toFixed(2) + ' / maand';
+    if (a.vorm === 'strippenkaart') return '€' + Number(a.prijs).toFixed(2) + ' eenmalig';
+    if (a.vorm === 'sessie') return '€' + Number(a.prijs).toFixed(2) + ' / keer';
+    return Number(a.prijs) > 0 ? '€' + Number(a.prijs).toFixed(2) : 'Gratis';
+  }
+
+  function subLabel(a) {
+    const delen = [];
+    if (a.sessies_per_week) delen.push(a.sessies_per_week + 'x per week');
+    if (a.vorm === 'strippenkaart' && a.strippen) delen.push(a.strippen + ' strippen, ' + (a.geldig_maanden || '?') + ' mnd geldig');
+    if (a.jaarkorting_pct > 0) delen.push(a.jaarkorting_pct + '% korting bij ineens betalen');
+    return delen.join(' · ');
+  }
+
+  async function toonVergelijking() {
+    const categorie = (mijnLeeftijd !== null && mijnLeeftijd <= 17) ? 'jeugd' : 'volwassen';
+    const opties = await haalOp('abonnementen', { select: '*', actief: 'eq.true', categorie: 'in.(' + categorie + ',alle)', order: 'vorm.asc' });
+    const regels = opties.map(a => {
+      const huidig = mijnAbonnement && mijnAbonnement.abonnementen && mijnAbonnement.abonnementen.naam === a.naam;
+      return '<div class="plan-regel">' +
+        '<div><div class="naam">' + a.naam + (huidig ? ' (huidig)' : '') + '</div>' +
+        (subLabel(a) ? '<div class="sub">' + subLabel(a) + '</div>' : '') + '</div>' +
+        '<div class="prijs">' + prijsLabel(a) + '</div></div>';
+    }).join('');
+    toonPopup('Vergelijk abonnementen', regels || '<p class="details">Geen abonnementen beschikbaar.</p>');
   }
 
   function toonAbonnementMelding(tekst, isFout) {
@@ -186,7 +593,7 @@
 
   (async () => {
     await laadProfiel();
-    await laadAbonnement();
+    await Promise.all([laadAbonnement(), laadSpelersStatistieken(), laadRatingSectie()]);
   })().catch(e => console.error(e));
 </script>
 </body>

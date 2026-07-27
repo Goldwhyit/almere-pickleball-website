@@ -10,6 +10,22 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/assets/leden.css" />
+<style>
+  .locatie-pil {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    width: 100%; text-align: left; padding: 10px 14px; border-radius: 10px;
+    border: 1.5px solid var(--line); background: transparent; color: var(--ink);
+    font-family: inherit; font-size: 13.5px; cursor: pointer; margin-bottom: 8px;
+  }
+  .locatie-pil:last-child { margin-bottom: 0; }
+  .locatie-pil .naam { font-weight: 700; }
+  .locatie-pil .tijd { color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+  .locatie-detail {
+    font-size: 12.5px; color: var(--ink-muted); padding: 0 14px 10px; margin-top: -6px; display: none;
+  }
+  .locatie-detail.open { display: block; }
+  .locatie-detail div { padding: 2px 0; }
+</style>
 </head>
 <body>
 <header>
@@ -21,6 +37,10 @@
   <div id="account-plek"></div>
 </header>
 <main>
+  <div class="kaart">
+    <h2>Locaties</h2>
+    <div id="locaties-inhoud" class="laden">Laden…</div>
+  </div>
   <div class="kaart">
     <h2>Speelavonden</h2>
     <div id="speeldagen-inhoud" class="laden">Laden…</div>
@@ -67,11 +87,30 @@
     mijnAbonnement = rows.length ? rows[0] : null;
   }
 
+  function toonLocaties(speeldagen) {
+    const el = document.getElementById('locaties-inhoud');
+    if (!speeldagen.length) { el.textContent = 'Geen locaties gevonden.'; return; }
+    el.innerHTML = speeldagen.map((sd, i) =>
+      '<button type="button" class="locatie-pil" data-locatie-index="' + i + '">' +
+      '<span class="naam">' + sd.locatie + '</span>' +
+      '<span class="tijd">' + dagnamen[sd.weekdag - 1] + ' ' + sd.start_tijd.slice(0, 5) + '–' + sd.eind_tijd.slice(0, 5) + '</span>' +
+      '</button>' +
+      '<div class="locatie-detail" id="locatie-detail-' + i + '">' +
+      '<div>🏟️ ' + sd.aantal_banen + ' banen beschikbaar</div>' +
+      (sd.adres ? '<div>📍 ' + sd.adres + '</div>' : '') +
+      '</div>'
+    ).join('');
+    el.querySelectorAll('[data-locatie-index]').forEach(btn => btn.addEventListener('click', () => {
+      document.getElementById('locatie-detail-' + btn.dataset.locatieIndex).classList.toggle('open');
+    }));
+  }
+
   async function laadSpeeldagen() {
     const el = document.getElementById('speeldagen-inhoud');
-    const speeldagen = await haalOp('speeldagen', { select: 'id,weekdag,start_tijd,eind_tijd,locatie,max_spelers', actief: 'eq.true' });
+    const speeldagen = await haalOp('speeldagen', { select: 'id,weekdag,start_tijd,eind_tijd,locatie,adres,aantal_banen,max_spelers', actief: 'eq.true', order: 'weekdag.asc' });
     if (!speeldagen.length) { el.textContent = 'Geen speelavonden gevonden.'; return; }
-    const sessies = volgendeSessies(speeldagen, 5).slice(0, 6);
+    toonLocaties(speeldagen);
+    const sessies = volgendeSessies(speeldagen, 5).slice(0, 8);
     if (!sessies.length) { el.textContent = 'Geen aankomende speelavonden binnen het seizoen.'; return; }
 
     const vanaf = sessies[0].start.toISOString();

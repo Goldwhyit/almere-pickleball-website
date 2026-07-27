@@ -11,20 +11,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/assets/leden.css" />
 <style>
-  .flyer { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; background: var(--paper); flex-shrink: 0; }
   .landelijk-badge {
     display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700;
-    background: rgba(184,134,10,0.12); color: var(--gold-deep);
+    background: rgba(184,134,10,0.12); color: var(--gold-deep); flex-shrink: 0;
   }
-  .toernooi-regel .kop { display: flex; align-items: flex-start; gap: 12px; }
-  .toernooi-regel .naamblok { flex: 1; }
-  .toernooi-regel .naam-rij { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .naam-rij { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
   .mail-knop { background: var(--navy); color: #fff; }
   .link-knop { background: transparent; color: var(--navy); border: 1.5px solid var(--navy); }
   .stat-rij { display: flex; gap: 10px; margin-top: 14px; }
   .stat-tegel {
     flex: 1; background: var(--paper); border: 1px solid var(--line); border-radius: 10px;
-    padding: 10px 12px; text-align: center; cursor: default;
+    padding: 10px 12px; text-align: center; cursor: default; font-family: inherit; color: inherit;
   }
   .stat-tegel.klikbaar { cursor: pointer; }
   .stat-tegel .waarde { font-size: 20px; font-weight: 700; color: var(--navy); }
@@ -44,6 +41,43 @@
   .training-kop { display: flex; align-items: center; gap: 8px; }
   .training-kop .dag { font-weight: 700; font-size: 15px; }
   .training-locatie { font-size: 12.5px; color: var(--ink-muted); margin-top: 2px; }
+  .omschrijving { font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin: 6px 0 0; }
+  .deelnemers-knop {
+    display: flex; align-items: center; gap: 6px; margin-top: 10px; padding: 0;
+    background: none; border: none; color: var(--navy); font-family: inherit; font-size: 13px;
+    font-weight: 700; cursor: pointer;
+  }
+  @media (prefers-color-scheme: dark) { .deelnemers-knop { color: #8ab6ec; } }
+
+  /* Landelijk: foto 50/50 over de kaart als er een flyer is */
+  .landelijk-kaart {
+    display: flex; border-top: 1px solid var(--line); padding: 12px 0; gap: 14px; align-items: stretch;
+  }
+  .landelijk-kaart:first-of-type { border-top: none; padding-top: 0; }
+  .landelijk-kaart.met-foto { padding: 12px 0; }
+  .landelijk-kaart .foto-helft {
+    flex: 0 0 50%; max-width: 50%; border-radius: 10px; overflow: hidden; background: var(--paper); min-height: 120px;
+  }
+  .landelijk-kaart .foto-helft img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .landelijk-kaart .tekst-helft { flex: 1; min-width: 0; }
+  .landelijk-kaart.zonder-foto .tekst-helft { flex: 1 1 100%; }
+
+  .popup-overlay {
+    position: fixed; inset: 0; background: rgba(4,27,51,0.45); z-index: 100;
+    display: flex; align-items: flex-end; justify-content: center;
+  }
+  .popup-kaart {
+    background: var(--card); border-radius: 18px 18px 0 0; width: 100%; max-width: 480px;
+    max-height: 75vh; overflow-y: auto; padding: 20px;
+  }
+  @media (min-width: 560px) {
+    .popup-overlay { align-items: center; }
+    .popup-kaart { border-radius: 18px; }
+  }
+  .popup-kop { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .popup-kop h3 { margin: 0; font-size: 16px; }
+  .popup-sluit { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--ink-muted); }
+  .popup-leeg { text-align: center; color: var(--ink-muted); padding: 30px 0; }
 </style>
 </head>
 <body>
@@ -95,24 +129,60 @@
   const niveauLabels = { open: 'Alle niveaus', beginner: 'Beginner', gevorderd: 'Gevorderd', competitie: 'Competitie' };
   let alleLeden = null;
 
+  function initialen(naam) {
+    return naam.split(' ').filter(Boolean).slice(0, 2).map(n => n[0].toUpperCase()).join('');
+  }
+
+  function toonLedenPopup(titel, leden, max) {
+    const bestaand = document.getElementById('leden-popup-overlay');
+    if (bestaand) bestaand.remove();
+    const overlay = document.createElement('div');
+    overlay.className = 'popup-overlay';
+    overlay.id = 'leden-popup-overlay';
+    overlay.innerHTML =
+      '<div class="popup-kaart">' +
+      '<div class="popup-kop"><h3>' + titel + ' — ' + leden.length + (max != null ? '/' + max : '') + '</h3>' +
+      '<button type="button" class="popup-sluit" aria-label="Sluiten">✕</button></div>' +
+      (leden.length
+        ? leden.map(l => '<div class="rank-regel"><span class="avatar">' + initialen(l.naam) + '</span><span class="naam">' + l.naam + '</span></div>').join('')
+        : '<div class="popup-leeg">Nog niemand aangemeld.</div>') +
+      '</div>';
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+    overlay.querySelector('.popup-sluit').addEventListener('click', () => overlay.remove());
+    document.body.appendChild(overlay);
+  }
+
+  async function toonToernooiDeelnemers(toernooi) {
+    const teams = window.__alleTeams.filter(team => team.toernooi_id === toernooi.id);
+    const ids = new Set();
+    teams.forEach(tm => { if (tm.speler1_id) ids.add(tm.speler1_id); if (tm.speler2_id) ids.add(tm.speler2_id); });
+    let leden = [];
+    if (ids.size) {
+      leden = await haalOp('leden', { select: 'naam', id: 'in.(' + [...ids].join(',') + ')' });
+    }
+    toonLedenPopup(toernooi.naam, leden, toernooi.max_deelnemers);
+  }
+
   async function laadToernooien() {
     const el = document.getElementById('almere-inhoud');
     const vandaag = new Date().toISOString().substring(0, 10);
     const toernooien = await haalOp('toernooien', {
-      select: 'id,naam,datum,klasse,niveau,inschrijfwijze,inschrijfgeld,inschrijving_open',
+      select: 'id,naam,datum,omschrijving,klasse,niveau,inschrijfwijze,inschrijfgeld,inschrijving_open,max_deelnemers',
       datum: 'gte.' + vandaag, order: 'datum.asc',
     });
     if (!toernooien.length) { el.textContent = 'Geen aankomende toernooien.'; return; }
 
     const ids = toernooien.map(t => t.id).join(',');
-    const mijnTeams = await haalOp('toernooi_teams', {
+    const alleTeams = await haalOp('toernooi_teams', {
       select: 'id,toernooi_id,speler1_id,speler2_id',
-      or: '(speler1_id.eq.' + sessie.user_id + ',speler2_id.eq.' + sessie.user_id + ')',
       toernooi_id: 'in.(' + ids + ')',
     });
+    window.__alleTeams = alleTeams;
 
     el.innerHTML = toernooien.map((t, i) => {
-      const mijnTeam = mijnTeams.find(team => team.toernooi_id === t.id);
+      const teams = alleTeams.filter(team => team.toernooi_id === t.id);
+      const mijnTeam = teams.find(team => team.speler1_id === sessie.user_id || team.speler2_id === sessie.user_id);
+      const spelers = teams.reduce((som, tm) => som + (tm.speler2_id ? 2 : 1), 0);
       const details = klasseLabels[t.klasse] + ' · ' + niveauLabels[t.niveau] +
         (t.inschrijfgeld > 0 ? ' · €' + Number(t.inschrijfgeld).toFixed(2) + ' inschrijfgeld' : '');
       let actie;
@@ -126,9 +196,12 @@
       } else {
         actie = '<button class="knop aanmelden" data-actie="inschrijven" data-index="' + i + '">Inschrijven</button>';
       }
+      const omschrijvingHtml = t.omschrijving ? '<p class="omschrijving">' + t.omschrijving + '</p>' : '';
       return '<div class="toernooi-regel"><div class="naam">' + t.naam + '</div>' +
         '<div class="details">' + new Date(t.datum).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) +
-        ' · ' + details + '</div><div class="actie">' + actie + '</div></div>';
+        ' · ' + details + '</div>' + omschrijvingHtml +
+        '<button type="button" class="deelnemers-knop" data-deelnemers-index="' + i + '">👥 ' + spelers + '/' + t.max_deelnemers + ' deelnemers →</button>' +
+        '<div class="actie">' + actie + '</div></div>';
     }).join('') + '<div id="almere-melding"></div>';
 
     window.__toernooien = toernooien;
@@ -146,6 +219,10 @@
         });
       });
     }
+
+    el.querySelectorAll('[data-deelnemers-index]').forEach(btn => btn.addEventListener('click', () => {
+      toonToernooiDeelnemers(window.__toernooien[Number(btn.dataset.deelnemersIndex)]);
+    }));
 
     el.querySelectorAll('[data-actie]').forEach(btn => btn.addEventListener('click', () => {
       const t = window.__toernooien[Number(btn.dataset.index)];
@@ -250,7 +327,6 @@
         : start.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
       const email = t.email && t.email.trim() ? t.email.trim() : null;
       const link = externeLink(t.aanmelden_via);
-      const flyer = t.flyer_url ? '<img class="flyer" src="' + t.flyer_url + '" alt="" />' : '';
       const detailRegels = [
         '<div class="details">📅 ' + datumTekst + (t.tijden ? ' · ' + t.tijden : '') + '</div>',
         '<div class="details">📍 ' + t.plaats + (t.adres ? ' · ' + t.adres : '') + '</div>',
@@ -265,10 +341,16 @@
           (link ? '<a class="knop link-knop" href="' + link + '" target="_blank" rel="noopener" style="text-decoration:none;text-align:center">Bekijk</a>' : '') +
           '</div>';
       }
-      return '<div class="toernooi-regel"><div class="kop">' + flyer +
-        '<div class="naamblok"><div class="naam-rij"><span class="naam">' + t.naam + '</span>' +
+      const tekstHelft = '<div class="tekst-helft">' +
+        '<div class="naam-rij"><span class="naam">' + t.naam + '</span>' +
         '<span class="landelijk-badge">Landelijk</span></div>' +
-        detailRegels.join('') + '</div></div>' + actie + '</div>';
+        detailRegels.join('') + actie + '</div>';
+      if (t.flyer_url) {
+        return '<div class="landelijk-kaart met-foto">' +
+          '<div class="foto-helft"><img src="' + t.flyer_url + '" alt="" /></div>' +
+          tekstHelft + '</div>';
+      }
+      return '<div class="landelijk-kaart zonder-foto">' + tekstHelft + '</div>';
     }).join('');
 
     el.querySelectorAll('[data-mail-index]').forEach(btn => btn.addEventListener('click', () => {
@@ -280,10 +362,6 @@
   // --- Training: eerstvolgende trainingsavond + ranglijst-top-10 ---
 
   const dagnamen = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
-
-  function initialen(naam) {
-    return naam.split(' ').filter(Boolean).slice(0, 2).map(n => n[0].toUpperCase()).join('');
-  }
 
   async function volgendeTrainingssessie() {
     const speeldagen = await haalOp('speeldagen', {
@@ -331,7 +409,7 @@
         sessieInfo.start.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + '</span></div>' +
         '<div class="training-locatie">' + sessieInfo.start.toTimeString().slice(0, 5) + ' · ' + sessieInfo.locatie + '</div>' +
         '<div class="stat-rij">' +
-        '<div class="stat-tegel"><div class="waarde">' + sessieInfo.aanmeldingen + '</div><div class="label">Aanmeldingen</div></div>' +
+        '<button type="button" class="stat-tegel klikbaar" id="training-aanmeldingen-tegel"><div class="waarde">' + sessieInfo.aanmeldingen + '</div><div class="label">Aanmeldingen →</div></button>' +
         '<div class="stat-tegel"><div class="waarde">' + sessieInfo.banen + '</div><div class="label">Banen ingezet</div></div>' +
         '</div>' +
         '<a class="knop aanmelden" href="/leden/reserveren.html" style="display:block;text-align:center;margin-top:14px;text-decoration:none">Bekijk speelavond →</a>';
@@ -351,6 +429,19 @@
       '<p class="details" style="margin-bottom:10px">Top 10 op basis van rating. Volledige ranglijst op de Leden-pagina.</p>' +
       (rankingHtml || '<p class="details">Nog geen ranglijst beschikbaar.</p>') +
       '</div>';
+
+    const aanmeldingenTegel = document.getElementById('training-aanmeldingen-tegel');
+    if (aanmeldingenTegel && sessieInfo) {
+      aanmeldingenTegel.addEventListener('click', () => toonTrainingAanmeldingen(sessieInfo));
+    }
+  }
+
+  async function toonTrainingAanmeldingen(sessieInfo) {
+    const reserveringen = await haalOp('reserveringen', {
+      select: 'leden(naam)', speeldag_id: 'eq.' + sessieInfo.speeldagId, start_tijd: 'eq.' + sessieInfo.start.toISOString(),
+    });
+    const leden = reserveringen.map(r => r.leden).filter(Boolean);
+    toonLedenPopup('Aanmeldingen', leden, sessieInfo.aanmeldingen);
   }
 
   laadToernooien().catch(e => console.error(e));
