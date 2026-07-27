@@ -35,11 +35,13 @@ function initNav(actievePagina) {
     body { padding-bottom: 100px; }
     .onderbalk {
       position: fixed; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); left: 14px; right: 14px; z-index: 50;
-      display: flex; background: var(--card, #fff);
-      border: 1px solid var(--line, rgba(4,27,51,0.1));
+      display: flex; background: var(--glas-oppervlak, rgba(255,255,255,0.55));
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      backdrop-filter: blur(24px) saturate(160%);
+      border: 1px solid var(--glas-rand, rgba(255,255,255,0.6));
       border-radius: 999px;
       padding: 7px 8px;
-      box-shadow: 0 8px 24px rgba(4,27,51,0.16);
+      box-shadow: 0 8px 24px rgba(4,27,51,0.16), inset 0 1px 0 var(--glas-hooglicht-boven, rgba(255,255,255,0.55)), inset 0 -1px 0 var(--glas-hooglicht-onder, rgba(0,0,0,0.1));
       max-width: 480px; margin: 0 auto;
     }
     .onderbalk a {
