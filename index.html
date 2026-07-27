@@ -145,15 +145,17 @@
   @media (prefers-color-scheme: dark) { .speel-sectie .let-op strong { color: var(--gold); } }
   .speel-regel {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: baseline;
+    gap: 4px 12px;
     font-family: 'Unbounded', sans-serif;
     font-weight: 700;
     font-size: 18px;
     color: var(--navy);
   }
   @media (prefers-color-scheme: dark) { .speel-regel { color: #8ab6ec; } }
-  .speel-regel .tijd { font-variant-numeric: tabular-nums; }
+  .speel-regel .tijd { font-variant-numeric: tabular-nums; white-space: nowrap; }
   .speel-adres {
     margin-top: 6px;
     font-size: 14px;
@@ -246,8 +248,11 @@
   <a class="toernooien-link" href="/toernooien/">Bekijk de actuele toernooistanden →</a>
   <a class="toernooien-link" href="/leden/">Ledenportaal (inloggen) →</a>
   <a class="toernooien-link" href="/baan-huren/">Baan huren (extern) →</a>
+  <a class="toernooien-link" href="/veelgestelde-vragen/">Veelgestelde vragen →</a>
 
-  <div class="footer">© <span id="jaar"></span> Almere Pickleball</div>
+  <div class="footer">
+    © <span id="jaar"></span> Almere Pickleball · <a href="/privacy/" style="color:inherit">Privacybeleid</a>
+  </div>
 </main>
 <script>
   document.getElementById('jaar').textContent = new Date().getFullYear();
