@@ -51,6 +51,13 @@ function initNav(actievePagina) {
     }
     .onderbalk a.actief { color: var(--navy, #005bbf); background: rgba(0,91,191,0.1); }
     .onderbalk a svg { width: 21px; height: 21px; }
+    .onderbalk-extra { display: flex; gap: 4px; align-items: center; flex-shrink: 0; margin-left: 2px; padding-left: 6px; border-left: 1px solid var(--line, rgba(4,27,51,0.1)); }
+    .onderbalk-extra .thema-knop, .onderbalk-extra .taal-knop {
+      height: 30px; background: transparent; border: none; color: var(--ink-muted, #5b6b7d);
+    }
+    .onderbalk-extra .thema-knop { width: 30px; }
+    .onderbalk-extra .thema-knop svg { width: 15px; height: 15px; }
+    .onderbalk-extra .taal-knop { min-width: 30px; padding: 0 7px; font-size: 10.5px; }
     #account-plek { flex-shrink: 0; }
     .account-knoppen { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; max-width: 100%; }
     .account-knoppen a, .account-knoppen button {
@@ -66,9 +73,11 @@ function initNav(actievePagina) {
   nav.innerHTML = NAV_ITEMS.map(item =>
     '<a href="' + item.href + '"' + (item.pagina === actievePagina ? ' class="actief"' : '') + '>' +
     item.icoon + '<span data-i18n="' + item.taalSleutel + '"></span></a>'
-  ).join('');
+  ).join('') + '<div class="onderbalk-extra" id="onderbalk-extra"></div>';
   const navPlek = document.getElementById('nav-plek');
   (navPlek || document.body).appendChild(nav);
+  if (typeof initThemeKnop === 'function') initThemeKnop('onderbalk-extra');
+  if (typeof initTaalKnop === 'function') initTaalKnop('onderbalk-extra');
 
   const accountPlek = document.getElementById('account-plek');
   if (accountPlek) {
@@ -76,8 +85,6 @@ function initNav(actievePagina) {
       (actievePagina === 'profiel' ? '' : '<a href="/leden/profiel.html" data-i18n="navProfiel"></a>') +
       '<button id="nav-uitlog-knop" data-i18n="uitloggen"></button></div>';
     document.getElementById('nav-uitlog-knop').addEventListener('click', uitloggen);
-    if (typeof initThemeKnop === 'function') initThemeKnop('account-knoppen-rij');
-    if (typeof initTaalKnop === 'function') initTaalKnop('account-knoppen-rij');
     if (typeof pasTaalToe === 'function') pasTaalToe();
 
     if (actievePagina !== 'beheer') {
