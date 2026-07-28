@@ -71,6 +71,11 @@
   </div>
   <div class="kaart">
     <h2>Speelavonden</h2>
+    <div class="swipe-banner">
+      <span class="helft"><span class="pijl">←</span> <span>Swipen naar links is <strong>afmelden</strong></span></span>
+      <span class="scheiding"></span>
+      <span class="helft rechts"><span>Naar rechts is <strong>aanmelden</strong></span> <span class="pijl">→</span></span>
+    </div>
     <div id="speeldagen-deck" class="laden">Laden…</div>
     <div id="speeldagen-melding"></div>
   </div>
@@ -256,10 +261,11 @@
       } else {
         knop = '<button class="knop aanmelden" data-actie="aanmelden" data-index="' + i + '">Aanmelden</button>';
       }
-      return '<div class="speeldag-regel' + (blokkade ? ' geblokkeerd' : '') + '" style="border-top:none;padding-top:0">' +
+      const locatieKlasse = s.locatie.includes('Haven') ? 'locatie-haven' : s.locatie.includes('Noordenplassen') ? 'locatie-noordenplassen' : '';
+      return '<div class="speeldag-regel' + (blokkade ? ' geblokkeerd' : '') + (locatieKlasse ? ' ' + locatieKlasse : '') + '" style="border-top:none;padding-top:0">' +
         '<span><span class="dag" style="font-size:17px">' + dagnamen[weekdag - 1] + ' ' +
         s.start.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + '</span><br>' +
-        '<span class="locatie">' + s.locatie + ' · ' + opDezeAvond.length + '/' + s.maxSpelers + '</span>' +
+        '<span class="locatie"><span class="locatie-dot ' + locatieKlasse + '"></span>' + s.locatie + ' · ' + opDezeAvond.length + '/' + s.maxSpelers + '</span>' +
         (blokkade ? '<div class="banner" style="margin:6px 0 0">🚫 Geannuleerd: ' + blokkade.reden + '</div>' : '') +
         '</span>' + knop + '</div>';
     });

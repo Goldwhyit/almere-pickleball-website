@@ -62,7 +62,7 @@ function initNav(actievePagina) {
     .account-knoppen { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; max-width: 100%; }
     .account-knoppen a, .account-knoppen button {
       background: rgba(255,255,255,0.15); color: inherit; border: none; border-radius: 8px;
-      padding: 7px 10px; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: none;
+      padding: 6px 9px; font-size: 11.5px; font-weight: 600; cursor: pointer; text-decoration: none;
       white-space: nowrap;
     }
   `;

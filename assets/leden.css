@@ -47,7 +47,7 @@ header {
   -webkit-backdrop-filter: blur(24px) saturate(160%);
   backdrop-filter: blur(24px) saturate(160%);
   color: #fff;
-  padding: 16px 22px; display: flex; align-items: center; gap: 12px;
+  padding: 16px 18px; display: flex; align-items: center; gap: 10px;
   position: sticky; top: 12px; z-index: 60;
   margin: 12px 12px 0;
   box-shadow: 0 10px 28px rgba(4,27,51,0.22), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(0,0,0,0.12);
@@ -56,7 +56,7 @@ header {
 }
 header .merk { font-family: 'Unbounded', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #cfe0f0; }
 header h1 {
-  font-family: 'Unbounded', sans-serif; font-size: 20px; margin: 4px 0 0; flex: 1;
+  font-family: 'Unbounded', sans-serif; font-size: clamp(15px, 4.8vw, 20px); margin: 4px 0 0; flex: 1;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
@@ -73,10 +73,15 @@ main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
 }
 @media (prefers-color-scheme: dark) { .status-badge { color: #8ab6ec; } }
 .status-badge.leeg { background: rgba(91,107,125,0.12); color: var(--ink-muted); }
-.speeldag-regel { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); gap: 10px; }
+.speeldag-regel { display: flex; justify-content: space-between; align-items: center; padding: 10px 0 10px 12px; border-top: 1px solid var(--line); gap: 10px; border-left: 4px solid transparent; }
 .speeldag-regel:first-of-type { border-top: none; padding-top: 0; }
 .speeldag-regel .dag { font-weight: 700; font-size: 14.5px; }
 .speeldag-regel .locatie { font-weight: 400; color: var(--ink-muted); font-size: 12.5px; }
+.speeldag-regel.locatie-haven { border-left-color: var(--navy); }
+.speeldag-regel.locatie-noordenplassen { border-left-color: #e0821f; }
+.locatie-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+.locatie-dot.locatie-haven { background: var(--navy); }
+.locatie-dot.locatie-noordenplassen { background: #e0821f; }
 .knop {
   padding: 8px 14px; border-radius: 8px; border: none; font-size: 13px; font-weight: 700;
   cursor: pointer; white-space: nowrap;
@@ -134,6 +139,16 @@ main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
 .swipe-knop:disabled { opacity: 0.3; cursor: default; }
 .swipe-teller { font-size: 12.5px; color: var(--ink-muted); font-variant-numeric: tabular-nums; min-width: 50px; text-align: center; }
 .swipe-leeg { text-align: center; color: var(--ink-muted); padding: 40px 20px; }
+.swipe-banner {
+  display: flex; align-items: stretch; gap: 10px; padding: 10px 4px; border-radius: 14px;
+  background: var(--glas-oppervlak); border: 1px solid var(--glas-rand); margin-bottom: 10px;
+  font-size: 12px; color: var(--ink-muted); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+}
+.swipe-banner .helft { flex: 1; display: flex; align-items: center; gap: 6px; padding: 0 10px; min-width: 0; }
+.swipe-banner .helft.rechts { justify-content: flex-end; text-align: right; }
+.swipe-banner .scheiding { width: 1px; background: var(--line); flex-shrink: 0; }
+.swipe-banner strong { color: var(--ink); font-weight: 700; }
+.swipe-banner .pijl { font-size: 15px; flex-shrink: 0; }
 .pil-knop-vorm {
   display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700;
   background: rgba(0,91,191,0.12); color: var(--navy); text-decoration: none;
