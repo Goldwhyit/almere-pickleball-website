@@ -280,6 +280,19 @@
       speeldagenDeck = initSwipeDeck(el, kaarten, {
         leegTekst: 'Geen aankomende speelavonden.',
         onRender: koppelKaartEvents,
+        badgeRechts: 'Aanmelden', badgeLinks: 'Afmelden',
+        // Hergebruikt de knop die al op de kaart staat (die kent zelf de
+        // juiste actie — normaal/bijbetalen — en toont de juiste melding).
+        // Geen knop beschikbaar (vol/geblokkeerd/geen aanmelding): niets te
+        // doen, gewoon de actuele stand opnieuw ophalen.
+        onSwipeRechts: () => {
+          const btn = el.querySelector('.swipe-kaart [data-actie^="aanmelden"]');
+          if (btn) btn.click(); else laadSpeeldagen();
+        },
+        onSwipeLinks: () => {
+          const btn = el.querySelector('.swipe-kaart [data-actie="afmelden"]');
+          if (btn) btn.click(); else laadSpeeldagen();
+        },
       });
     }
   }

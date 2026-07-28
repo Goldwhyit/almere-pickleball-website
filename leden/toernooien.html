@@ -315,12 +315,19 @@
     window.location.href = 'mailto:' + email + '?' + params.toString();
   }
 
+  // "Niet geïnteresseerd" (swipe naar links) is puur een lokale voorkeur —
+  // er is geen serverkant-concept van interesse voor landelijke toernooien,
+  // dus onthouden we genegeerde toernooien per toestel in localStorage.
+  function landelijkSleutel(t) { return t.naam + '|' + t.datum_start; }
+
   async function laadLandelijk() {
     const el = document.getElementById('landelijk-inhoud');
     const vandaag = new Date().toISOString().substring(0, 10);
-    const toernooien = await haalOp('landelijke_toernooien', {
+    let toernooien = await haalOp('landelijke_toernooien', {
       select: '*', datum_start: 'gte.' + vandaag, order: 'volgorde.asc',
     });
+    const genegeerd = JSON.parse(localStorage.getItem('pb_landelijk_genegeerd') || '[]');
+    toernooien = toernooien.filter(t => !genegeerd.includes(landelijkSleutel(t)));
     if (!toernooien.length) { el.textContent = 'Geen aankomende landelijke toernooien.'; return; }
 
     window.__landelijk = toernooien;
@@ -364,6 +371,20 @@
           const t = window.__landelijk[Number(btn.dataset.mailIndex)];
           inschrijvenPerMail(t.naam, t.email.trim());
         }));
+      },
+      badgeRechts: 'Inschrijven/bekijken', badgeLinks: 'Niet geïnteresseerd',
+      onSwipeRechts: () => {
+        const kaartEl = el.querySelector('.swipe-kaart');
+        const btn = kaartEl && (kaartEl.querySelector('[data-mail-index]') || kaartEl.querySelector('.link-knop'));
+        if (btn) btn.click();
+      },
+      onSwipeLinks: (index) => {
+        const t = window.__landelijk[index];
+        const lijst = JSON.parse(localStorage.getItem('pb_landelijk_genegeerd') || '[]');
+        const sleutel = landelijkSleutel(t);
+        if (!lijst.includes(sleutel)) lijst.push(sleutel);
+        localStorage.setItem('pb_landelijk_genegeerd', JSON.stringify(lijst));
+        laadLandelijk();
       },
     });
   }

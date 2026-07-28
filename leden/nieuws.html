@@ -80,16 +80,28 @@
     algemeen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg>',
   };
 
+  // "Bewaren"/"niet geïnteresseerd" zijn pure voorkeuren van dit toestel —
+  // er is geen serverkant-concept van opgeslagen/genegeerd nieuws per lid,
+  // dus onthouden we dit lokaal (net als bij landelijke toernooien).
+  function nieuwsSleutel(n) { return String(n.id); }
+  function geefBewaard() { return JSON.parse(localStorage.getItem('pb_nieuws_bewaard') || '[]'); }
+  function geefVerborgen() { return JSON.parse(localStorage.getItem('pb_nieuws_verborgen') || '[]'); }
+
+  let nieuwsDeck = null;
+
   async function laadNieuws() {
     const el = document.getElementById('nieuws-deck');
     const vandaag = new Date().toISOString().substring(0, 10);
     const rows = await haalOp('nieuws', {
-      select: 'titel,inhoud,gepubliceerd_op,categorie,bron,link,datum_tekst,afbeelding_url,vervaldatum',
+      select: 'id,titel,inhoud,gepubliceerd_op,categorie,bron,link,datum_tekst,afbeelding_url,vervaldatum',
       or: '(vervaldatum.is.null,vervaldatum.gte.' + vandaag + ')',
       order: 'gepubliceerd_op.desc,volgorde.asc',
     });
+    const verborgen = geefVerborgen();
+    const bewaard = geefBewaard();
+    window.__nieuws = rows.filter(n => !verborgen.includes(nieuwsSleutel(n)));
 
-    const kaarten = rows.map(n => {
+    const kaarten = window.__nieuws.map(n => {
       const categorie = n.categorie && categorieLabels[n.categorie] ? n.categorie : 'algemeen';
       const datumWeergave = n.datum_tekst ||
         new Date(n.gepubliceerd_op).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -99,7 +111,9 @@
       const bronLink = n.link
         ? '<a href="' + n.link + '" target="_blank" rel="noopener">Meer lezen →</a>'
         : '';
-      return '<div class="nieuws-kaart" style="border:none;box-shadow:none">' + foto +
+      const bewaardBadge = bewaard.includes(nieuwsSleutel(n))
+        ? '<span class="pil-knop-vorm" style="position:absolute;top:10px;right:10px">★ Bewaard</span>' : '';
+      return '<div class="nieuws-kaart" style="border:none;box-shadow:none;position:relative">' + bewaardBadge + foto +
         '<div class="inhoud-vlak">' +
         '<span class="categorie-badge categorie-' + categorie + '">' + categorieLabels[categorie] + '</span>' +
         '<h3>' + n.titel + '</h3>' +
@@ -108,7 +122,28 @@
         '</div></div>';
     });
 
-    initSwipeDeck(el, kaarten, { leegTekst: 'Nog geen nieuwsberichten.' });
+    const opties = {
+      leegTekst: 'Nog geen nieuwsberichten.',
+      badgeRechts: 'Bewaren', badgeLinks: 'Niet geïnteresseerd',
+      onSwipeRechts: (index) => {
+        const n = window.__nieuws[index];
+        const lijst = geefBewaard();
+        const sleutel = nieuwsSleutel(n);
+        if (!lijst.includes(sleutel)) lijst.push(sleutel);
+        localStorage.setItem('pb_nieuws_bewaard', JSON.stringify(lijst));
+        laadNieuws();
+      },
+      onSwipeLinks: (index) => {
+        const n = window.__nieuws[index];
+        const lijst = geefVerborgen();
+        const sleutel = nieuwsSleutel(n);
+        if (!lijst.includes(sleutel)) lijst.push(sleutel);
+        localStorage.setItem('pb_nieuws_verborgen', JSON.stringify(lijst));
+        laadNieuws();
+      },
+    };
+    if (nieuwsDeck) nieuwsDeck.herlaad(kaarten);
+    else nieuwsDeck = initSwipeDeck(el, kaarten, opties);
   }
 
   laadNieuws().catch(e => {

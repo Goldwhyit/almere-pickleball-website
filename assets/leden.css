@@ -114,9 +114,17 @@ main { max-width: 640px; margin: -16px auto 24px; padding: 0 18px; }
 .swipe-kaart {
   background: var(--card); border: 1px solid var(--line); border-radius: 18px;
   padding: 18px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); cursor: grab; user-select: none;
-  transition: transform 0.22s ease; touch-action: pan-y;
+  transition: transform 0.22s ease; touch-action: pan-y; position: relative;
 }
 .swipe-kaart:active { cursor: grabbing; }
+.swipe-badge {
+  position: absolute; top: 14px; z-index: 5; padding: 6px 14px; border-radius: 999px;
+  font-family: 'Unbounded', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+  text-transform: uppercase; opacity: 0; pointer-events: none; border: 2px solid currentColor;
+  transition: opacity 0.15s ease;
+}
+.swipe-badge-links { left: 14px; color: var(--danger, #b3261e); transform: rotate(-8deg); }
+.swipe-badge-rechts { right: 14px; color: var(--goed, #1e8a4c); transform: rotate(8deg); }
 .swipe-nav { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 12px; }
 .swipe-knop {
   width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--line); background: var(--paper);

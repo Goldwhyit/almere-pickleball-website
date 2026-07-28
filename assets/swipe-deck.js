@@ -2,11 +2,17 @@
 //
 // initSwipeDeck(container, kaartenHtmlArray, opties) bouwt één zichtbare
 // kaart tegelijk; slepen (of de pijlknoppen) toont de volgende/vorige kaart
-// met een swipe-animatie. Geen like/reject-semantiek — puur een compacte
-// manier om items één voor één te doorbladeren. Actieknoppen (aanmelden,
-// inschrijven, ...) leven op de kaart zelf en werken zoals altijd; alleen
-// een sleep die op de kaart zelf begint (niet op een knop/link/invoerveld)
-// wisselt van kaart.
+// met een swipe-animatie. Standaard puur navigatie (geen like/reject-
+// semantiek) — een compacte manier om items één voor één te doorbladeren.
+//
+// Optioneel, via opties.onSwipeLinks/onSwipeRechts, kan een sleep-richting
+// ook een echte actie betekenen (bijv. reserveren: rechts = aanmelden,
+// links = afmelden) i.p.v. gewoon bladeren — als die functie is opgegeven
+// vervangt de actie de normale vorige/volgende-navigatie voor die richting,
+// en toont een gekleurde badge tijdens het slepen als visuele hint
+// (opties.badgeLinks/badgeRechts). Actieknoppen (aanmelden, inschrijven,
+// ...) op de kaart zelf blijven altijd gewoon werken; alleen een sleep die
+// op de kaart zelf begint (niet op een knop/link/invoerveld) telt als swipe.
 //
 // Bewust GEEN los-gestapelde kaarten achter de bovenste (elk met eigen
 // hoogte/overflow-risico) — één kaart per keer in de normale document-flow
@@ -37,7 +43,12 @@ function initSwipeDeck(container, kaarten, opties) {
       knopVorige.disabled = true; knopVolgende.disabled = true;
       return;
     }
-    stapel.innerHTML = '<div class="swipe-kaart">' + kaarten[index] + '</div>';
+    const heeftActieLinks = typeof opties.onSwipeLinks === 'function';
+    const heeftActieRechts = typeof opties.onSwipeRechts === 'function';
+    stapel.innerHTML = '<div class="swipe-kaart">' +
+      (heeftActieLinks ? '<div class="swipe-badge swipe-badge-links">' + (opties.badgeLinks || '') + '</div>' : '') +
+      (heeftActieRechts ? '<div class="swipe-badge swipe-badge-rechts">' + (opties.badgeRechts || '') + '</div>' : '') +
+      kaarten[index] + '</div>';
     teller.textContent = (index + 1) + ' / ' + kaarten.length;
     knopVorige.disabled = index === 0;
     knopVolgende.disabled = index === kaarten.length - 1;
@@ -64,6 +75,11 @@ function initSwipeDeck(container, kaarten, opties) {
     if (!kaart) return;
     huidigX = puntX(e) - startX;
     kaart.style.transform = 'translateX(' + huidigX + 'px) rotate(' + (huidigX / 20) + 'deg)';
+    const sterkte = Math.min(1, Math.abs(huidigX) / 80);
+    const badgeLinks = kaart.querySelector('.swipe-badge-links');
+    const badgeRechts = kaart.querySelector('.swipe-badge-rechts');
+    if (badgeLinks) badgeLinks.style.opacity = huidigX < 0 ? sterkte : 0;
+    if (badgeRechts) badgeRechts.style.opacity = huidigX > 0 ? sterkte : 0;
   }
   function onEnd() {
     if (!slepend) return;
@@ -71,14 +87,27 @@ function initSwipeDeck(container, kaarten, opties) {
     const kaart = stapel.querySelector('.swipe-kaart');
     if (!kaart) return;
     kaart.style.transition = 'transform 0.22s ease';
-    const kanVolgende = huidigX < 0 && index < kaarten.length - 1;
-    const kanVorige = huidigX > 0 && index > 0;
-    if (Math.abs(huidigX) > 80 && (kanVolgende || kanVorige)) {
+    const heeftActieLinks = typeof opties.onSwipeLinks === 'function';
+    const heeftActieRechts = typeof opties.onSwipeRechts === 'function';
+    const kanActieLinks = heeftActieLinks && huidigX < 0;
+    const kanActieRechts = heeftActieRechts && huidigX > 0;
+    const kanVolgende = !heeftActieLinks && huidigX < 0 && index < kaarten.length - 1;
+    const kanVorige = !heeftActieRechts && huidigX > 0 && index > 0;
+    if (Math.abs(huidigX) > 80 && (kanActieLinks || kanActieRechts || kanVolgende || kanVorige)) {
       const richting = huidigX > 0 ? 1 : -1;
+      const indexTenTijdeVanSwipe = index;
       kaart.style.transform = 'translateX(' + (richting * 500) + 'px) rotate(' + (richting * 25) + 'deg)';
-      setTimeout(() => { richting > 0 ? vorige() : volgende(); }, 160);
+      setTimeout(() => {
+        if (kanActieRechts) opties.onSwipeRechts(indexTenTijdeVanSwipe, kaarten[indexTenTijdeVanSwipe]);
+        else if (kanActieLinks) opties.onSwipeLinks(indexTenTijdeVanSwipe, kaarten[indexTenTijdeVanSwipe]);
+        else richting > 0 ? vorige() : volgende();
+      }, 160);
     } else {
       kaart.style.transform = '';
+      const badgeLinks = kaart.querySelector('.swipe-badge-links');
+      const badgeRechts = kaart.querySelector('.swipe-badge-rechts');
+      if (badgeLinks) badgeLinks.style.opacity = 0;
+      if (badgeRechts) badgeRechts.style.opacity = 0;
     }
     huidigX = 0;
   }
