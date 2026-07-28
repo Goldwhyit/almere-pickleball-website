@@ -90,26 +90,15 @@ const I18N = {
     zh: '阿尔梅勒海文体育馆 6、7 或 8 号球场，周二晚间——按小时计。',
   },
   titelJeTicket: { nl: 'Je ticket', de: 'Dein Ticket', en: 'Your ticket', fr: 'Votre billet', zh: '您的凭证' },
-  linkProefles: {
-    nl: 'Gratis proefles aanvragen →', de: 'Kostenlose Probestunde anfragen →', en: 'Request a free trial lesson →',
-    fr: 'Demander un cours d’essai gratuit →', zh: '申请免费试打 →',
-  },
-  linkToernooistanden: {
-    nl: 'Bekijk de actuele toernooistanden →', de: 'Aktuelle Turnierstände ansehen →', en: 'View current tournament standings →',
-    fr: 'Voir les classements actuels des tournois →', zh: '查看当前比赛排名 →',
-  },
-  linkLedenportaal: {
-    nl: 'Ledenportaal (inloggen) →', de: 'Mitgliederportal (einloggen) →', en: 'Member portal (sign in) →',
-    fr: 'Portail des membres (connexion) →', zh: '会员门户（登录）→',
-  },
-  linkBaanHuren: {
-    nl: 'Baan huren (extern) →', de: 'Platz mieten (extern) →', en: 'Rent a court (external) →',
-    fr: 'Louer un terrain (externe) →', zh: '租用球场（外部）→',
-  },
-  veelgesteldeVragenPijl: {
-    nl: 'Veelgestelde vragen →', de: 'Häufige Fragen →', en: 'Frequently asked questions →',
-    fr: 'Questions fréquentes →', zh: '常见问题 →',
-  },
+  linkProeflesTitel: { nl: 'Gratis proefles aanvragen', de: 'Kostenlose Probestunde anfragen', en: 'Request a free trial lesson', fr: 'Demander un cours d’essai gratuit', zh: '申请免费试打' },
+  linkProeflesSub: { nl: 'Kom vrijblijvend meespelen', de: 'Spiel unverbindlich mit', en: 'Come play, no obligation', fr: 'Venez jouer sans engagement', zh: '无需承诺，来打球' },
+  linkToernooistandenTitel: { nl: 'Toernooistanden', de: 'Turnierstände', en: 'Tournament standings', fr: 'Classements des tournois', zh: '比赛排名' },
+  linkToernooistandenSub: { nl: 'Poule-standen en wedstrijdschema', de: 'Gruppentabellen und Spielplan', en: 'Group standings and match schedule', fr: 'Classements de poule et calendrier', zh: '小组积分与赛程' },
+  linkLedenportaalTitel: { nl: 'Ledenportaal', de: 'Mitgliederportal', en: 'Member portal', fr: 'Portail des membres', zh: '会员门户' },
+  linkLedenportaalSub: { nl: 'Inloggen voor leden', de: 'Anmelden für Mitglieder', en: 'Sign in for members', fr: 'Connexion pour les membres', zh: '会员登录' },
+  linkBaanHurenTitel: { nl: 'Baan huren', de: 'Platz mieten', en: 'Rent a court', fr: 'Louer un terrain', zh: '租用球场' },
+  linkBaanHurenSub: { nl: 'Los een baan huren, ook als niet-lid', de: 'Einzeln einen Platz mieten, auch als Nichtmitglied', en: 'Rent a court on its own, even as a non-member', fr: 'Louez un terrain, même sans être membre', zh: '即使非会员也可单独租用球场' },
+  linkFaqSub: { nl: 'Spelen, lidmaatschap en toernooien', de: 'Spielen, Mitgliedschaft und Turniere', en: 'Playing, membership and tournaments', fr: 'Jeu, adhésion et tournois', zh: '打球、会员与比赛' },
   heroPrefix: { nl: 'We zijn', de: 'Wir sind', en: 'We’re', fr: 'Nous sommes', zh: '我们正在' },
   heroAccent: {
     nl: 'volop aan het bouwen', de: 'mitten im Aufbau', en: 'hard at work building',
