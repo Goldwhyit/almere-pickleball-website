@@ -47,6 +47,13 @@
     box-shadow: 0 20px 50px rgba(4,27,51,0.35), inset 0 1px 0 var(--glas-hooglicht-boven), inset 0 -1px 0 var(--glas-hooglicht-onder);
   }
   .popup-kaart h3 { margin: 0 0 10px; font-size: 16px; }
+  .stat-tegel {
+    background: var(--paper); border: 1px solid var(--line); border-radius: 10px;
+    padding: 12px 10px; text-align: center;
+  }
+  .stat-tegel .waarde { font-size: 22px; font-weight: 700; color: var(--navy); }
+  @media (prefers-color-scheme: dark) { .stat-tegel .waarde { color: #8ab6ec; } }
+  .stat-tegel .label { font-size: 11px; color: var(--ink-muted); margin-top: 2px; }
   .dag-keuze { display: flex; gap: 10px; margin-top: 14px; }
   .dag-keuze button {
     flex: 1; padding: 14px; border-radius: 10px; border: 1.5px solid var(--line); background: transparent;
@@ -173,7 +180,7 @@
         '<h3>Overstappen naar 2x per week</h3>' +
         '<p class="details">Je stapt over naar <strong>' + info.nieuw_abonnement_naam + '</strong>. ' +
         'Voor de rest van de huidige periode betaal je het geprorateerde verschil:</p>' +
-        '<p style="font-size:24px;font-weight:700;color:var(--navy);margin:10px 0">€' + Number(info.bedrag).toFixed(2) + '</p>' +
+        '<div class="stat-tegel" style="margin:10px 0"><div class="waarde">€' + Number(info.bedrag).toFixed(2) + '</div><div class="label">Te betalen</div></div>' +
         '<button class="knop aanmelden" id="upgrade-betaal-knop" style="display:block;width:100%">Betalen en overstappen</button>' +
         '<button class="knop" id="upgrade-annuleer-knop" style="display:block;width:100%;margin-top:8px;background:transparent">Annuleren</button>' +
         '<div id="upgrade-melding"></div>';

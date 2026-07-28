@@ -95,9 +95,10 @@
   .popup-kop h3 { margin: 0; font-size: 16px; }
   .popup-sluit { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--ink-muted); }
   .plan-regel {
-    padding: 12px 0; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 10px;
+    padding: 12px 14px; display: flex; justify-content: space-between; gap: 10px;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 8px;
   }
-  .plan-regel:first-of-type { border-top: none; padding-top: 0; }
+  .plan-regel:last-child { margin-bottom: 0; }
   .plan-regel .naam { font-weight: 700; font-size: 14px; }
   .plan-regel .sub { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
   .plan-regel .prijs { font-weight: 700; font-size: 14px; color: var(--navy); white-space: nowrap; }
@@ -166,7 +167,7 @@
       toonPopup('Overstappen naar 2x per week',
         '<p class="details">Je stapt over naar <strong>' + info.nieuw_abonnement_naam + '</strong>. ' +
         'Voor de rest van de huidige periode betaal je het geprorateerde verschil:</p>' +
-        '<p style="font-size:24px;font-weight:700;color:var(--navy);margin:10px 0">€' + Number(info.bedrag).toFixed(2) + '</p>' +
+        '<div class="stat-tegel" style="margin:10px 0"><div class="waarde">€' + Number(info.bedrag).toFixed(2) + '</div><div class="label">Te betalen</div></div>' +
         '<button class="knop aanmelden" id="upgrade-betaal-knop" style="display:block;width:100%">Betalen en overstappen</button>' +
         '<div id="upgrade-melding"></div>');
       document.getElementById('upgrade-betaal-knop').addEventListener('click', async (e) => {
