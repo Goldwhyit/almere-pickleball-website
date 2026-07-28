@@ -63,6 +63,20 @@ async function inloggen(email, wachtwoord) {
   return data;
 }
 
+/// Stuurt een wachtwoord-herstel-mail (zelfde flow als login_screen.dart's
+/// resetPasswordForEmail in de app).
+async function stuurWachtwoordHerstel(email) {
+  const resp = await fetch(AUTH_BASE + '/recover', {
+    method: 'POST',
+    headers: { apikey: ANON_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  if (!resp.ok) {
+    const data = await resp.json().catch(() => ({}));
+    throw new Error(data.error_description || data.msg || 'Versturen is mislukt.');
+  }
+}
+
 /// Maakt een nieuw account aan (data = metadata voor de handle_new_user-
 /// trigger: naam, telefoon, taal, geboortedatum, ... — zie de app se
 /// login_screen.dart voor de volledige lijst). Bewaart meteen een sessie

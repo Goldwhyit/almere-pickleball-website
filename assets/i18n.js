@@ -51,6 +51,16 @@ const I18N = {
   titelPrivacy: { nl: 'Privacybeleid', de: 'Datenschutz', en: 'Privacy policy', fr: 'Confidentialité', zh: '隐私政策' },
   titelFaq: { nl: 'Veelgestelde vragen', de: 'Häufige Fragen', en: 'Frequently asked questions', fr: 'Questions fréquentes', zh: '常见问题' },
   titelInloggen: { nl: 'Ledenportaal', de: 'Mitgliederportal', en: 'Member portal', fr: 'Portail des membres', zh: '会员门户' },
+  wachtwoordVergeten: { nl: 'Wachtwoord vergeten?', de: 'Passwort vergessen?', en: 'Forgot password?', fr: 'Mot de passe oublié ?', zh: '忘记密码？' },
+  wachtwoordMailVerstuurd: {
+    nl: 'Herstel-e-mail verstuurd. Check je inbox.', de: 'Wiederherstellungs-E-Mail gesendet. Prüfe deinen Posteingang.',
+    en: 'Recovery email sent. Check your inbox.', fr: 'E-mail de récupération envoyé. Vérifiez votre boîte de réception.',
+    zh: '恢复邮件已发送，请查看收件箱。',
+  },
+  vulEerstEmailIn: {
+    nl: 'Vul eerst je e-mailadres in.', de: 'Gib zuerst deine E-Mail-Adresse ein.', en: 'Fill in your email address first.',
+    fr: 'Indiquez d’abord votre adresse e-mail.', zh: '请先填写您的电子邮箱。',
+  },
   subToernooien: {
     nl: 'Poule-standen en wedstrijdschema, live bijgewerkt.',
     de: 'Gruppentabellen und Spielplan, live aktualisiert.',

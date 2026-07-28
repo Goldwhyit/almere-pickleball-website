@@ -87,7 +87,9 @@
     <input type="password" id="wachtwoord" autocomplete="current-password" required />
     <button type="submit" class="primair" id="login-knop" data-i18n="inloggen">Inloggen</button>
     <div class="fout" id="fout-melding"></div>
+    <div id="herstel-melding"></div>
   </form>
+  <a href="#" id="wachtwoord-vergeten-link" class="terug" data-i18n="wachtwoordVergeten" style="margin-top:14px">Wachtwoord vergeten?</a>
   <a class="terug" href="/" data-i18n="terugNaarSite">← Terug naar de website</a>
   <p style="text-align:center;margin-top:14px;font-size:12px">
     <a href="/veelgestelde-vragen/" style="color:var(--ink-muted)" data-i18n="veelgesteldeVragen">Veelgestelde vragen</a>
@@ -138,6 +140,25 @@
       foutEl.textContent = err.message;
       knop.disabled = false;
       knop.textContent = 'Inloggen';
+    }
+  });
+
+  document.getElementById('wachtwoord-vergeten-link').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const herstelEl = document.getElementById('herstel-melding');
+    const foutEl = document.getElementById('fout-melding');
+    foutEl.textContent = '';
+    if (!email) {
+      foutEl.textContent = vertaal('vulEerstEmailIn');
+      document.getElementById('email').focus();
+      return;
+    }
+    try {
+      await stuurWachtwoordHerstel(email);
+      herstelEl.innerHTML = '<div class="fout" style="color:#148c5a">' + vertaal('wachtwoordMailVerstuurd') + '</div>';
+    } catch (err) {
+      foutEl.textContent = err.message;
     }
   });
 </script>
