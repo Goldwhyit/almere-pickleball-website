@@ -31,6 +31,10 @@ async function laadVerjaardagsoverlay() {
 /// Toont de taart alleen als geboortedatum vandaag jarig is (maand+dag,
 /// jaartal doet er niet toe). Laadt de overlay lui in — geen extra
 /// netwerk-call op dagen die toch geen verjaardag zijn.
+///
+/// Thema volgt automatisch het licht/donker-thema van de site (crème/bruin
+/// bij licht, navy/goud bij donker) via de al bestaande huidigThema() uit
+/// theme.js — geef zelf een thema mee om dat te overschrijven.
 async function toonVerjaardagAlsJarig(geboortedatum, naam, thema) {
   if (!geboortedatum) return false;
   const nu = new Date();
@@ -39,7 +43,8 @@ async function toonVerjaardagAlsJarig(geboortedatum, naam, thema) {
   await laadVerjaardagsoverlay();
   if (!window.PickleballBirthday) return false;
   window.PickleballBirthday.setName(naam);
-  if (thema) window.PickleballBirthday.setTheme(thema);
+  const gekozenThema = thema || (typeof huidigThema === 'function' && huidigThema() === 'dark' ? 'club' : 'original');
+  window.PickleballBirthday.setTheme(gekozenThema);
   window.PickleballBirthday.show();
   return true;
 }
