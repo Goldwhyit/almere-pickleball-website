@@ -70,6 +70,14 @@
   }
   .popup-sluit-rij { text-align: right; }
   .popup-sluit { background: rgba(91,107,125,0.12); border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 14px; cursor: pointer; color: var(--ink-muted); }
+  .mini-toast {
+    position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom, 0px)); z-index: 150;
+    transform: translate(-50%, 12px); opacity: 0; transition: transform 0.25s ease, opacity 0.25s ease;
+    background: var(--glas-oppervlak); -webkit-backdrop-filter: blur(20px) saturate(160%); backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid var(--glas-rand); border-radius: 999px; padding: 10px 18px; font-size: 13px; font-weight: 600;
+    color: var(--ink); box-shadow: 0 8px 24px rgba(4,27,51,0.2); max-width: 88vw; text-align: center;
+  }
+  .mini-toast.zichtbaar { transform: translate(-50%, 0); opacity: 1; }
 </style>
 </head>
 <body>
@@ -96,6 +104,11 @@
         <button data-niveau="competitie">Competitie</button>
       </div>
     </div>
+    <div id="leden-swipe-banner" class="swipe-banner">
+      <span class="helft"><span class="pijl">←</span> <span>Niet <strong>samen spelen</strong></span></span>
+      <span class="scheiding"></span>
+      <span class="helft rechts"><span><strong>Samen spelen</strong></span> <span class="pijl">→</span></span>
+    </div>
     <div id="leden-inhoud" class="laden">Laden…</div>
   </div>
 </main>
@@ -117,6 +130,12 @@
   let niveauFilter = '';
   let toonRanglijst = false;
   let ledenDeck = null;
+  // Module-scope i.p.v. lokaal aan render(): initSwipeDeck bindt onRender/
+  // onSwipeRechts/onSwipeLinks maar één keer (bij de eerste render), dus
+  // latere render()-aanroepen (zoeken, filteren, swipen) moeten dezelfde
+  // variabele bijwerken i.p.v. een nieuwe lokale te schaduwen — anders
+  // lezen die eerder gebonden callbacks straks een verouderde lijst/index.
+  let swipeLijst = [];
 
   function initialen(naam) {
     return naam.split(' ').filter(Boolean).slice(0, 2).map(n => n[0].toUpperCase()).join('');
@@ -128,6 +147,24 @@
     if (!s || !s.gespeeld) return niveau;
     const pct = Math.round((s.gewonnen / s.gespeeld) * 100);
     return niveau + ' · ' + s.gespeeld + ' gespeeld, ' + s.gewonnen + ' gewonnen (' + pct + '%)';
+  }
+
+  // "Niet samen spelen" (swipe links op de Leden-tab) is een pure lokale
+  // voorkeur van dit toestel — verbergt dat lid alleen uit je eigen
+  // Leden-swipe-weergave, niet uit de Ranglijst (die blijft de volledige,
+  // objectieve clubranglijst tonen).
+  function geefLedenGenegeerd() { return JSON.parse(localStorage.getItem('pb_leden_genegeerd') || '[]'); }
+
+  function toonToast(tekst) {
+    const bestaand = document.getElementById('mini-toast');
+    if (bestaand) bestaand.remove();
+    const toast = document.createElement('div');
+    toast.id = 'mini-toast';
+    toast.className = 'mini-toast';
+    toast.textContent = tekst;
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('zichtbaar'));
+    setTimeout(() => { toast.classList.remove('zichtbaar'); setTimeout(() => toast.remove(), 250); }, 2200);
   }
 
   function gefilterdeLeden() {
@@ -165,6 +202,7 @@
     const el = document.getElementById('leden-inhoud');
     const lijst = gefilterdeLeden();
     el.className = '';
+    document.getElementById('leden-swipe-banner').style.display = toonRanglijst ? 'none' : '';
     if (!lijst.length) { el.innerHTML = '<p class="details">Geen leden gevonden.</p>'; ledenDeck = null; return; }
 
     if (toonRanglijst) {
@@ -183,23 +221,41 @@
     }
 
     // Leden-weergave: tinder-stijl swipe-kaarten met foto, klik voor wedstrijddetails.
-    const kaarten = lijst.map((l, i) => '<div class="lid-kaart">' +
+    const genegeerd = geefLedenGenegeerd();
+    swipeLijst = lijst.filter(l => !genegeerd.includes(l.id));
+    const kaarten = swipeLijst.map((l, i) => '<div class="lid-kaart">' +
       (l.avatar_url ? '<img class="avatar-groot" src="' + l.avatar_url + '" alt="" />' : '<div class="avatar-groot">' + initialen(l.naam) + '</div>') +
       '<div class="naam">' + l.naam + '</div>' +
       '<span class="niveau-badge">' + (niveauLabels[l.niveau] || l.niveau || '') + '</span>' +
       '<button type="button" class="details-knop" data-details-index="' + i + '">Bekijk wedstrijddetails</button>' +
       '</div>');
 
-    function koppel(kaartEl) {
-      const btn = kaartEl.querySelector('[data-details-index]');
-      if (btn) btn.addEventListener('click', () => toonWedstrijdDetails(lijst[Number(btn.dataset.detailsIndex)]));
-    }
-
     if (ledenDeck) {
       ledenDeck.herlaad(kaarten);
     } else {
       el.innerHTML = '';
-      ledenDeck = initSwipeDeck(el, kaarten, { leegTekst: 'Geen leden gevonden.', onRender: koppel });
+      ledenDeck = initSwipeDeck(el, kaarten, {
+        leegTekst: 'Geen leden gevonden.',
+        // Deze callbacks worden maar één keer gebonden (bij deze eerste
+        // render) — ze lezen daarom bewust de module-scope swipeLijst
+        // i.p.v. de bovenstaande const, zodat latere render()-aanroepen
+        // (zoeken/filteren/swipen) ze altijd van verse data voorzien.
+        onRender: (kaartEl) => {
+          const btn = kaartEl.querySelector('[data-details-index]');
+          if (btn) btn.addEventListener('click', () => toonWedstrijdDetails(swipeLijst[Number(btn.dataset.detailsIndex)]));
+        },
+        badgeRechts: 'Samen spelen', badgeLinks: 'Niet samen spelen',
+        onSwipeRechts: (index) => {
+          toonToast('Leuk! Misschien speel je snel met ' + swipeLijst[index].naam.split(' ')[0]);
+          render();
+        },
+        onSwipeLinks: (index) => {
+          const lijstGenegeerd = geefLedenGenegeerd();
+          if (!lijstGenegeerd.includes(swipeLijst[index].id)) lijstGenegeerd.push(swipeLijst[index].id);
+          localStorage.setItem('pb_leden_genegeerd', JSON.stringify(lijstGenegeerd));
+          render();
+        },
+      });
     }
   }
 
