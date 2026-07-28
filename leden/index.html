@@ -60,6 +60,17 @@
   button.primair:disabled { opacity: 0.5; cursor: default; }
   .fout { color: var(--danger); font-size: 13.5px; margin-top: 12px; text-align: center; }
   .terug { display: block; text-align: center; margin-top: 20px; font-size: 13px; color: var(--ink-muted); text-decoration: none; }
+  .intro-video-overlay {
+    position: fixed; inset: 0; z-index: 200; background: #000;
+  }
+  .intro-video-overlay:not([hidden]) { display: flex; align-items: center; justify-content: center; }
+  .intro-video-overlay video { width: 100%; height: 100%; object-fit: contain; }
+  .intro-skip {
+    position: absolute; bottom: max(20px, env(safe-area-inset-bottom, 0px)); right: 20px;
+    background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 999px; padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+    font-family: inherit; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }
 </style>
 </head>
 <body>
@@ -84,9 +95,34 @@
     <a href="/privacy/" style="color:var(--ink-muted)" data-i18n="titelPrivacy">Privacybeleid</a>
   </p>
 </div>
+<div id="intro-video-overlay" class="intro-video-overlay" hidden>
+  <video id="intro-video" src="/assets/video/intro.mp4" autoplay muted playsinline></video>
+  <button type="button" id="intro-skip" class="intro-skip">Overslaan →</button>
+</div>
 <script src="/assets/supabase.js"></script>
 <script>
   if (isIngelogd()) window.location.href = '/leden/home.html';
+
+  // Speelt de intro-video af na een geslaagde login, en gaat pas daarna
+  // naar het homescherm — met een skip-knop en een veiligheidstimer voor
+  // het geval de video niet kan afspelen (bijv. geblokkeerd door de
+  // browser of een laad-fout), zodat inloggen nooit vast kan lopen.
+  function toonIntroVideo() {
+    const overlay = document.getElementById('intro-video-overlay');
+    const video = document.getElementById('intro-video');
+    let gestart = false;
+    const ga = () => {
+      if (gestart) return;
+      gestart = true;
+      window.location.href = '/leden/home.html';
+    };
+    overlay.hidden = false;
+    document.getElementById('intro-skip').addEventListener('click', ga);
+    video.addEventListener('ended', ga);
+    video.addEventListener('error', ga);
+    video.play().catch(ga);
+    setTimeout(ga, 12000);
+  }
 
   document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -97,7 +133,7 @@
     knop.textContent = 'Bezig…';
     try {
       await inloggen(document.getElementById('email').value.trim(), document.getElementById('wachtwoord').value);
-      window.location.href = '/leden/home.html';
+      toonIntroVideo();
     } catch (err) {
       foutEl.textContent = err.message;
       knop.disabled = false;
