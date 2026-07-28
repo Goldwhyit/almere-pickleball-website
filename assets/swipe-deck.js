@@ -97,11 +97,17 @@ function initSwipeDeck(container, kaarten, opties) {
       const richting = huidigX > 0 ? 1 : -1;
       const indexTenTijdeVanSwipe = index;
       kaart.style.transform = 'translateX(' + (richting * 500) + 'px) rotate(' + (richting * 25) + 'deg)';
-      setTimeout(() => {
+      if (kanActieRechts || kanActieLinks) {
+        // Meteen aanroepen (synchroon, nog binnen de gebruikersinteractie) i.p.v.
+        // na de vlieg-animatie — anders ziet de browser het niet meer als een
+        // directe gebruikersactie en blokkeert bijv. het openen van een nieuwe
+        // tab/link (bevestigd: een setTimeout hier brak het openen van externe
+        // toernooi-links op een echte swipe, terwijl een directe klik altijd werkte).
         if (kanActieRechts) opties.onSwipeRechts(indexTenTijdeVanSwipe, kaarten[indexTenTijdeVanSwipe]);
-        else if (kanActieLinks) opties.onSwipeLinks(indexTenTijdeVanSwipe, kaarten[indexTenTijdeVanSwipe]);
-        else richting > 0 ? vorige() : volgende();
-      }, 160);
+        else opties.onSwipeLinks(indexTenTijdeVanSwipe, kaarten[indexTenTijdeVanSwipe]);
+      } else {
+        setTimeout(() => { richting > 0 ? vorige() : volgende(); }, 160);
+      }
     } else {
       kaart.style.transform = '';
       const badgeLinks = kaart.querySelector('.swipe-badge-links');

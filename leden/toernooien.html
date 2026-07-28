@@ -105,6 +105,11 @@
       <button id="pil-training">Training</button>
     </div>
     <div id="almere-inhoud" class="laden">Laden…</div>
+    <div id="landelijk-banner" class="swipe-banner" style="display:none">
+      <span class="helft"><span class="pijl">←</span> <span>Niet <strong>geïnteresseerd</strong></span></span>
+      <span class="scheiding"></span>
+      <span class="helft rechts"><span><strong>Inschrijven</strong>/bekijken</span> <span class="pijl">→</span></span>
+    </div>
     <div id="landelijk-inhoud" class="laden" style="display:none">Laden…</div>
     <div id="training-inhoud" class="laden" style="display:none">Laden…</div>
   </div>
@@ -128,6 +133,7 @@
     document.getElementById('pil-landelijk').classList.toggle('actief', w === 'landelijk');
     document.getElementById('pil-training').classList.toggle('actief', w === 'training');
     document.getElementById('almere-inhoud').style.display = w === 'almere' ? '' : 'none';
+    document.getElementById('landelijk-banner').style.display = w === 'landelijk' ? '' : 'none';
     document.getElementById('landelijk-inhoud').style.display = w === 'landelijk' ? '' : 'none';
     document.getElementById('training-inhoud').style.display = w === 'training' ? '' : 'none';
     if (w === 'landelijk' && !window.__landelijkGeladen) { window.__landelijkGeladen = true; laadLandelijk(); }
