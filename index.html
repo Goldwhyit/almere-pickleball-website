@@ -32,27 +32,17 @@
   }
   :root[data-theme="dark"] { --paper: #071224; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
   :root[data-theme="light"] { --paper: #f5f8fc; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1); }
-  .thema-knop {
-    position: fixed; top: 16px; right: 16px; background: var(--navy); border: none; color: #fff;
-    border-radius: 50%; width: 38px; height: 38px; font-size: 16px; cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12); z-index: 50;
+  #thema-plek {
+    position: fixed; top: 16px; right: 16px; z-index: 50; display: flex; gap: 8px; align-items: center;
   }
-  .taal-wrap { position: relative; flex-shrink: 0; margin-left: 8px; }
-  .taal-knop {
-    background: rgba(255,255,255,0.15); border: none; border-radius: 8px; height: 34px; min-width: 34px;
-    padding: 0 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; color: inherit; font-family: inherit;
-    letter-spacing: 0.02em;
+  .thema-knop, .taal-knop {
+    background: var(--navy); border: none; color: #fff; border-radius: 999px; height: 38px;
+    cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.12); font-family: inherit;
+    display: inline-flex; align-items: center; justify-content: center;
   }
-  .taal-menu {
-    position: absolute; top: 40px; right: 0; z-index: 70; display: flex; flex-direction: column;
-    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
-    padding: 6px; min-width: 88px; box-shadow: 0 8px 20px rgba(0,0,0,0.18);
-  }
-  .taal-item {
-    background: transparent; border: none; border-radius: 8px; padding: 8px 10px; text-align: left;
-    font-size: 13.5px; font-weight: 600; cursor: pointer; color: var(--ink); font-family: inherit;
-  }
-  .taal-item:hover { background: rgba(127,127,127,0.14); }
+  .thema-knop { width: 38px; }
+  .thema-knop svg { width: 17px; height: 17px; }
+  .taal-knop { min-width: 38px; padding: 0 12px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.02em; }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body {
@@ -231,41 +221,41 @@
 <main>
   <img class="logo" src="/assets/img/logo.png" alt="Almere Pickleball" width="180" height="176" />
 
-  <h1>We zijn <span>volop aan het bouwen</span></h1>
+  <h1><span data-i18n="heroPrefix">We zijn</span> <span data-i18n="heroAccent">volop aan het bouwen</span></h1>
 
-  <div class="badge"><span class="stip"></span> Nieuwe website in aanbouw</div>
+  <div class="badge"><span class="stip"></span> <span data-i18n="badgeTekst">Nieuwe website in aanbouw</span></div>
 
-  <p class="uitleg">
+  <p class="uitleg" data-i18n="heroUitleg">
     Onze nieuwe website komt er binnenkort aan — met alles over de club,
     speelavonden, toernooien en lidmaatschap. Tot die tijd: bedankt voor je
     geduld, en tot snel op de baan.
   </p>
 
   <div class="app-sectie speel-sectie">
-    <h2>Waar en wanneer we spelen</h2>
+    <h2 data-i18n="speelTitel">Waar en wanneer we spelen</h2>
     <p class="let-op">
-      Let op: we trainen op dit moment tijdelijk buiten. Vanaf
-      <strong>dinsdag 18 augustus, 19:30 uur</strong> spelen we weer
-      binnen in de sporthal.
+      <span data-i18n="letOpDeel1">Let op: we trainen op dit moment tijdelijk buiten. Vanaf</span>
+      <strong data-i18n="letOpDatum">dinsdag 18 augustus, 19:30 uur</strong>
+      <span data-i18n="letOpDeel2">spelen we weer binnen in de sporthal.</span>
     </p>
     <div class="speel-regel">
-      <span class="dag">Dinsdag</span>
+      <span class="dag" data-i18n="dagDinsdag">Dinsdag</span>
       <span class="tijd">19:30 – 21:30 uur</span>
     </div>
     <div class="speel-adres">Sporthal Almere Haven — Parkwerf 138, 1354 EB Almere</div>
   </div>
 
   <div class="app-sectie">
-    <h2>De clubapp</h2>
-    <p>Binnenkort beschikbaar voor iPhone en Android.</p>
+    <h2 data-i18n="clubappTitel">De clubapp</h2>
+    <p data-i18n="clubappSub">Binnenkort beschikbaar voor iPhone en Android.</p>
     <div class="store-knoppen">
       <div class="store-knop" role="img" aria-label="Binnenkort in de App Store">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M16.365 1.43c0 1.14-.417 2.06-1.25 2.77-.83.71-1.83 1.09-2.86 1.02-.14-1.1.35-2.09 1.16-2.83.81-.74 1.9-1.16 2.95-1.16zM20.5 17.32c-.5 1.15-1.1 2.28-1.98 3.3-.9 1.05-1.85 2.08-3.3 2.11-1.4.03-1.87-.83-3.5-.83-1.63 0-2.14.8-3.46.86-1.4.06-2.46-1.13-3.37-2.17-1.87-2.15-3.3-6.08-1.38-8.74 0.95-1.32 2.65-2.16 4.5-2.19 1.36-.03 2.65.92 3.48.92.83 0 2.38-1.14 4.02-.97.68.03 2.6.28 3.83 2.09-.1.06-2.28 1.34-2.26 3.99.02 3.16 2.78 4.21 2.82 4.23-.02.06-.44 1.5-.9 2.4z"/></svg>
-        <span class="tekst"><span class="klein">Binnenkort in de</span><span class="groot">App Store</span></span>
+        <span class="tekst"><span class="klein" data-i18n="binnenkortInDe">Binnenkort in de</span><span class="groot">App Store</span></span>
       </div>
       <div class="store-knop" role="img" aria-label="Binnenkort op Google Play">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M3.6 2.7c-.35.36-.55.9-.55 1.6v15.4c0 .7.2 1.24.55 1.6l.1.08 8.62-8.63v-.2L3.7 2.6l-.1.1z"/><path d="M15.3 14.9l-2.87-2.87v-.2l2.87-2.87.07.04 3.4 1.93c.97.55.97 1.45 0 2l-3.4 1.93z" opacity=".85"/><path d="M15.37 14.86l-2.94-2.94-8.73 8.73c.32.34.85.38 1.45.05l10.22-5.84" opacity=".95"/><path d="M15.37 9.14L5.15 3.3c-.6-.33-1.13-.29-1.45.05l8.73 8.73 2.94-2.94z" opacity=".95"/></svg>
-        <span class="tekst"><span class="klein">Binnenkort op</span><span class="groot">Google Play</span></span>
+        <span class="tekst"><span class="klein" data-i18n="binnenkortOp">Binnenkort op</span><span class="groot">Google Play</span></span>
       </div>
     </div>
   </div>
@@ -277,7 +267,7 @@
   <a class="toernooien-link" href="/veelgestelde-vragen/" data-i18n="veelgesteldeVragenPijl">Veelgestelde vragen →</a>
 
   <div class="footer">
-    © <span id="jaar"></span> Almere Pickleball · <a href="/privacy/" style="color:inherit">Privacybeleid</a>
+    © <span id="jaar"></span> Almere Pickleball · <a href="/privacy/" style="color:inherit" data-i18n="titelPrivacy">Privacybeleid</a>
   </div>
 </main>
 <script>

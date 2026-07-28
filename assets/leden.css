@@ -26,27 +26,16 @@
   --glas-hooglicht-boven: rgba(255,255,255,0.55); --glas-hooglicht-onder: rgba(0,0,0,0.1);
 }
 * { box-sizing: border-box; }
-.thema-knop {
-  background: rgba(255,255,255,0.15); border: none; border-radius: 8px; width: 34px; height: 34px;
-  font-size: 15px; cursor: pointer; color: inherit; flex-shrink: 0;
+.thema-knop, .taal-knop {
+  background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.22); border-radius: 999px;
+  height: 34px; cursor: pointer; color: inherit; flex-shrink: 0; font-family: inherit;
+  display: inline-flex; align-items: center; justify-content: center;
 }
-.taal-wrap { position: relative; flex-shrink: 0; }
+.thema-knop { width: 34px; }
+.thema-knop svg { width: 17px; height: 17px; }
 .taal-knop {
-  background: rgba(255,255,255,0.15); border: none; border-radius: 8px; height: 34px; min-width: 34px;
-  padding: 0 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; color: inherit; font-family: inherit;
-  letter-spacing: 0.02em;
+  min-width: 34px; padding: 0 10px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.02em;
 }
-.taal-menu {
-  position: absolute; top: 40px; right: 0; z-index: 70; display: flex; flex-direction: column;
-  background: var(--glas-oppervlak); -webkit-backdrop-filter: blur(20px) saturate(160%);
-  backdrop-filter: blur(20px) saturate(160%); border: 1px solid var(--glas-rand); border-radius: 12px;
-  padding: 6px; min-width: 88px; box-shadow: 0 8px 20px rgba(0,0,0,0.18);
-}
-.taal-item {
-  background: transparent; border: none; border-radius: 8px; padding: 8px 10px; text-align: left;
-  font-size: 13.5px; font-weight: 600; cursor: pointer; color: var(--ink); font-family: inherit;
-}
-.taal-item:hover { background: rgba(127,127,127,0.14); }
 body { margin: 0; font-family: 'Manrope', -apple-system, sans-serif; background: var(--paper); color: var(--ink); }
 
 /* "Liquid Glass" — zelfde recept als lib/widgets/glass.dart: backdrop-blur,
@@ -65,7 +54,10 @@ header {
   border-bottom: 1px solid rgba(255,255,255,0.22);
 }
 header .merk { font-family: 'Unbounded', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #cfe0f0; }
-header h1 { font-family: 'Unbounded', sans-serif; font-size: 20px; margin: 4px 0 0; flex: 1; }
+header h1 {
+  font-family: 'Unbounded', sans-serif; font-size: 20px; margin: 4px 0 0; flex: 1;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 main { max-width: 640px; margin: -16px auto 24px; padding: 0 18px; }
 .kaart {
   background: var(--card); border: 1px solid var(--line); border-radius: 16px;

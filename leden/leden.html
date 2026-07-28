@@ -36,10 +36,11 @@
   .rang-nummer { width: 22px; text-align: center; font-weight: 700; color: var(--ink-muted); font-size: 13px; }
 
   .lid-kaart { text-align: center; padding: 10px; }
-  .lid-kaart .avatar-groot {
-    width: 96px; height: 96px; border-radius: 50%; object-fit: cover; margin: 0 auto 12px;
+  .avatar-groot {
+    width: 96px; height: 96px; max-width: 96px; max-height: 96px; border-radius: 50%; object-fit: cover; margin: 0 auto 12px;
     background: linear-gradient(135deg, var(--navy), var(--navy-deep)); color: #fff;
     display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 32px;
+    flex-shrink: 0;
   }
   .lid-kaart .naam { font-size: 18px; font-weight: 700; }
   .lid-kaart .niveau-badge {
@@ -68,7 +69,7 @@
 <body>
 <header>
   <img src="/assets/img/logo.png" alt="" width="40" height="39" style="border-radius: 8px;" />
-  <div style="flex: 1;">
+  <div style="flex: 1; min-width: 0;">
     <div class="merk">Almere Pickleball</div>
     <h1 id="kop-titel">Leden</h1>
   </div>

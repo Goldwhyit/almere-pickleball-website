@@ -51,10 +51,12 @@ function initNav(actievePagina) {
     }
     .onderbalk a.actief { color: var(--navy, #005bbf); background: rgba(0,91,191,0.1); }
     .onderbalk a svg { width: 21px; height: 21px; }
-    .account-knoppen { display: flex; gap: 8px; align-items: center; }
+    #account-plek { flex-shrink: 0; }
+    .account-knoppen { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; max-width: 100%; }
     .account-knoppen a, .account-knoppen button {
       background: rgba(255,255,255,0.15); color: inherit; border: none; border-radius: 8px;
-      padding: 7px 11px; font-size: 12.5px; font-weight: 600; cursor: pointer; text-decoration: none;
+      padding: 7px 10px; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: none;
+      white-space: nowrap;
     }
   `;
   document.head.appendChild(stijl);

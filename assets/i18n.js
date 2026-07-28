@@ -100,6 +100,48 @@ const I18N = {
     nl: 'Veelgestelde vragen →', de: 'Häufige Fragen →', en: 'Frequently asked questions →',
     fr: 'Questions fréquentes →', zh: '常见问题 →',
   },
+  heroPrefix: { nl: 'We zijn', de: 'Wir sind', en: 'We’re', fr: 'Nous sommes', zh: '我们正在' },
+  heroAccent: {
+    nl: 'volop aan het bouwen', de: 'mitten im Aufbau', en: 'hard at work building',
+    fr: 'en plein chantier', zh: '全力建设中',
+  },
+  badgeTekst: {
+    nl: 'Nieuwe website in aanbouw', de: 'Neue Website im Aufbau', en: 'New website under construction',
+    fr: 'Nouveau site en construction', zh: '新网站建设中',
+  },
+  heroUitleg: {
+    nl: 'Onze nieuwe website komt er binnenkort aan — met alles over de club, speelavonden, toernooien en lidmaatschap. Tot die tijd: bedankt voor je geduld, en tot snel op de baan.',
+    de: 'Unsere neue Website kommt bald — mit allem über den Verein, Spielabende, Turniere und Mitgliedschaft. Bis dahin: danke für deine Geduld, und bis bald auf dem Platz.',
+    en: 'Our new website is coming soon — with everything about the club, play nights, tournaments and membership. Until then: thanks for your patience, and see you on the court soon.',
+    fr: 'Notre nouveau site arrive bientôt — avec tout sur le club, les soirées de jeu, les tournois et l’adhésion. D’ici là, merci de votre patience, et à bientôt sur le terrain.',
+    zh: '我们的新网站即将上线——包含俱乐部、比赛之夜、比赛和会员的所有信息。在此之前，感谢您的耐心，球场上见。',
+  },
+  speelTitel: {
+    nl: 'Waar en wanneer we spelen', de: 'Wo und wann wir spielen', en: 'Where and when we play',
+    fr: 'Où et quand nous jouons', zh: '我们在哪里、何时打球',
+  },
+  letOpDeel1: {
+    nl: 'Let op: we trainen op dit moment tijdelijk buiten. Vanaf', de: 'Achtung: wir trainieren derzeit vorübergehend draußen. Ab',
+    en: 'Note: we currently train outside temporarily. From', fr: 'Attention : nous nous entraînons actuellement temporairement dehors. À partir du',
+    zh: '注意：我们目前暂时在户外训练。从',
+  },
+  letOpDatum: {
+    nl: 'dinsdag 18 augustus, 19:30 uur', de: 'Dienstag, 18. August, 19:30 Uhr', en: 'Tuesday 18 August, 7:30 pm',
+    fr: 'mardi 18 août, 19h30', zh: '8月18日星期二 19:30',
+  },
+  letOpDeel2: {
+    nl: 'spelen we weer binnen in de sporthal.', de: 'spielen wir wieder drinnen in der Sporthalle.',
+    en: 'we’ll play indoors in the sports hall again.', fr: 'nous rejouerons à l’intérieur du gymnase.',
+    zh: '我们将重新回到体育馆室内打球。',
+  },
+  dagDinsdag: { nl: 'Dinsdag', de: 'Dienstag', en: 'Tuesday', fr: 'Mardi', zh: '周二' },
+  clubappTitel: { nl: 'De clubapp', de: 'Die Vereins-App', en: 'The club app', fr: 'L’appli du club', zh: '俱乐部应用' },
+  clubappSub: {
+    nl: 'Binnenkort beschikbaar voor iPhone en Android.', de: 'Bald verfügbar für iPhone und Android.',
+    en: 'Coming soon for iPhone and Android.', fr: 'Bientôt disponible sur iPhone et Android.', zh: '即将支持 iPhone 和 Android。',
+  },
+  binnenkortInDe: { nl: 'Binnenkort in de', de: 'Bald im', en: 'Coming soon to the', fr: 'Bientôt sur l’', zh: '即将登陆' },
+  binnenkortOp: { nl: 'Binnenkort op', de: 'Bald bei', en: 'Coming soon on', fr: 'Bientôt sur', zh: '即将上线' },
 };
 
 const TAAL_SLEUTEL = 'pb_taal';
@@ -137,36 +179,22 @@ function zetTaal(taal) {
   pasTaalToe();
 }
 
+// Eén enkele knop (geen apart zwevend menu-paneel): elke tik schuift naar
+// de volgende van de 5 talen, exact zoals de thema-knop tussen 2 standen
+// wisselt — hier gewoon een langere cyclus.
 function initTaalKnop(containerId) {
   const houder = document.getElementById(containerId);
   if (!houder) return;
-  const wrap = document.createElement('div');
-  wrap.className = 'taal-wrap';
-  wrap.innerHTML =
-    '<button type="button" class="taal-knop" aria-haspopup="true" aria-expanded="false">' +
-    '<span data-taal-label></span></button>' +
-    '<div class="taal-menu" hidden>' +
-    TALEN.map(t => '<button type="button" class="taal-item" data-taal="' + t.code + '">' + t.label + '</button>').join('') +
-    '</div>';
-  houder.appendChild(wrap);
-
-  const knop = wrap.querySelector('.taal-knop');
-  const menu = wrap.querySelector('.taal-menu');
-  knop.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const open = !menu.hidden;
-    menu.hidden = open;
-    knop.setAttribute('aria-expanded', String(!open));
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'taal-knop';
+  btn.setAttribute('aria-label', 'Taal wisselen');
+  btn.innerHTML = '<span data-taal-label></span>';
+  btn.addEventListener('click', () => {
+    const idx = TALEN.findIndex(t => t.code === huidigeTaal());
+    const volgende = TALEN[(idx + 1) % TALEN.length];
+    zetTaal(volgende.code);
   });
-  wrap.querySelectorAll('.taal-item').forEach(item => {
-    item.addEventListener('click', (e) => {
-      e.stopPropagation();
-      zetTaal(item.dataset.taal);
-      menu.hidden = true;
-      knop.setAttribute('aria-expanded', 'false');
-    });
-  });
-  document.addEventListener('click', () => { menu.hidden = true; knop.setAttribute('aria-expanded', 'false'); });
-
+  houder.appendChild(btn);
   pasTaalToe();
 }

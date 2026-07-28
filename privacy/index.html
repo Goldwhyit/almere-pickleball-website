@@ -20,26 +20,15 @@
   }
   :root[data-theme="dark"] { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
   :root[data-theme="light"] { --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1); }
-  .thema-knop {
-    background: rgba(255,255,255,0.15); border: none; border-radius: 8px; width: 34px; height: 34px;
-    font-size: 15px; cursor: pointer; color: inherit;
+  .thema-knop, .taal-knop {
+    background: rgba(255,255,255,0.15); border: none; border-radius: 999px; height: 34px;
+    cursor: pointer; color: inherit; flex-shrink: 0; font-family: inherit;
+    display: inline-flex; align-items: center; justify-content: center;
   }
-  .taal-wrap { position: relative; flex-shrink: 0; margin-left: 8px; }
-  .taal-knop {
-    background: rgba(255,255,255,0.15); border: none; border-radius: 8px; height: 34px; min-width: 34px;
-    padding: 0 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; color: inherit; font-family: inherit;
-    letter-spacing: 0.02em;
-  }
-  .taal-menu {
-    position: absolute; top: 40px; right: 0; z-index: 70; display: flex; flex-direction: column;
-    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
-    padding: 6px; min-width: 88px; box-shadow: 0 8px 20px rgba(0,0,0,0.18);
-  }
-  .taal-item {
-    background: transparent; border: none; border-radius: 8px; padding: 8px 10px; text-align: left;
-    font-size: 13.5px; font-weight: 600; cursor: pointer; color: var(--ink); font-family: inherit;
-  }
-  .taal-item:hover { background: rgba(127,127,127,0.14); }
+  .thema-knop { width: 34px; }
+  .thema-knop svg { width: 16px; height: 16px; }
+  .taal-knop { min-width: 34px; padding: 0 10px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.02em; }
+  #thema-plek { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: 'Manrope', -apple-system, sans-serif; background: var(--paper); color: var(--ink); }
   header {
