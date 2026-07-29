@@ -93,6 +93,7 @@
   .popup-kop h3 { margin: 0; font-size: 16px; }
   .popup-sluit { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--ink-muted); }
   .popup-leeg { text-align: center; color: var(--ink-muted); padding: 30px 0; }
+  .i-inline { width: 14px; height: 14px; vertical-align: -2px; margin-right: 3px; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -224,7 +225,7 @@
       return '<div class="toernooi-regel"><div class="naam">' + t.naam + '</div>' +
         '<div class="details">' + new Date(t.datum).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) +
         ' · ' + details + '</div>' + omschrijvingHtml +
-        '<button type="button" class="deelnemers-knop" data-deelnemers-index="' + i + '">👥 ' + spelers + '/' + t.max_deelnemers + ' deelnemers →</button>' +
+        '<button type="button" class="deelnemers-knop" data-deelnemers-index="' + i + '"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M15 15.5c2.2.3 4 2 4 4.5"/></svg>' + spelers + '/' + t.max_deelnemers + ' deelnemers →</button>' +
         '<div class="actie">' + actie + '</div></div>';
     }).join('') + '<div id="almere-melding"></div>';
 
@@ -359,8 +360,8 @@
       const email = t.email && t.email.trim() ? t.email.trim() : null;
       const link = externeLink(t.aanmelden_via);
       const detailRegels = [
-        '<div class="details">📅 ' + datumTekst + (t.tijden ? ' · ' + t.tijden : '') + '</div>',
-        '<div class="details">📍 ' + t.plaats + (t.adres ? ' · ' + t.adres : '') + '</div>',
+        '<div class="details"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>' + datumTekst + (t.tijden ? ' · ' + t.tijden : '') + '</div>',
+        '<div class="details"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.58 7-12A7 7 0 0 0 5 9c0 4.42 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>' + t.plaats + (t.adres ? ' · ' + t.adres : '') + '</div>',
       ];
       if (t.toernooi_type) detailRegels.push('<div class="details">' + t.toernooi_type + '</div>');
       if (t.kosten) detailRegels.push('<div class="details">Kosten: ' + t.kosten + '</div>');

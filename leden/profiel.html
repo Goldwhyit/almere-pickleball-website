@@ -103,6 +103,7 @@
   .plan-regel .sub { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
   .plan-regel .prijs { font-weight: 700; font-size: 14px; color: var(--navy); white-space: nowrap; }
   @media (prefers-color-scheme: dark) { .plan-regel .prijs { color: #8ab6ec; } }
+  .i-inline { width: 14px; height: 14px; vertical-align: -2px; margin-right: 3px; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -357,9 +358,9 @@
       '</div>' +
       (eerste || tweede || derde
         ? '<div class="podium-rij">' +
-          (eerste ? '<span>🥇 ' + eerste + '</span>' : '') +
-          (tweede ? '<span>🥈 ' + tweede + '</span>' : '') +
-          (derde ? '<span>🥉 ' + derde + '</span>' : '') +
+          (eerste ? '<span><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5"/><path d="M9 3h6l-2 6.5M9 3l-3 8M15 3l3 8"/></svg>' + eerste + '</span>' : '') +
+          (tweede ? '<span><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5"/><path d="M9 3h6l-2 6.5M9 3l-3 8M15 3l3 8"/></svg>' + tweede + '</span>' : '') +
+          (derde ? '<span><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="5"/><path d="M9 3h6l-2 6.5M9 3l-3 8M15 3l3 8"/></svg>' + derde + '</span>' : '') +
           '</div>'
         : '');
   }

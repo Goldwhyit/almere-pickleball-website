@@ -60,6 +60,7 @@
     color: var(--ink); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; text-transform: capitalize;
   }
   .dag-keuze button:hover { border-color: var(--navy); }
+  .i-inline { width: 14px; height: 14px; vertical-align: -2px; margin-right: 3px; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -210,8 +211,8 @@
       '<span class="tijd">' + dagnamen[sd.weekdag - 1] + ' ' + sd.start_tijd.slice(0, 5) + '–' + sd.eind_tijd.slice(0, 5) + '</span>' +
       '</button>' +
       '<div class="locatie-detail" id="locatie-detail-' + i + '">' +
-      '<div>🏟️ ' + sd.aantal_banen + ' banen beschikbaar</div>' +
-      (sd.adres ? '<div>📍 ' + sd.adres + '</div>' : '') +
+      '<div><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 21v-4h6v4M9 7h.01M15 7h.01M9 11h.01M15 11h.01"/></svg>' + sd.aantal_banen + ' banen beschikbaar</div>' +
+      (sd.adres ? '<div><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.58 7-12A7 7 0 0 0 5 9c0 4.42 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>' + sd.adres + '</div>' : '') +
       '</div>'
     ).join('');
     el.querySelectorAll('[data-locatie-index]').forEach(btn => btn.addEventListener('click', () => {
@@ -273,7 +274,7 @@
         '<span><span class="dag" style="font-size:17px">' + dagnamen[weekdag - 1] + ' ' +
         s.start.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + '</span><br>' +
         '<span class="locatie"><span class="locatie-dot ' + locatieKlasse + '"></span>' + s.locatie + ' · ' + opDezeAvond.length + '/' + s.maxSpelers + '</span>' +
-        (blokkade ? '<div class="banner" style="margin:6px 0 0">🚫 Geannuleerd: ' + blokkade.reden + '</div>' : '') +
+        (blokkade ? '<div class="banner" style="margin:6px 0 0"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="5.8" y1="5.8" x2="18.2" y2="18.2"/></svg>Geannuleerd: ' + blokkade.reden + '</div>' : '') +
         '</span>' + knop + '</div>';
     });
 

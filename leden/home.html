@@ -54,6 +54,7 @@
     background: linear-gradient(135deg, var(--navy), var(--navy-deep)); color: #fff;
     display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;
   }
+  .i-inline { width: 14px; height: 14px; vertical-align: -2px; margin-right: 3px; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -193,7 +194,7 @@
       volgende.start.toTimeString().slice(0, 5) + '–' + volgende.eindTijd.slice(0, 5) +
       (benIkAangemeld ? '<span class="aangemeld-badge">✓ Aangemeld</span>' : '') + '</span><br>' +
       '<span class="locatie">' + volgende.locatie + '</span></span></div>' +
-      '<button type="button" class="aanmelders-knop" id="zie-aanmelders-knop">👥 ' + reserveringen.length + '/' + volgende.maxSpelers + ' aangemeld — bekijk wie →</button>' +
+      '<button type="button" class="aanmelders-knop" id="zie-aanmelders-knop"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M15 15.5c2.2.3 4 2 4 4.5"/></svg>' + reserveringen.length + '/' + volgende.maxSpelers + ' aangemeld — bekijk wie →</button>' +
       '<p style="margin-top:10px"><a href="/leden/reserveren.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Aanmelden/afmelden →</a></p>';
 
     document.getElementById('zie-aanmelders-knop').addEventListener('click', () => {
@@ -219,7 +220,7 @@
     html += nieuws.map(n => '<div class="nieuws-item"><h3>' + n.titel + '</h3><p>' + n.inhoud + '</p></div>').join('');
     if (landelijk.length) {
       const t = landelijk[0];
-      html += '<div class="landelijk-item"><div class="naam">🏆 ' + t.naam + '</div>' +
+      html += '<div class="landelijk-item"><div class="naam"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M17 5h2.5a1.5 1.5 0 0 1 1.5 1.5c0 2-1.5 3.5-3.5 3.5M7 5H4.5A1.5 1.5 0 0 0 3 6.5C3 8.5 4.5 10 6.5 10"/></svg>' + t.naam + '</div>' +
         '<div class="sub">' + new Date(t.datum_start).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + ' · ' + t.plaats + ' · landelijk toernooi</div></div>';
     }
     html += '<p style="margin-top:10px"><a href="/leden/nieuws.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Al het nieuws →</a>' +
