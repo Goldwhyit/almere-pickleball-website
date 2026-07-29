@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /leden/home.html
+Disallow: /leden/reserveren.html
+Disallow: /leden/toernooien.html
+Disallow: /leden/nieuws.html
+Disallow: /leden/leden.html
+Disallow: /leden/profiel.html
+Disallow: /leden/beheer.html
+Allow: /
+
+Sitemap: https://www.almerepickleball.nl/sitemap.xml
