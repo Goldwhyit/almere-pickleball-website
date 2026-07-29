@@ -1,7 +1,7 @@
 /* Almere Pickleball — gedeelde stijl voor het ledenportaal (alle pagina's
    onder /leden/, behalve index.html dat zijn eigen losse look heeft). */
 :root {
-  --navy: #005bbf; --navy-deep: #003d82; --gold: #ffd23f; --gold-deep: #b8860a;
+  --navy: #2457ff; --navy-deep: #003d82; --gold: #ffd23f; --gold-deep: #b8860a;
   --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1);
   --glas-oppervlak: rgba(255,255,255,0.55); --glas-rand: rgba(255,255,255,0.6);
   --glas-hooglicht-boven: rgba(255,255,255,0.55); --glas-hooglicht-onder: rgba(0,0,0,0.1);
