@@ -47,9 +47,17 @@ function initNav(actievePagina) {
     .onderbalk a {
       flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
       text-decoration: none; color: var(--ink-muted, #5b6b7d); font-size: 10.5px; font-weight: 600;
-      padding: 6px 0 5px; border-radius: 999px;
+      padding: 6px 2px 5px; margin: 0 2px; border-radius: 999px;
+      transition: background-color 0.22s ease, color 0.22s ease, box-shadow 0.22s ease;
     }
-    .onderbalk a.actief { color: var(--navy, #005bbf); background: rgba(0,91,191,0.1); }
+    /* "Liquid" gevulde gloed-pil op de actieve tab — zelfde behandeling als
+       de actieve tegel in de app se PilNavigatie (lib/widgets/pil_navigatie.dart):
+       een volle koningsblauwe pil met witte tekst/icoon en een zachte gloed,
+       i.p.v. enkel een lichte kleurtint. */
+    .onderbalk a.actief {
+      color: #fff; background: var(--navy, #2457ff);
+      box-shadow: 0 0 14px 0.5px rgba(0,91,191,0.45);
+    }
     .onderbalk a svg { width: 21px; height: 21px; }
     .onderbalk-extra { display: flex; gap: 4px; align-items: center; flex-shrink: 0; margin-left: 2px; padding-left: 6px; border-left: 1px solid var(--line, rgba(4,27,51,0.1)); }
     .onderbalk-extra .thema-knop, .onderbalk-extra .taal-knop {
