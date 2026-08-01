@@ -178,7 +178,8 @@
     border: 1px solid rgba(255,255,255,0.14);
   }
   .embed-gate-inhoud { max-width: 380px; text-align: center; padding: 24px; color: #fff; }
-  .embed-gate-inhoud .embed-icoon { font-size: 32px; margin-bottom: 8px; }
+  .embed-gate-inhoud .embed-icoon { margin-bottom: 8px; }
+  .embed-gate-inhoud .embed-icoon svg { width: 32px; height: 32px; }
   .embed-gate-inhoud p { color: rgba(255,255,255,0.78); font-size: 13.5px; margin: 8px 0 16px; }
   .embed-gate-knoppen { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
   .embed-gate-knoppen .knop-outline { color: #fff; border-color: rgba(255,255,255,0.4); }
@@ -237,8 +238,11 @@
   .transform-paneel { position: relative; aspect-ratio: 4/5; display: flex; align-items: flex-end; padding: 22px; color: #fff; }
   .transform-paneel.voor { background: linear-gradient(160deg, var(--navy-ink), var(--navy-deep)); }
   .transform-paneel.na { background: linear-gradient(160deg, var(--navy), var(--gold-deep)); }
-  .transform-paneel .label { position: absolute; top: 18px; left: 18px; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(255,255,255,0.16); padding: 6px 12px; border-radius: var(--radius-pil); }
-  .transform-paneel .bijschrift { font-size: 14.5px; font-weight: 700; }
+  .transform-paneel .label { position: absolute; top: 18px; left: 18px; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(255,255,255,0.16); padding: 6px 12px; border-radius: var(--radius-pil); z-index: 1; }
+  .transform-paneel .bijschrift { position: relative; z-index: 1; font-size: 14.5px; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.35); }
+  .transform-illustratie { position: absolute; top: 12%; left: 8%; right: 8%; bottom: 30%; width: 84%; height: auto; opacity: 0.92; }
+  /* TODO: illustratieve lijntekeningen i.p.v. echte ledenfoto's — vervangen
+     door echte voor/na-actiefoto's zodra leden akkoord zijn met publicatie. */
   .transform-dots { display: flex; gap: 8px; justify-content: center; margin-top: 20px; }
   .transform-dots button { width: 9px; height: 9px; border-radius: 50%; border: none; background: var(--line); cursor: pointer; padding: 0; }
   .transform-dots button.actief { background: var(--gold-deep); width: 22px; border-radius: var(--radius-pil); transition: width 0.2s ease; }
@@ -258,11 +262,17 @@
   @media (prefers-color-scheme: dark) { .programma-pijl { color: #8ab6ec; } }
   .feature-lijst { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
   .feature-lijst li { display: flex; align-items: center; gap: 10px; font-size: 14.5px; }
-  .programma-illustratie { aspect-ratio: 1/1; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 64px; }
-  .programma-illustratie.i1 { background: linear-gradient(155deg, rgba(255,210,63,0.25), rgba(255,210,63,0.06)); }
-  .programma-illustratie.i2 { background: linear-gradient(155deg, rgba(36,87,255,0.18), rgba(36,87,255,0.05)); }
-  .programma-illustratie.i3 { background: linear-gradient(155deg, rgba(184,134,10,0.2), rgba(184,134,10,0.05)); }
-  .programma-illustratie.i4 { background: linear-gradient(155deg, rgba(0,61,130,0.18), rgba(0,61,130,0.05)); }
+  .programma-illustratie { aspect-ratio: 1/1; border-radius: 24px; display: flex; align-items: center; justify-content: center; }
+  .programma-illustratie svg { width: 44%; height: 44%; }
+  .programma-illustratie.i1 { background: linear-gradient(155deg, rgba(255,210,63,0.25), rgba(255,210,63,0.06)); color: var(--gold-deep); }
+  .programma-illustratie.i2 { background: linear-gradient(155deg, rgba(36,87,255,0.18), rgba(36,87,255,0.05)); color: var(--navy); }
+  .programma-illustratie.i3 { background: linear-gradient(155deg, rgba(184,134,10,0.2), rgba(184,134,10,0.05)); color: var(--gold-deep); }
+  .programma-illustratie.i4 { background: linear-gradient(155deg, rgba(0,61,130,0.18), rgba(0,61,130,0.05)); color: var(--navy); }
+  @media (prefers-color-scheme: dark) {
+    .programma-illustratie.i2 { color: #8ab6ec; }
+    .programma-illustratie.i4 { color: #8ab6ec; }
+    .programma-illustratie.i1, .programma-illustratie.i3 { color: var(--gold); }
+  }
 
   /* ---------- Nieuws (mini-strip, gekoppeld aan menu-item "Blog") ---------- */
   .nieuws-kaart .label { font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold-deep); }
@@ -317,7 +327,8 @@
   .stap-kaart h3 { font-size: 1.15rem; margin: 10px 0 8px; }
   .stap-kaart p { font-size: 13.5px; opacity: 0.85; margin: 0; }
   .stap-kaart .stap-pijl { position: absolute; top: 22px; right: 22px; width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.16); display: flex; align-items: center; justify-content: center; }
-  .stap-kaart .stap-decor { position: absolute; right: -30px; bottom: -30px; font-size: 130px; opacity: 0.14; transform: rotate(-8deg); }
+  .stap-kaart .stap-decor { position: absolute; right: -30px; bottom: -30px; width: 150px; height: 150px; opacity: 0.14; transform: rotate(-8deg); }
+  .stap-kaart .stap-decor svg { width: 100%; height: 100%; }
   .stap-kaart.s1 { background: linear-gradient(155deg, var(--gold-deep) 0%, var(--gold) 100%); color: #2a1e02; }
   .stap-kaart.s1 .stap-nr, .stap-kaart.s1 p { opacity: 0.75; }
   .stap-kaart.s1 .stap-pijl { background: rgba(42,30,2,0.14); }
@@ -481,7 +492,7 @@
     <div class="hero-vlak">
       <div class="hero-grid">
         <div class="hero-tekst">
-          <span class="trust-badge">🏓 2 vaste speelavonden per week — 10 banen in Almere</span>
+          <span class="trust-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="10" cy="9" rx="6" ry="7"/><line x1="10" y1="16" x2="10" y2="21"/><circle cx="19" cy="17" r="2.3"/></svg> 2 vaste speelavonden per week — 10 banen in Almere</span>
           <h1>Voel je die <span class="accent-goud">kriebel</span><br />al?</h1>
           <p class="lead">
             Almere Pickleball is de plek waar lef, lenigheid en een vleugje verleiding
@@ -580,16 +591,114 @@
       <div class="transform-frame">
         <div class="transform-track" id="transform-track">
           <div class="transform-slide">
-            <div class="transform-paneel voor"><span class="label">Week 1</span><span class="bijschrift">Eerste keer op de baan</span></div>
-            <div class="transform-paneel na"><span class="label">Maand 3</span><span class="bijschrift">Eerste toernooi gespeeld</span></div>
+            <div class="transform-paneel voor">
+              <svg class="transform-illustratie" viewBox="0 0 220 220" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="8" y1="178" x2="212" y2="178" stroke-width="4"/>
+                <line x1="165" y1="50" x2="165" y2="178" stroke-width="5"/>
+                <line x1="153" y1="66" x2="177" y2="86"/><line x1="153" y1="90" x2="177" y2="110"/><line x1="153" y1="114" x2="177" y2="134"/><line x1="153" y1="138" x2="177" y2="158"/>
+                <circle cx="55" cy="95" r="13" fill="rgba(255,255,255,0.92)"/>
+                <line x1="55" y1="108" x2="52" y2="145"/>
+                <line x1="52" y1="145" x2="38" y2="176"/><line x1="52" y1="145" x2="66" y2="176"/>
+                <line x1="55" y1="118" x2="30" y2="110"/>
+                <line x1="55" y1="118" x2="78" y2="145"/>
+                <rect x="72" y="140" width="10" height="20" rx="5" fill="rgba(255,255,255,0.92)" transform="rotate(35 77 150)"/>
+                <path d="M80 150 Q95 163 100 170" stroke-dasharray="3 6"/>
+                <circle cx="102" cy="171" r="7" fill="rgba(255,255,255,0.92)"/>
+                <text x="82" y="66" font-size="30" font-weight="800" fill="rgba(255,255,255,0.92)" stroke="none" font-family="'Unbounded', sans-serif">?</text>
+              </svg>
+              <span class="label">Week 1</span><span class="bijschrift">Eerste keer op de baan</span>
+            </div>
+            <div class="transform-paneel na">
+              <svg class="transform-illustratie" viewBox="0 0 220 220" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="8" y1="178" x2="212" y2="178" stroke-width="4"/>
+                <line x1="165" y1="50" x2="165" y2="178" stroke-width="5"/>
+                <line x1="153" y1="66" x2="177" y2="86"/><line x1="153" y1="90" x2="177" y2="110"/><line x1="153" y1="114" x2="177" y2="134"/><line x1="153" y1="138" x2="177" y2="158"/>
+                <circle cx="58" cy="85" r="13" fill="rgba(255,255,255,0.92)"/>
+                <line x1="58" y1="98" x2="65" y2="135"/>
+                <line x1="65" y1="135" x2="40" y2="176"/><line x1="65" y1="135" x2="90" y2="160"/>
+                <line x1="58" y1="105" x2="30" y2="120"/>
+                <line x1="58" y1="105" x2="95" y2="80"/>
+                <rect x="90" y="68" width="10" height="22" rx="5" fill="rgba(255,255,255,0.92)" transform="rotate(-25 95 79)"/>
+                <path d="M95 80 Q133 42 163 88" stroke-dasharray="3 6"/>
+                <circle cx="164" cy="90" r="7" fill="rgba(255,255,255,0.92)"/>
+                <polygon points="190,48 193,56 202,56 195,61 197,70 190,65 183,70 185,61 178,56 187,56" fill="rgba(255,255,255,0.92)" stroke="none"/>
+              </svg>
+              <span class="label">Maand 3</span><span class="bijschrift">Eerste toernooi gespeeld</span>
+            </div>
           </div>
           <div class="transform-slide">
-            <div class="transform-paneel voor"><span class="label">Voor</span><span class="bijschrift">Onwennig servicegebaar</span></div>
-            <div class="transform-paneel na"><span class="label">Na</span><span class="bijschrift">Scherpe, precieze service</span></div>
+            <div class="transform-paneel voor">
+              <svg class="transform-illustratie" viewBox="0 0 220 220" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="8" y1="178" x2="212" y2="178" stroke-width="4"/>
+                <line x1="165" y1="50" x2="165" y2="178" stroke-width="5"/>
+                <line x1="153" y1="66" x2="177" y2="86"/><line x1="153" y1="90" x2="177" y2="110"/><line x1="153" y1="114" x2="177" y2="134"/><line x1="153" y1="138" x2="177" y2="158"/>
+                <circle cx="55" cy="88" r="13" fill="rgba(255,255,255,0.92)"/>
+                <line x1="55" y1="101" x2="50" y2="140"/>
+                <line x1="50" y1="140" x2="35" y2="176"/><line x1="50" y1="140" x2="62" y2="176"/>
+                <line x1="55" y1="112" x2="40" y2="95"/>
+                <line x1="55" y1="112" x2="85" y2="135"/>
+                <rect x="80" y="128" width="9" height="18" rx="4" fill="rgba(255,255,255,0.92)" transform="rotate(50 84 137)"/>
+                <path d="M87 137 Q120 150 152 150" stroke-dasharray="3 6"/>
+                <circle cx="155" cy="150" r="7" fill="rgba(255,255,255,0.92)"/>
+                <line x1="150" y1="139" x2="143" y2="130"/><line x1="150" y1="139" x2="158" y2="130"/><line x1="150" y1="139" x2="150" y2="126"/>
+              </svg>
+              <span class="label">Voor</span><span class="bijschrift">Onwennig servicegebaar</span>
+            </div>
+            <div class="transform-paneel na">
+              <svg class="transform-illustratie" viewBox="0 0 220 220" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="8" y1="178" x2="212" y2="178" stroke-width="4"/>
+                <line x1="165" y1="50" x2="165" y2="178" stroke-width="5"/>
+                <line x1="153" y1="66" x2="177" y2="86"/><line x1="153" y1="90" x2="177" y2="110"/><line x1="153" y1="114" x2="177" y2="134"/><line x1="153" y1="138" x2="177" y2="158"/>
+                <circle cx="55" cy="85" r="13" fill="rgba(255,255,255,0.92)"/>
+                <line x1="55" y1="98" x2="52" y2="138"/>
+                <line x1="52" y1="138" x2="38" y2="176"/><line x1="52" y1="138" x2="64" y2="176"/>
+                <line x1="55" y1="110" x2="35" y2="100"/>
+                <line x1="55" y1="110" x2="90" y2="128"/>
+                <rect x="85" y="121" width="9" height="18" rx="4" fill="rgba(255,255,255,0.92)" transform="rotate(30 89 130)"/>
+                <path d="M90 128 Q140 92 183 138" stroke-dasharray="3 6"/>
+                <circle cx="184" cy="140" r="7" fill="rgba(255,255,255,0.92)"/>
+                <circle cx="188" cy="170" r="10"/><circle cx="188" cy="170" r="5"/><circle cx="188" cy="170" r="1.5" fill="rgba(255,255,255,0.92)" stroke="none"/>
+                <path d="M178 52 l7 7 l14 -15" stroke-width="5"/>
+              </svg>
+              <span class="label">Na</span><span class="bijschrift">Scherpe, precieze service</span>
+            </div>
           </div>
           <div class="transform-slide">
-            <div class="transform-paneel voor"><span class="label">Voor</span><span class="bijschrift">Alleen hard slaan</span></div>
-            <div class="transform-paneel na"><span class="label">Na</span><span class="bijschrift">Slim dinken bij het net</span></div>
+            <div class="transform-paneel voor">
+              <svg class="transform-illustratie" viewBox="0 0 220 220" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="8" y1="178" x2="212" y2="178" stroke-width="4"/>
+                <line x1="165" y1="50" x2="165" y2="178" stroke-width="5"/>
+                <line x1="153" y1="66" x2="177" y2="86"/><line x1="153" y1="90" x2="177" y2="110"/><line x1="153" y1="114" x2="177" y2="134"/><line x1="153" y1="138" x2="177" y2="158"/>
+                <circle cx="55" cy="80" r="13" fill="rgba(255,255,255,0.92)"/>
+                <line x1="55" y1="93" x2="62" y2="128"/>
+                <line x1="62" y1="128" x2="35" y2="176"/><line x1="62" y1="128" x2="80" y2="166"/>
+                <line x1="55" y1="100" x2="30" y2="62"/>
+                <line x1="55" y1="100" x2="100" y2="72"/>
+                <rect x="95" y="64" width="10" height="22" rx="5" fill="rgba(255,255,255,0.92)" transform="rotate(-35 100 75)"/>
+                <line x1="70" y1="90" x2="82" y2="98"/><line x1="75" y1="80" x2="88" y2="86"/>
+                <path d="M100 72 Q160 22 213 15" stroke-dasharray="2 5"/>
+                <circle cx="212" cy="16" r="6" fill="rgba(255,255,255,0.92)"/>
+                <line x1="200" y1="10" x2="207" y2="18"/><line x1="205" y1="6" x2="209" y2="15"/>
+              </svg>
+              <span class="label">Voor</span><span class="bijschrift">Alleen hard slaan</span>
+            </div>
+            <div class="transform-paneel na">
+              <svg class="transform-illustratie" viewBox="0 0 220 220" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="8" y1="178" x2="212" y2="178" stroke-width="4"/>
+                <line x1="165" y1="50" x2="165" y2="178" stroke-width="5"/>
+                <line x1="153" y1="66" x2="177" y2="86"/><line x1="153" y1="90" x2="177" y2="110"/><line x1="153" y1="114" x2="177" y2="134"/><line x1="153" y1="138" x2="177" y2="158"/>
+                <circle cx="110" cy="95" r="13" fill="rgba(255,255,255,0.92)"/>
+                <line x1="110" y1="108" x2="106" y2="140"/>
+                <line x1="106" y1="140" x2="90" y2="172"/><line x1="106" y1="140" x2="120" y2="172"/>
+                <line x1="110" y1="118" x2="86" y2="126"/>
+                <line x1="110" y1="118" x2="140" y2="150"/>
+                <rect x="135" y="145" width="8" height="16" rx="4" fill="rgba(255,255,255,0.92)" transform="rotate(35 139 153)"/>
+                <path d="M141 152 Q159 118 175 152" stroke-dasharray="3 6"/>
+                <circle cx="176" cy="153" r="6" fill="rgba(255,255,255,0.92)"/>
+                <path d="M187 68 l0 12 M181 74 l12 0" stroke-width="3"/>
+              </svg>
+              <span class="label">Na</span><span class="bijschrift">Slim dinken bij het net</span>
+            </div>
           </div>
         </div>
       </div>
@@ -619,7 +728,7 @@
           <li><span class="icoon-vinkje">✓</span> Al eerder gespeeld? Losse proefles voor €4,25</li>
         </ul>
       </div>
-      <div class="programma-illustratie i1" aria-hidden="true">🏓</div>
+      <div class="programma-illustratie i1" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="10" cy="9" rx="6" ry="7"/><line x1="10" y1="16" x2="10" y2="21"/><circle cx="19" cy="17" r="2.3"/></svg></div>
     </div>
 
     <div class="kaart hover-kaart programma-kaart reveal">
@@ -632,7 +741,7 @@
           <li><span class="icoon-vinkje">✓</span> Aanmelden per avond via de app</li>
         </ul>
       </div>
-      <div class="programma-illustratie i2" aria-hidden="true">📅</div>
+      <div class="programma-illustratie i2" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></div>
     </div>
 
     <div class="kaart hover-kaart programma-kaart reveal">
@@ -645,7 +754,7 @@
           <li><span class="icoon-vinkje">✓</span> Poules met live standen, plus landelijke toernooien</li>
         </ul>
       </div>
-      <div class="programma-illustratie i3" aria-hidden="true">🏆</div>
+      <div class="programma-illustratie i3" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="9" r="6"/><path d="M9 14L7 21l5-3 5 3-2-7" stroke-linejoin="round"/></svg></div>
     </div>
 
     <div class="kaart hover-kaart programma-kaart reveal">
@@ -658,7 +767,7 @@
           <li><span class="icoon-vinkje">✓</span> Jeugdtarief: vanaf €10 per maand</li>
         </ul>
       </div>
-      <div class="programma-illustratie i4" aria-hidden="true">🧒</div>
+      <div class="programma-illustratie i4" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="7" r="3.4"/><path d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg></div>
     </div>
   </section>
 
@@ -767,22 +876,22 @@
     </div>
     <div class="stappen-grid reveal">
       <div class="stap-kaart s1">
-        <span class="stap-decor" aria-hidden="true">🏓</span>
+        <span class="stap-decor" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><ellipse cx="10" cy="9" rx="6" ry="7"/><line x1="10" y1="16" x2="10" y2="21"/><circle cx="19" cy="17" r="2.3"/></svg></span>
         <div><div class="stap-nr">STAP 01</div><h3>Meld je aan voor een proefles</h3><p>Kies een speelavond die je uitkomt en geef je op via de app of website.</p></div>
         <span class="stap-pijl" aria-hidden="true">↗</span>
       </div>
       <div class="stap-kaart s2">
-        <span class="stap-decor" aria-hidden="true">🤝</span>
+        <span class="stap-decor" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M15 15.5c2.2.3 4 2 4 4.5"/></svg></span>
         <div><div class="stap-nr">STAP 02</div><h3>Kom spelen en ontdek het spel</h3><p>Onze begeleiders leren je de basis: service, dinken en de kitchen.</p></div>
         <span class="stap-pijl" aria-hidden="true">↗</span>
       </div>
       <div class="stap-kaart s3">
-        <span class="stap-decor" aria-hidden="true">📋</span>
+        <span class="stap-decor" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="5" y="4" width="14" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="13" y2="18"/></svg></span>
         <div><div class="stap-nr">STAP 03</div><h3>Kies je lidmaatschap</h3><p>Verliefd geworden? Kies de vorm die bij jouw speelritme past.</p></div>
         <span class="stap-pijl" aria-hidden="true">↗</span>
       </div>
       <div class="stap-kaart s4">
-        <span class="stap-decor" aria-hidden="true">🏆</span>
+        <span class="stap-decor" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="9" r="6"/><path d="M9 14L7 21l5-3 5 3-2-7" stroke-linejoin="round"/></svg></span>
         <div><div class="stap-nr">STAP 04</div><h3>Word onderdeel van de club</h3><p>Speel toernooien, klim in speelsterkte en maak nieuwe vrienden.</p></div>
         <span class="stap-pijl" aria-hidden="true">↗</span>
       </div>
@@ -913,11 +1022,11 @@
       <div>
         <div class="kaart" style="margin-bottom:18px;">
           <div class="contact-info-rij">
-            <span class="icoon" aria-hidden="true">✉️</span>
+            <span class="icoon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 6l9 7 9-7"/></svg></span>
             <div><div style="font-weight:700;">E-mail</div><a href="mailto:info@pickleballalmere.nl">info@pickleballalmere.nl</a></div>
           </div>
           <div class="contact-info-rij">
-            <span class="icoon" aria-hidden="true">📍</span>
+            <span class="icoon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-11a7 7 0 1 0-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg></span>
             <div><div style="font-weight:700;">Adres</div><div style="color:var(--ink-muted);font-size:14px;">Sporthal Almere Haven, Parkwerf 138, 1354 EB Almere</div></div>
           </div>
         </div>
@@ -1189,14 +1298,17 @@
   // TODO: vervang door de echte YouTube-video-ID van Almere Pickleball.
   const YOUTUBE_VIDEO_ID = 'VIDEO_ID_HIER';
 
+  const ICOON_AFSPELEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l6 3.5-6 3.5z" fill="currentColor" stroke="none"/></svg>';
+  const ICOON_KAART = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><line x1="9" y1="4" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="20"/></svg>';
+
   zetEmbedGate(document.getElementById('video-gate'), {
-    icoon: '🎬',
+    icoon: ICOON_AFSPELEN,
     titel: 'Deze video wordt geladen via YouTube.',
     uitleg: 'Wil je deze content tonen?',
     details: 'YouTube (eigendom van Google) kan bij het afspelen cookies plaatsen en je IP-adres verwerken, volgens hun eigen voorwaarden. Wij laden de video pas nadat je hier toestemming geeft.',
     bouwEmbed: () => {
       if (YOUTUBE_VIDEO_ID === 'VIDEO_ID_HIER') {
-        return '<div class="embed-gate-inhoud"><div class="embed-icoon" aria-hidden="true">🏓</div><p style="margin-top:6px;">Video volgt binnenkort.</p></div>';
+        return '<div class="embed-gate-inhoud"><div class="embed-icoon" aria-hidden="true">' + ICOON_AFSPELEN + '</div><p style="margin-top:6px;">Video volgt binnenkort.</p></div>';
       }
       return '<iframe src="https://www.youtube-nocookie.com/embed/' + YOUTUBE_VIDEO_ID +
         '" title="Almere Pickleball introductievideo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
@@ -1204,7 +1316,7 @@
   });
 
   zetEmbedGate(document.getElementById('kaart-gate'), {
-    icoon: '🗺️',
+    icoon: ICOON_KAART,
     titel: 'Deze kaart wordt geladen via Google Maps.',
     uitleg: 'Wil je deze content tonen?',
     details: 'Google Maps kan bij het laden cookies plaatsen en je IP-adres verwerken, volgens hun eigen voorwaarden. Wij laden de kaart pas nadat je hier toestemming geeft.',
