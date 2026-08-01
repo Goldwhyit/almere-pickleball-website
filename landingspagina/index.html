@@ -1,0 +1,1226 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<script>(function(){try{var t=localStorage.getItem('pb_thema');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<!-- Toegangscode-gate: de pagina staat op internet (voor wie de link heeft),
+     maar is nog niet toegankelijk voor iedereen. Dit is GEEN echte
+     beveiliging (het is en blijft statische HTML — met "view source" of
+     uitgeschakelde JS is de inhoud alsnog te zien), maar houdt zoekmachines,
+     toevallige bezoekers en per ongeluk gedeelde links tegen. Deze klasse
+     wordt vóór het renderen van <body> gezet zodat er geen flits van de
+     inhoud te zien is. -->
+<script>(function(){try{if(localStorage.getItem('pb_toegang_ok')!=='ja'){document.documentElement.classList.add('gate-locked');}}catch(e){document.documentElement.classList.add('gate-locked');}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Almere Pickleball — Doe mee</title>
+<meta name="description" content="Almere Pickleball: speeldagen, lidmaatschappen, speelsterkte en aanmelden voor een proefles." />
+<!-- Nog niet openbaar — preview-pagina, bewust niet gelinkt vanuit nav/sitemap en met noindex,
+     zodat 'ie niet meegenomen wordt door zoekmachines/AI-crawlers voordat de club 'm vrijgeeft. -->
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" type="image/png" href="/assets/img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     Design tokens — zelfde huisstijl als de rest van de site
+     (navy/goud, Unbounded/Manrope). De structuur van deze pagina
+     volgt een "fitness coaching"-UX/UI-bouwdocument van de klant,
+     maar met de kleuren/stijl van Almere Pickleball zelf i.p.v. de
+     roze/koraal/paars-paletsuggestie uit dat document.
+     ============================================================ */
+  :root {
+    --navy: #2457ff; --navy-deep: #003d82; --navy-ink: #041b33;
+    --gold: #ffd23f; --gold-deep: #b8860a;
+    --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d;
+    --line: rgba(4,27,51,0.1);
+    --radius-kaart: 24px; --radius-kaart-groot: 32px; --radius-pil: 999px;
+    --schaduw-kaart: 0 1px 3px rgba(0,0,0,0.06), 0 12px 28px -14px rgba(4,27,51,0.18);
+    --schaduw-kaart-hover: 0 20px 44px -16px rgba(4,27,51,0.28);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  }
+  :root[data-theme="dark"] { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  :root[data-theme="light"] { --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1); }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body { margin: 0; font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--paper); color: var(--ink); overflow-x: hidden; }
+  h1, h2, h3 { font-family: 'Unbounded', sans-serif; text-wrap: balance; margin: 0; }
+  p { line-height: 1.65; }
+  a { color: inherit; }
+  img, svg { max-width: 100%; display: block; }
+  button { font-family: inherit; }
+  ::selection { background: var(--gold); color: #241a02; }
+
+  .accent { color: var(--gold-deep); }
+  @media (prefers-color-scheme: dark) { .accent { color: var(--gold); } }
+
+  section { padding: 88px 24px; max-width: 1120px; margin: 0 auto; position: relative; }
+  .sectie-kop { max-width: 640px; margin: 0 auto 40px; text-align: center; }
+  .sectie-kop .eyebrow { display:inline-block; font-size:12.5px; font-weight:800; letter-spacing:0.14em; text-transform:uppercase; color: var(--navy); margin-bottom: 14px; }
+  @media (prefers-color-scheme: dark) { .sectie-kop .eyebrow { color: #8ab6ec; } }
+  .sectie-kop h2 { font-size: clamp(1.9rem, 5vw, 3rem); line-height: 1.08; }
+  .sectie-kop p { color: var(--ink-muted); margin-top: 16px; font-size: 16px; }
+  .sectie-licht { background: var(--card); }
+  .sectie-grijs { background: var(--paper); }
+
+  /* ---------- Scroll-reveal ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal.reveal-init { opacity: 0; transform: translateY(28px); }
+    .reveal { transition: opacity 0.7s cubic-bezier(.2,.7,.3,1), transform 0.7s cubic-bezier(.2,.7,.3,1); }
+    .reveal.in-view { opacity: 1; transform: none; }
+  }
+
+  /* ---------- Knoppen ---------- */
+  .knop { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 24px; border-radius: var(--radius-pil); font-weight: 700; font-size: 14.5px; text-decoration: none; cursor: pointer; border: none; font-family: inherit; transition: transform 0.18s ease, box-shadow 0.18s ease; }
+  .knop:active { transform: scale(0.96); }
+  .knop-primair { background: var(--gold); color: #2a1e02; box-shadow: 0 12px 26px -8px rgba(255,210,63,0.55); }
+  .knop-primair:hover { box-shadow: 0 16px 32px -8px rgba(255,210,63,0.7); transform: translateY(-1px); }
+  .knop-outline { background: transparent; color: var(--navy); border: 1.5px solid var(--line); }
+  @media (prefers-color-scheme: dark) { .knop-outline { color: #8ab6ec; } }
+  .knop-cirkel-cta { display: inline-flex; align-items: center; gap: 16px; background: #fff; color: var(--navy-ink); border-radius: var(--radius-pil); padding: 6px 8px 6px 28px; font-weight: 700; font-size: 15px; cursor: pointer; border: none; box-shadow: 0 16px 34px -10px rgba(0,0,0,0.35); transition: transform 0.18s ease, box-shadow 0.18s ease; }
+  .knop-cirkel-cta:hover { transform: translateY(-2px); box-shadow: 0 20px 40px -8px rgba(0,0,0,0.4); }
+  .knop-cirkel-cta .cirkel { width: 46px; height: 46px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .icoon-vinkje { width: 22px; height: 22px; border-radius: 50%; background: rgba(255,210,63,0.2); color: var(--gold-deep); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  @media (prefers-color-scheme: dark) { .icoon-vinkje { color: var(--gold); } }
+
+  /* ---------- Kaarten (algemeen) ---------- */
+  .kaart { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-kaart); padding: 26px; box-shadow: var(--schaduw-kaart); }
+  .hover-kaart { transition: transform 0.25s cubic-bezier(.2,.7,.3,1), box-shadow 0.25s ease; }
+  .hover-kaart:hover { transform: translateY(-6px) scale(1.015); box-shadow: var(--schaduw-kaart-hover); }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px; }
+
+  /* ============================================================
+     Header — vaste balk (logo links, pil-vormige MENU-knop rechts)
+     + donker uitklappaneel vanuit de rechterbovenhoek.
+     ============================================================ */
+  header.site-header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px clamp(20px, 4vw, 48px);
+    background: color-mix(in srgb, var(--paper) 78%, transparent);
+    -webkit-backdrop-filter: blur(14px) saturate(160%); backdrop-filter: blur(14px) saturate(160%);
+    border-bottom: 1px solid var(--line);
+  }
+  .merk-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); background: none; border: none; cursor: pointer; padding: 0; }
+  .merk-logo img { width: 34px; height: 34px; border-radius: 9px; }
+  .merk-logo span { font-family: 'Unbounded', sans-serif; font-size: 15px; font-weight: 700; white-space: nowrap; }
+  .menu-toggle { display: flex; align-items: center; gap: 10px; padding: 10px 10px 10px 20px; border-radius: var(--radius-pil); background: var(--gold); color: #2a1e02; border: none; font-weight: 800; font-size: 12.5px; letter-spacing: 0.06em; cursor: pointer; box-shadow: 0 10px 22px -8px rgba(255,210,63,0.6); }
+  .menu-toggle .balkjes { width: 30px; height: 30px; border-radius: 50%; background: rgba(42,30,2,0.14); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+  .menu-toggle .balkjes span { width: 13px; height: 2px; background: #2a1e02; border-radius: 2px; }
+
+  .menu-paneel {
+    position: fixed; top: 74px; right: clamp(12px, 3vw, 32px); z-index: 99;
+    width: min(280px, calc(100vw - 24px));
+    background: var(--navy-ink); color: #fff; border-radius: 24px;
+    padding: 18px; box-shadow: 0 30px 70px -20px rgba(0,0,0,0.55);
+    transform-origin: top right;
+    transform: scale(0.9) translateY(-10px); opacity: 0; pointer-events: none;
+    transition: transform 0.22s cubic-bezier(.2,.9,.3,1), opacity 0.2s ease;
+  }
+  .menu-paneel.open { transform: scale(1) translateY(0); opacity: 1; pointer-events: auto; }
+  .menu-paneel nav { display: flex; flex-direction: column; }
+  .menu-paneel nav a, .menu-paneel nav button { text-align: left; background: none; border: none; color: rgba(255,255,255,0.82); font-size: 16px; font-weight: 600; padding: 12px 10px; border-radius: 12px; cursor: pointer; text-decoration: none; font-family: inherit; transition: background 0.15s ease, color 0.15s ease; }
+  .menu-paneel nav a:hover, .menu-paneel nav button:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .menu-paneel nav .aan-de-slag { color: var(--gold); font-weight: 800; }
+  .menu-paneel .sluit-rij { display: flex; justify-content: flex-end; margin-bottom: 4px; }
+  .menu-paneel .sluit-knop { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.1); color: #fff; border: none; cursor: pointer; font-size: 14px; }
+  .menu-scrim { position: fixed; inset: 0; z-index: 98; background: rgba(4,10,20,0.01); display: none; }
+  .menu-scrim.open { display: block; }
+
+  /* ============================================================
+     Hero
+     ============================================================ */
+  .hero { max-width: none; padding: 0; }
+  .hero-vlak {
+    position: relative; min-height: 100vh; display: flex; align-items: center; overflow: hidden;
+    padding-top: 90px;
+    background:
+      radial-gradient(ellipse 900px 620px at 8% 0%, rgba(255,255,255,0.14), transparent 60%),
+      radial-gradient(ellipse 780px 700px at 100% 30%, rgba(255,210,63,0.32), transparent 55%),
+      linear-gradient(150deg, var(--navy-deep) 0%, var(--navy-ink) 62%, #000814 100%);
+  }
+  .hero-grid { position: relative; z-index: 1; max-width: 1120px; width: 100%; margin: 0 auto; padding: 40px 24px 70px; display: grid; grid-template-columns: 1.05fr 0.85fr; gap: 40px; align-items: center; }
+  @media (max-width: 860px) { .hero-grid { grid-template-columns: 1fr; text-align: center; } }
+  .trust-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: var(--radius-pil); background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.22); color: #fff; font-size: 13px; font-weight: 700; margin-bottom: 24px; }
+  .trust-badge .sterren { color: var(--gold); letter-spacing: 1px; }
+  .hero-tekst h1 { font-size: clamp(2.4rem, 6.4vw, 4.6rem); line-height: 1.03; color: #fff; }
+  .hero-tekst h1 .accent-goud { color: var(--gold); }
+  .hero-tekst p.lead { margin: 24px 0 0; max-width: 480px; font-size: 17.5px; line-height: 1.7; color: rgba(255,255,255,0.86); }
+  @media (max-width: 860px) { .hero-tekst p.lead { margin-inline: auto; } }
+  .hero-knoppen { margin-top: 34px; display: flex; gap: 14px; flex-wrap: wrap; }
+  @media (max-width: 860px) { .hero-knoppen { justify-content: center; } }
+
+  .hero-portret { position: relative; display: flex; align-items: center; justify-content: center; }
+  @media (max-width: 860px) { .hero-portret { display: none; } }
+  .hero-portret-orb {
+    position: relative; width: 100%; aspect-ratio: 1/1; max-width: 440px; border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.28), transparent 55%), linear-gradient(155deg, var(--gold) 0%, var(--navy) 100%);
+    box-shadow: 0 40px 90px -20px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.3);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-portret-orb svg { width: 46%; height: 46%; filter: drop-shadow(0 14px 20px rgba(0,0,0,0.3)); }
+  /* TODO: vervang deze illustratieve "portret"-cirkel door een echte
+     actiefoto van een speler zodra er goedgekeurd beeldmateriaal is —
+     de tekstlaag/CTA's ernaast blijven dan ongewijzigd werken. */
+
+  /* ============================================================
+     Over ons — intro + video + teamcarrousel
+     ============================================================ */
+  .video-intro { max-width: 760px; margin: 0 auto 56px; }
+  .embed-gate {
+    position: relative; border-radius: 24px; overflow: hidden; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(160deg, rgba(4,27,51,0.86), rgba(0,20,40,0.94));
+    -webkit-backdrop-filter: blur(20px) saturate(150%); backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid rgba(255,255,255,0.14);
+  }
+  .embed-gate-inhoud { max-width: 380px; text-align: center; padding: 24px; color: #fff; }
+  .embed-gate-inhoud .embed-icoon { font-size: 32px; margin-bottom: 8px; }
+  .embed-gate-inhoud p { color: rgba(255,255,255,0.78); font-size: 13.5px; margin: 8px 0 16px; }
+  .embed-gate-knoppen { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .embed-gate-knoppen .knop-outline { color: #fff; border-color: rgba(255,255,255,0.4); }
+  .embed-gate-details { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 12px; line-height: 1.6; display: none; }
+  .embed-gate-details.tonen { display: block; }
+  .embed-gate iframe, .embed-gate video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  .team-sectie { position: relative; }
+  .team-bg-tekst { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-family: 'Unbounded', sans-serif; font-weight: 900; font-size: clamp(3rem, 13vw, 8rem); color: var(--navy); opacity: 0.05; white-space: nowrap; user-select: none; pointer-events: none; z-index: 0; }
+  .team-carousel-wrap { position: relative; z-index: 1; overflow-x: auto; scrollbar-width: none; padding: 30px 6px 10px; -webkit-overflow-scrolling: touch; }
+  .team-carousel-wrap::-webkit-scrollbar { display: none; }
+  .team-carousel { display: flex; gap: 20px; width: max-content; padding: 0 8px; }
+  .team-kaart {
+    position: relative; width: 210px; height: 270px; border-radius: 26px; overflow: hidden; flex-shrink: 0;
+    background: linear-gradient(155deg, var(--navy) 0%, var(--navy-deep) 100%);
+    box-shadow: var(--schaduw-kaart); transition: transform 0.3s cubic-bezier(.2,.8,.3,1), box-shadow 0.3s ease;
+  }
+  .team-kaart:nth-child(odd) { transform: rotate(-3deg); }
+  .team-kaart:nth-child(even) { transform: rotate(2.5deg); }
+  .team-kaart:hover { transform: rotate(0deg) scale(1.06); box-shadow: var(--schaduw-kaart-hover); z-index: 2; }
+  .team-kaart .initialen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: 46px; color: rgba(255,255,255,0.5); }
+  .team-kaart .plus-knop { position: absolute; top: 12px; right: 12px; width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.18); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; }
+  .team-kaart .overlay { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 16px 16px; background: linear-gradient(0deg, rgba(0,0,0,0.72), transparent); color: #fff; }
+  .team-kaart .overlay .naam { font-weight: 700; font-size: 14.5px; }
+  .team-kaart .overlay .functie { font-size: 12px; color: rgba(255,255,255,0.75); margin-top: 2px; }
+  .carousel-pijlen { display: flex; gap: 10px; justify-content: center; margin-top: 20px; position: relative; z-index: 1; }
+  .pijl-knop { width: 42px; height: 42px; border-radius: 50%; background: var(--card); border: 1px solid var(--line); color: var(--navy); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.15s ease, transform 0.15s ease; }
+  @media (prefers-color-scheme: dark) { .pijl-knop { color: #8ab6ec; } }
+  .pijl-knop:hover { background: var(--paper); transform: scale(1.06); }
+  .pijl-knop:active { transform: scale(0.94); }
+  /* TODO: teamkaarten tonen nu placeholder-initialen i.p.v. echte
+     teamfoto's/namen — invullen zodra bestuur/coaches akkoord zijn met
+     publicatie van hun portret. */
+
+  /* ============================================================
+     Statistieken-balk
+     ============================================================ */
+  .stats-balk { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; text-align: center; }
+  @media (max-width: 620px) { .stats-balk { grid-template-columns: 1fr; gap: 36px; } }
+  .stat-getal { font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: clamp(2.6rem, 6vw, 3.6rem); line-height: 1; }
+  .stat-item:nth-child(1) .stat-getal { color: var(--gold-deep); }
+  .stat-item:nth-child(2) .stat-getal { color: var(--navy); }
+  .stat-item:nth-child(3) .stat-getal { color: var(--gold-deep); }
+  @media (prefers-color-scheme: dark) {
+    .stat-item:nth-child(2) .stat-getal { color: #8ab6ec; }
+    .stat-item:nth-child(1) .stat-getal, .stat-item:nth-child(3) .stat-getal { color: var(--gold); }
+  }
+  .stat-label { margin-top: 8px; color: var(--ink-muted); font-size: 14px; font-weight: 600; }
+
+  /* ============================================================
+     Transformatie / voortgang-carrousel
+     ============================================================ */
+  .transform-frame { position: relative; overflow: hidden; border-radius: var(--radius-kaart-groot); }
+  .transform-track { display: flex; transition: transform 0.5s cubic-bezier(.2,.8,.3,1); }
+  .transform-slide { flex: 0 0 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+  .transform-paneel { position: relative; aspect-ratio: 4/5; display: flex; align-items: flex-end; padding: 22px; color: #fff; }
+  .transform-paneel.voor { background: linear-gradient(160deg, var(--navy-ink), var(--navy-deep)); }
+  .transform-paneel.na { background: linear-gradient(160deg, var(--navy), var(--gold-deep)); }
+  .transform-paneel .label { position: absolute; top: 18px; left: 18px; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(255,255,255,0.16); padding: 6px 12px; border-radius: var(--radius-pil); }
+  .transform-paneel .bijschrift { font-size: 14.5px; font-weight: 700; }
+  .transform-dots { display: flex; gap: 8px; justify-content: center; margin-top: 20px; }
+  .transform-dots button { width: 9px; height: 9px; border-radius: 50%; border: none; background: var(--line); cursor: pointer; padding: 0; }
+  .transform-dots button.actief { background: var(--gold-deep); width: 22px; border-radius: var(--radius-pil); transition: width 0.2s ease; }
+  /* TODO: illustratieve voor/na-vlakken i.p.v. echte ledenfoto's — pas
+     aan zodra leden akkoord zijn met het delen van hun voortgangsfoto's. */
+
+  /* ============================================================
+     Programma's
+     ============================================================ */
+  .programma-kaart { display: grid; grid-template-columns: 1.3fr 0.7fr; align-items: center; gap: 28px; padding: 32px; margin-bottom: 20px; }
+  @media (max-width: 700px) { .programma-kaart { grid-template-columns: 1fr; } }
+  .programma-kaart:last-child { margin-bottom: 0; }
+  .programma-kop { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .programma-kaart h3 { font-size: 1.35rem; }
+  .programma-kaart p.beschrijving { color: var(--ink-muted); margin: 12px 0 18px; font-size: 15px; }
+  .programma-pijl { width: 36px; height: 36px; border-radius: 50%; background: var(--paper); color: var(--navy); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  @media (prefers-color-scheme: dark) { .programma-pijl { color: #8ab6ec; } }
+  .feature-lijst { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .feature-lijst li { display: flex; align-items: center; gap: 10px; font-size: 14.5px; }
+  .programma-illustratie { aspect-ratio: 1/1; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 64px; }
+  .programma-illustratie.i1 { background: linear-gradient(155deg, rgba(255,210,63,0.25), rgba(255,210,63,0.06)); }
+  .programma-illustratie.i2 { background: linear-gradient(155deg, rgba(36,87,255,0.18), rgba(36,87,255,0.05)); }
+  .programma-illustratie.i3 { background: linear-gradient(155deg, rgba(184,134,10,0.2), rgba(184,134,10,0.05)); }
+  .programma-illustratie.i4 { background: linear-gradient(155deg, rgba(0,61,130,0.18), rgba(0,61,130,0.05)); }
+
+  /* ---------- Nieuws (mini-strip, gekoppeld aan menu-item "Blog") ---------- */
+  .nieuws-kaart .label { font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold-deep); }
+  @media (prefers-color-scheme: dark) { .nieuws-kaart .label { color: var(--gold); } }
+  .nieuws-kaart h3 { font-size: 16px; margin: 8px 0 6px; }
+  .nieuws-kaart p { color: var(--ink-muted); font-size: 14px; margin: 0; }
+
+  /* ============================================================
+     Prijzen
+     ============================================================ */
+  .prijzen-toggle-rij { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 44px; }
+  .prijzen-toggle-rij span { font-weight: 700; font-size: 14px; color: var(--ink-muted); }
+  .prijzen-toggle-rij span.actief-label { color: var(--ink); }
+  .toggle-switch { position: relative; width: 54px; height: 30px; border-radius: var(--radius-pil); background: var(--line); border: none; cursor: pointer; flex-shrink: 0; }
+  .toggle-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--card); box-shadow: 0 2px 6px rgba(0,0,0,0.25); transition: transform 0.2s ease; }
+  .toggle-switch.aan { background: var(--gold); }
+  .toggle-switch.aan::after { transform: translateX(24px); }
+  .bespaar-badge { display: inline-block; margin-left: 4px; padding: 3px 9px; border-radius: var(--radius-pil); background: rgba(255,210,63,0.2); color: var(--gold-deep); font-size: 11px; font-weight: 800; }
+  @media (prefers-color-scheme: dark) { .bespaar-badge { color: var(--gold); } }
+
+  .prijs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; align-items: stretch; }
+  @media (max-width: 860px) { .prijs-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; } }
+  .prijs-kaart { display: flex; flex-direction: column; padding: 32px 26px; position: relative; }
+  .prijs-kaart.uitgelicht { background: linear-gradient(160deg, var(--navy) 0%, var(--navy-deep) 100%); color: #fff; border: none; transform: scale(1.04); box-shadow: 0 30px 60px -18px rgba(0,61,130,0.5); }
+  @media (max-width: 860px) { .prijs-kaart.uitgelicht { transform: none; } }
+  .prijs-kaart .badge-gekozen { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #2a1e02; font-size: 11px; font-weight: 800; letter-spacing: 0.04em; padding: 6px 14px; border-radius: var(--radius-pil); white-space: nowrap; }
+  .prijs-kaart .naam { font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 15px; }
+  .prijs-kaart .prijs { font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: 2.4rem; margin: 14px 0 4px; }
+  .prijs-kaart .prijs small { font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 600; opacity: 0.7; }
+  .prijs-kaart .prijs .prijs-jaar { display: none; }
+  .prijzen-wrap.jaarlijks .prijs-maand { display: none; }
+  .prijzen-wrap.jaarlijks .prijs-jaar { display: inline; }
+  .prijs-kaart .omschrijving { font-size: 13.5px; opacity: 0.8; margin-bottom: 22px; }
+  .prijs-kaart .feature-lijst { margin-bottom: 26px; flex-grow: 1; }
+  .prijs-kaart.uitgelicht .icoon-vinkje { background: rgba(255,255,255,0.18); color: var(--gold); }
+  .prijs-kaart .knop { width: 100%; }
+  .prijs-kaart:not(.uitgelicht) .knop-primair { background: var(--navy-ink); color: #fff; box-shadow: none; }
+  @media (prefers-color-scheme: dark) { .prijs-kaart:not(.uitgelicht) .knop-primair { background: var(--gold); color: #2a1e02; } }
+  .prijzen-voetnoot { text-align: center; font-size: 12.5px; color: var(--ink-muted); margin-top: 20px; }
+
+  /* ============================================================
+     Hoe het werkt
+     ============================================================ */
+  .stappen-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  @media (max-width: 700px) { .stappen-grid { grid-template-columns: 1fr; } }
+  .stap-kaart { position: relative; border-radius: var(--radius-kaart-groot); padding: 30px; color: #fff; min-height: 210px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+  .stap-kaart .stap-nr { font-family: 'Unbounded', sans-serif; font-weight: 900; font-size: 13px; opacity: 0.7; letter-spacing: 0.08em; }
+  .stap-kaart h3 { font-size: 1.15rem; margin: 10px 0 8px; }
+  .stap-kaart p { font-size: 13.5px; opacity: 0.85; margin: 0; }
+  .stap-kaart .stap-pijl { position: absolute; top: 22px; right: 22px; width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.16); display: flex; align-items: center; justify-content: center; }
+  .stap-kaart .stap-decor { position: absolute; right: -30px; bottom: -30px; font-size: 130px; opacity: 0.14; transform: rotate(-8deg); }
+  .stap-kaart.s1 { background: linear-gradient(155deg, var(--gold-deep) 0%, var(--gold) 100%); color: #2a1e02; }
+  .stap-kaart.s1 .stap-nr, .stap-kaart.s1 p { opacity: 0.75; }
+  .stap-kaart.s1 .stap-pijl { background: rgba(42,30,2,0.14); }
+  .stap-kaart.s2 { background: linear-gradient(155deg, var(--navy) 0%, var(--navy-deep) 100%); }
+  .stap-kaart.s3 { background: linear-gradient(155deg, var(--navy-deep) 0%, var(--navy-ink) 100%); }
+  .stap-kaart.s4 { background: linear-gradient(155deg, var(--gold-deep) 0%, var(--navy-ink) 120%); }
+
+  /* ============================================================
+     Drie pijlers — doorlopende tekst, geen bullets
+     ============================================================ */
+  .pijlers-tekst { max-width: 760px; margin: 0 auto; font-size: 17px; color: var(--ink-muted); }
+  .pijlers-tekst p { margin-bottom: 20px; }
+  .pijlers-tekst strong { color: var(--ink); }
+
+  /* ============================================================
+     FAQ
+     ============================================================ */
+  .faq-lijst { display: flex; flex-direction: column; gap: 12px; max-width: 760px; margin: 0 auto; }
+  .faq-item { background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+  .faq-vraag { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 22px; background: none; border: none; cursor: pointer; text-align: left; font-weight: 700; font-size: 15px; color: var(--ink); }
+  .faq-chevron { width: 30px; height: 30px; border-radius: 50%; background: var(--paper); color: var(--navy); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.25s ease; }
+  @media (prefers-color-scheme: dark) { .faq-chevron { color: #8ab6ec; } }
+  .faq-item[data-open="true"] .faq-chevron { transform: rotate(180deg); }
+  .faq-antwoord { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+  .faq-antwoord-inner { padding: 0 22px 20px; color: var(--ink-muted); font-size: 14.5px; }
+
+  /* ============================================================
+     Testimonials
+     ============================================================ */
+  .testi-sectie { background: var(--navy-ink); color: #fff; }
+  .testi-avatars { display: flex; justify-content: center; gap: -8px; margin-bottom: 8px; }
+  .testi-avatars .av { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(155deg, var(--navy), var(--gold-deep)); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; margin-left: -10px; border: 2px solid var(--navy-ink); opacity: 0.55; }
+  .testi-avatars .av:first-child { margin-left: 0; }
+  .testi-bg-tekst { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); font-family: 'Unbounded', sans-serif; font-weight: 900; font-size: clamp(2.4rem, 10vw, 6rem); color: rgba(255,255,255,0.04); white-space: nowrap; pointer-events: none; }
+  .testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; position: relative; z-index: 1; margin-top: 46px; }
+  @media (max-width: 820px) { .testi-grid { grid-template-columns: 1fr; } }
+  .testi-kaart { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 22px; padding: 24px; }
+  .testi-kop { display: flex; align-items: center; gap: 12px; }
+  .testi-kop .av { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(155deg, var(--gold-deep), var(--navy)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  .testi-kop .naam { font-weight: 700; font-size: 14.5px; }
+  .testi-kop .datum { font-size: 12px; color: rgba(255,255,255,0.55); }
+  .testi-sterren { color: var(--gold); font-size: 13px; margin: 10px 0 4px; letter-spacing: 1px; }
+  .testi-titel { font-weight: 700; font-size: 14.5px; margin-bottom: 6px; }
+  .testi-quote { font-style: italic; font-size: 14px; color: rgba(255,255,255,0.78); margin: 0; }
+  .testi-samenvatting { text-align: center; margin-top: 40px; position: relative; z-index: 1; font-size: 14px; color: rgba(255,255,255,0.7); }
+  .testi-samenvatting strong { color: #fff; font-family: 'Unbounded', sans-serif; font-size: 20px; }
+  <!-- placeholder markup removed below; kept style block only -->
+
+  /* ============================================================
+     Contact
+     ============================================================ */
+  .contact-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; align-items: start; }
+  @media (max-width: 700px) { .contact-grid { grid-template-columns: 1fr; } }
+  .veld { margin-bottom: 16px; }
+  .veld label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .label-verplicht::after { content: ' *'; color: var(--gold-deep); }
+  .veld input, .veld textarea { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--paper); color: var(--ink); font-family: inherit; font-size: 14.5px; }
+  .veld textarea { resize: vertical; min-height: 100px; }
+  .veld input:focus, .veld textarea:focus { outline: 2px solid var(--navy); outline-offset: 1px; }
+  .form-status { margin-top: 14px; font-size: 13.5px; font-weight: 600; display: none; }
+  .form-status.tonen { display: block; }
+  .form-status.ok { color: #1e8a4c; }
+  .form-status.fout { color: #b3261e; }
+  .contact-info-rij { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 16px; }
+  .contact-info-rij:last-child { margin-bottom: 0; }
+  .contact-info-rij .icoon { width: 36px; height: 36px; border-radius: 11px; background: rgba(36,87,255,0.1); color: var(--navy); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  @media (prefers-color-scheme: dark) { .contact-info-rij .icoon { background: rgba(138,182,236,0.14); color: #8ab6ec; } }
+
+  /* ============================================================
+     Newsletter + footer
+     ============================================================ */
+  .nieuwsbrief-sectie { text-align: center; padding-bottom: 50px; }
+  .nieuwsbrief-vorm { display: flex; gap: 8px; max-width: 460px; margin: 28px auto 0; padding: 6px; border-radius: var(--radius-pil); background: var(--card); border: 1px solid var(--line); box-shadow: var(--schaduw-kaart); }
+  .nieuwsbrief-vorm input { flex: 1; border: none; background: none; padding: 12px 16px; font-family: inherit; font-size: 14.5px; color: var(--ink); }
+  .nieuwsbrief-vorm input:focus { outline: none; }
+  .nieuwsbrief-vorm button { width: 44px; height: 44px; border-radius: 50%; background: var(--gold); color: #2a1e02; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+  .nieuwsbrief-disclaimer { font-size: 12px; color: var(--ink-muted); margin-top: 14px; }
+  .nieuwsbrief-status { font-size: 13px; font-weight: 700; margin-top: 12px; display: none; color: #1e8a4c; }
+  .nieuwsbrief-status.tonen { display: block; }
+
+  /* ============================================================
+     Toegangscode-gate
+     ============================================================ */
+  #site-inhoud { display: block; }
+  html.gate-locked #site-inhoud { display: none; }
+  #toegangs-gate { display: none; position: fixed; inset: 0; z-index: 999; align-items: center; justify-content: center; padding: 24px; background: linear-gradient(150deg, var(--navy-deep) 0%, var(--navy-ink) 60%, #000814 100%); }
+  html.gate-locked #toegangs-gate { display: flex; }
+  .gate-kaart { width: 100%; max-width: 380px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); border-radius: 28px; padding: 34px 30px; color: #fff; text-align: center; -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
+  .gate-kaart img { width: 44px; height: 44px; border-radius: 12px; margin: 0 auto 16px; }
+  .gate-kaart h1 { font-size: 1.2rem; margin-bottom: 8px; }
+  .gate-kaart p { color: rgba(255,255,255,0.7); font-size: 13.5px; margin: 0 0 22px; }
+  .gate-vorm { display: flex; flex-direction: column; gap: 12px; }
+  .gate-vorm input { padding: 13px 16px; border-radius: var(--radius-pil); border: 1.5px solid rgba(255,255,255,0.24); background: rgba(255,255,255,0.08); color: #fff; font-family: inherit; font-size: 15px; text-align: center; }
+  .gate-vorm input::placeholder { color: rgba(255,255,255,0.45); }
+  .gate-vorm input:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+  .gate-fout { color: #ff8a80; font-size: 13px; font-weight: 700; min-height: 18px; margin-top: 2px; display: none; }
+  .gate-fout.tonen { display: block; }
+
+  footer.site-footer { background: var(--navy-ink); color: rgba(255,255,255,0.75); padding: 56px 24px 26px; }
+  .footer-grid { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 36px; }
+  @media (max-width: 700px) { .footer-grid { grid-template-columns: 1fr; gap: 30px; } }
+  .footer-grid h4 { color: #fff; font-family: 'Unbounded', sans-serif; font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
+  .footer-grid ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .footer-grid button, .footer-grid a { display: inline-flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.75); text-decoration: none; font-size: 14.5px; background: none; border: none; padding: 0; cursor: pointer; text-align: left; font-family: inherit; }
+  .footer-grid button:hover, .footer-grid a:hover { color: #fff; }
+  .footer-merk { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .footer-merk img { width: 36px; height: 36px; border-radius: 10px; }
+  .footer-merk span { font-family: 'Unbounded', sans-serif; font-weight: 700; color: #fff; font-size: 16px; }
+  .footer-tagline { font-size: 14.5px; max-width: 320px; }
+  .footer-social { display: flex; gap: 12px; margin-top: 18px; }
+  .social-knop { width: 42px; height: 42px; border-radius: 50%; background: var(--gold); color: #2a1e02; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .footer-onder { max-width: 1120px; margin: 40px auto 0; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.14); font-size: 12.5px; color: rgba(255,255,255,0.5); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+</style>
+</head>
+<body>
+
+<div id="toegangs-gate">
+  <div class="gate-kaart">
+    <img src="/assets/img/logo.png" alt="" />
+    <h1>Bijna zover</h1>
+    <p>Deze pagina is nog niet openbaar. Heb je een toegangscode gekregen? Vul 'm hieronder in.</p>
+    <form class="gate-vorm" id="gate-vorm" novalidate>
+      <input type="password" id="gate-code" placeholder="Toegangscode" autocomplete="off" />
+      <button type="submit" class="knop knop-primair">Openen</button>
+      <span class="gate-fout" id="gate-fout">Onjuiste code, probeer het nog eens.</span>
+    </form>
+  </div>
+</div>
+
+<div id="site-inhoud">
+<header class="site-header">
+  <button type="button" class="merk-logo" id="nav-home">
+    <img src="/assets/img/logo.png" alt="" />
+    <span>Almere Pickleball</span>
+  </button>
+  <button type="button" class="menu-toggle" id="menu-open-btn" aria-expanded="false" aria-controls="menu-paneel">
+    MENU
+    <span class="balkjes" aria-hidden="true"><span></span><span></span><span></span></span>
+  </button>
+</header>
+
+<div class="menu-scrim" id="menu-scrim"></div>
+<div class="menu-paneel" id="menu-paneel">
+  <div class="sluit-rij">
+    <button type="button" class="sluit-knop" id="menu-sluit-btn" aria-label="Sluiten">✕</button>
+  </div>
+  <nav aria-label="Hoofdnavigatie">
+    <a href="#over-ons">Over ons</a>
+    <a href="#programmas">Programma's</a>
+    <a href="#prijzen">Prijzen</a>
+    <a href="#nieuws">Blog</a>
+    <a href="#contact">Contact</a>
+    <a href="#contact" class="aan-de-slag">Aan de slag →</a>
+  </nav>
+</div>
+
+<main>
+
+  <!-- ============ Hero ============ -->
+  <section class="hero">
+    <div class="hero-vlak">
+      <div class="hero-grid">
+        <div class="hero-tekst">
+          <span class="trust-badge"><span class="sterren">★★★★★</span> 4,9 — leden-tevredenheid</span>
+          <h1>Voel je die <span class="accent-goud">kriebel</span><br />al?</h1>
+          <p class="lead">
+            Almere Pickleball is de plek waar lef, lenigheid en een vleugje verleiding
+            elkaar ontmoeten op de baan. Pak je paddle, trek je stoerste kant aan en
+            kom spelen met mensen die net zo verslingerd raken aan dit spel als jij.
+          </p>
+          <div class="hero-knoppen">
+            <button type="button" class="knop-cirkel-cta" data-scroll="prijzen">
+              Doe mee
+              <span class="cirkel" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2a1e02" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </span>
+            </button>
+            <button type="button" class="knop knop-outline" style="color:#fff;border-color:rgba(255,255,255,0.4);" data-scroll="programmas">Bekijk programma's</button>
+          </div>
+        </div>
+        <div class="hero-portret" aria-hidden="true">
+          <div class="hero-portret-orb">
+            <svg viewBox="0 0 64 64" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="24" cy="16" r="7"/>
+              <path d="M18 20c-6 3-9 9-9 17v10c0 2 2 4 4 4s4-2 4-4V37"/>
+              <path d="M30 20c6 3 9 9 9 17v10c0 2-2 4-4 4s-4-2-4-4V37"/>
+              <path d="M24 30l4 6 4-6" fill="#fff"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Over ons ============ -->
+  <section id="over-ons" class="sectie-licht">
+    <div class="sectie-kop reveal">
+      <span class="eyebrow">Wie wij zijn</span>
+      <h2>Over <span class="accent">ons</span></h2>
+      <p>
+        Pickleball is tennis, badminton en tafeltennis die een avondje stappen zijn
+        gaan doen en verliefd op elkaar zijn geworden. Bij Almere Pickleball spelen
+        we met power, met humor en met net dat beetje swagger dat een potje net
+        wat pittiger maakt.
+      </p>
+    </div>
+
+    <div class="video-intro reveal">
+      <div class="embed-gate" id="video-gate" data-embed-sleutel="pb_toestemming_video"></div>
+    </div>
+
+    <div class="team-sectie reveal">
+      <div class="team-bg-tekst">HET TEAM</div>
+      <div class="team-carousel-wrap">
+        <!-- TODO: echte namen/foto's van bestuur en begeleiders invullen -->
+        <div class="team-carousel" id="team-carousel">
+          <div class="team-kaart"><div class="initialen">BC</div><button type="button" class="plus-knop" aria-hidden="true" tabindex="-1">+</button><div class="overlay"><div class="naam">Naam volgt</div><div class="functie">Baancoördinator</div></div></div>
+          <div class="team-kaart"><div class="initialen">TC</div><button type="button" class="plus-knop" aria-hidden="true" tabindex="-1">+</button><div class="overlay"><div class="naam">Naam volgt</div><div class="functie">Toernooicommissie</div></div></div>
+          <div class="team-kaart"><div class="initialen">JB</div><button type="button" class="plus-knop" aria-hidden="true" tabindex="-1">+</button><div class="overlay"><div class="naam">Naam volgt</div><div class="functie">Jeugdbegeleiding</div></div></div>
+          <div class="team-kaart"><div class="initialen">ON</div><button type="button" class="plus-knop" aria-hidden="true" tabindex="-1">+</button><div class="overlay"><div class="naam">Naam volgt</div><div class="functie">Onthaal nieuwe leden</div></div></div>
+        </div>
+      </div>
+      <div class="carousel-pijlen">
+        <button type="button" class="pijl-knop" id="team-links" aria-label="Vorige">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button type="button" class="pijl-knop" id="team-rechts" aria-label="Volgende">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Statistieken ============ -->
+  <section class="sectie-grijs">
+    <div class="stats-balk">
+      <div class="stat-item reveal">
+        <div class="stat-getal" data-count-to="150">0</div>
+        <div class="stat-label">Actieve leden<sup>*</sup></div>
+      </div>
+      <div class="stat-item reveal">
+        <div class="stat-getal" data-count-to="8">0</div>
+        <div class="stat-label">Banen op dinsdagavond</div>
+      </div>
+      <div class="stat-item reveal">
+        <div class="stat-getal" data-count-to="32">0</div>
+        <div class="stat-label">Spelers per speelavond</div>
+      </div>
+    </div>
+    <!-- TODO: * exact ledenaantal controleren met bestuur voordat de pagina live gaat -->
+  </section>
+
+  <!-- ============ Transformatie ============ -->
+  <section class="sectie-licht">
+    <div class="sectie-kop reveal">
+      <span class="eyebrow">Groei op de baan</span>
+      <h2>Van eerste bal tot <span class="accent">baanheld</span></h2>
+      <p>Elke speler begint ergens. Zo ziet die groei er in het echt uit.</p>
+    </div>
+    <div class="reveal" style="max-width:720px;margin:0 auto;">
+      <div class="transform-frame">
+        <div class="transform-track" id="transform-track">
+          <div class="transform-slide">
+            <div class="transform-paneel voor"><span class="label">Week 1</span><span class="bijschrift">Eerste keer op de baan</span></div>
+            <div class="transform-paneel na"><span class="label">Maand 3</span><span class="bijschrift">Eerste toernooi gespeeld</span></div>
+          </div>
+          <div class="transform-slide">
+            <div class="transform-paneel voor"><span class="label">Voor</span><span class="bijschrift">Onwennig servicegebaar</span></div>
+            <div class="transform-paneel na"><span class="label">Na</span><span class="bijschrift">Scherpe, precieze service</span></div>
+          </div>
+          <div class="transform-slide">
+            <div class="transform-paneel voor"><span class="label">Voor</span><span class="bijschrift">Alleen hard slaan</span></div>
+            <div class="transform-paneel na"><span class="label">Na</span><span class="bijschrift">Slim dinken bij het net</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="transform-dots" id="transform-dots">
+        <button type="button" class="actief" aria-label="Slide 1"></button>
+        <button type="button" aria-label="Slide 2"></button>
+        <button type="button" aria-label="Slide 3"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Programma's ============ -->
+  <section id="programmas" class="sectie-grijs">
+    <div class="sectie-kop reveal">
+      <span class="eyebrow">Wat je bij ons doet</span>
+      <h2>Onze <span class="accent">programma's</span></h2>
+      <p>Van eerste kennismaking tot competitief spelen — er is altijd een plek voor je.</p>
+    </div>
+
+    <div class="kaart hover-kaart programma-kaart reveal">
+      <div>
+        <div class="programma-kop"><h3>Proefles</h3><span class="programma-pijl" aria-hidden="true">↗</span></div>
+        <p class="beschrijving">Nieuw lid? Kom drie keer gratis kennismaken voordat je iets kiest.</p>
+        <ul class="feature-lijst">
+          <li><span class="icoon-vinkje">✓</span> 3 gratis proeflessen</li>
+          <li><span class="icoon-vinkje">✓</span> Geen verplichtingen</li>
+          <li><span class="icoon-vinkje">✓</span> Begeleiding voor beginners</li>
+        </ul>
+      </div>
+      <div class="programma-illustratie i1" aria-hidden="true">🏓</div>
+    </div>
+
+    <div class="kaart hover-kaart programma-kaart reveal">
+      <div>
+        <div class="programma-kop"><h3>Reguliere speelavonden</h3><span class="programma-pijl" aria-hidden="true">↗</span></div>
+        <p class="beschrijving">Dinsdag en donderdag samen zweten, lachen en scoren op vaste tijden.</p>
+        <ul class="feature-lijst">
+          <li><span class="icoon-vinkje">✓</span> Dinsdag 19:30–21:30, Sporthal Almere Haven</li>
+          <li><span class="icoon-vinkje">✓</span> Donderdag 18:30–20:30, Gymlokaal Kraaiennest</li>
+          <li><span class="icoon-vinkje">✓</span> Aanmelden per avond via de app</li>
+        </ul>
+      </div>
+      <div class="programma-illustratie i2" aria-hidden="true">📅</div>
+    </div>
+
+    <div class="kaart hover-kaart programma-kaart reveal">
+      <div>
+        <div class="programma-kop"><h3>Toernooien</h3><span class="programma-pijl" aria-hidden="true">↗</span></div>
+        <p class="beschrijving">Speel voor de eer in clubtoernooien of schrijf je in voor landelijke evenementen.</p>
+        <ul class="feature-lijst">
+          <li><span class="icoon-vinkje">✓</span> Mix, vrouwen, mannen en open klasses</li>
+          <li><span class="icoon-vinkje">✓</span> Poules met live standen</li>
+          <li><span class="icoon-vinkje">✓</span> Landelijke toernooien in de app</li>
+        </ul>
+      </div>
+      <div class="programma-illustratie i3" aria-hidden="true">🏆</div>
+    </div>
+
+    <div class="kaart hover-kaart programma-kaart reveal">
+      <div>
+        <div class="programma-kop"><h3>Jeugd</h3><span class="programma-pijl" aria-hidden="true">↗</span></div>
+        <p class="beschrijving">Voor onze jongste spelers houden we het simpel, veilig en vooral heel leuk.</p>
+        <ul class="feature-lijst">
+          <li><span class="icoon-vinkje">✓</span> Bewegen, buiten zijn, vriendschappen sluiten</li>
+          <li><span class="icoon-vinkje">✓</span> Begeleiders zorgen voor een fijne sfeer</li>
+          <li><span class="icoon-vinkje">✓</span> Eigen jeugdgroep, eigen tempo</li>
+        </ul>
+      </div>
+      <div class="programma-illustratie i4" aria-hidden="true">🧒</div>
+    </div>
+  </section>
+
+  <!-- ============ Nieuws (Blog) ============ -->
+  <section id="nieuws" class="sectie-licht">
+    <div class="sectie-kop reveal">
+      <span class="eyebrow">Vers van de baan</span>
+      <h2>Nieuws</h2>
+      <p>Blijf op de hoogte met korte, pittige verhalen.</p>
+    </div>
+    <div class="grid-3 reveal">
+      <div class="kaart hover-kaart nieuws-kaart">
+        <span class="label">Beginnen</span>
+        <h3>Tips voor beginners</h3>
+        <p>De belangrijkste dingen om te weten voor je je eerste bal slaat.</p>
+      </div>
+      <div class="kaart hover-kaart nieuws-kaart">
+        <span class="label">Jeugd</span>
+        <h3>Pickleball op school</h3>
+        <p>Hoe pickleball langzaam de gymles verovert — en waarom dat goed nieuws is.</p>
+      </div>
+      <div class="kaart hover-kaart nieuws-kaart">
+        <span class="label">Trend</span>
+        <h3>Waarom steeds meer tennissers overstappen</h3>
+        <p>Kleiner veld, kortere rally's, net zoveel adrenaline.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Prijzen ============ -->
+  <section id="prijzen" class="sectie-grijs">
+    <div class="sectie-kop reveal">
+      <span class="eyebrow">Word lid</span>
+      <h2>Kies je <span class="accent">lidmaatschap</span></h2>
+      <p>Van vrijblijvend proberen tot onbeperkt spelen — er is een vorm die bij jou past.</p>
+    </div>
+
+    <div class="prijzen-toggle-rij reveal">
+      <span class="actief-label" id="label-maandelijks">Maandelijks</span>
+      <button type="button" class="toggle-switch" id="prijzen-toggle" aria-pressed="false" aria-label="Wissel tussen maandelijks en jaarlijks"></button>
+      <span id="label-jaarlijks">Jaarlijks <span class="bespaar-badge">bespaar 20%</span></span>
+    </div>
+
+    <div class="prijs-grid prijzen-wrap reveal" id="prijzen-wrap">
+      <div class="kaart prijs-kaart">
+        <div class="naam">Proef</div>
+        <div class="prijs">Gratis</div>
+        <p class="omschrijving">3 proeflessen, geen verplichtingen.</p>
+        <ul class="feature-lijst">
+          <li><span class="icoon-vinkje">✓</span> Aanmelden voor elke speelavond</li>
+          <li><span class="icoon-vinkje">✓</span> Begeleiding voor beginners</li>
+          <li><span class="icoon-vinkje">✓</span> Daarna vrijblijvend kiezen</li>
+        </ul>
+        <button type="button" class="knop knop-primair" data-scroll="contact">Meld je aan</button>
+      </div>
+
+      <div class="kaart prijs-kaart uitgelicht">
+        <span class="badge-gekozen">Meest gekozen</span>
+        <div class="naam">Flex</div>
+        <div class="prijs"><span class="prijs-maand">€25<small>/maand</small></span><span class="prijs-jaar">€20<small>/maand</small></span></div>
+        <p class="omschrijving">1× per week spelen, maandelijks opzegbaar.</p>
+        <ul class="feature-lijst">
+          <li><span class="icoon-vinkje">✓</span> Aanmelden voor 1 speelavond per week</li>
+          <li><span class="icoon-vinkje">✓</span> Deelname aan clubtoernooien</li>
+          <li><span class="icoon-vinkje">✓</span> Opzeggen t/m einde van de maand</li>
+        </ul>
+        <button type="button" class="knop knop-primair" data-scroll="contact">Meld je aan</button>
+      </div>
+
+      <div class="kaart prijs-kaart">
+        <div class="naam">Onbeperkt</div>
+        <div class="prijs"><span class="prijs-maand">€35<small>/maand</small></span><span class="prijs-jaar">€28<small>/maand</small></span></div>
+        <p class="omschrijving">Zo vaak spelen als je wilt, het hele seizoen.</p>
+        <ul class="feature-lijst">
+          <li><span class="icoon-vinkje">✓</span> Onbeperkt aanmelden, alle speelavonden</li>
+          <li><span class="icoon-vinkje">✓</span> Voorrang bij toernooi-inschrijving</li>
+          <li><span class="icoon-vinkje">✓</span> Jaarcontract met opzegtermijn</li>
+        </ul>
+        <button type="button" class="knop knop-primair" data-scroll="contact">Meld je aan</button>
+      </div>
+    </div>
+    <p class="prijzen-voetnoot reveal">* Richtprijzen — definitieve tarieven worden vastgesteld door het bestuur.</p>
+  </section>
+
+  <!-- ============ Hoe het werkt ============ -->
+  <section class="sectie-licht">
+    <div class="sectie-kop reveal">
+      <span class="eyebrow">Zo ga je van start</span>
+      <h2>Hoe het <span class="accent">werkt</span></h2>
+      <p>In vier stappen van nieuwsgierig naar verslingerd aan pickleball.</p>
+    </div>
+    <div class="stappen-grid reveal">
+      <div class="stap-kaart s1">
+        <span class="stap-decor" aria-hidden="true">🏓</span>
+        <div><div class="stap-nr">STAP 01</div><h3>Meld je aan voor een proefles</h3><p>Kies een speelavond die je uitkomt en geef je op via de app of website.</p></div>
+        <span class="stap-pijl" aria-hidden="true">↗</span>
+      </div>
+      <div class="stap-kaart s2">
+        <span class="stap-decor" aria-hidden="true">🤝</span>
+        <div><div class="stap-nr">STAP 02</div><h3>Kom spelen en ontdek het spel</h3><p>Onze begeleiders leren je de basis: service, dinken en de kitchen.</p></div>
+        <span class="stap-pijl" aria-hidden="true">↗</span>
+      </div>
+      <div class="stap-kaart s3">
+        <span class="stap-decor" aria-hidden="true">📋</span>
+        <div><div class="stap-nr">STAP 03</div><h3>Kies je lidmaatschap</h3><p>Verliefd geworden? Kies de vorm die bij jouw speelritme past.</p></div>
+        <span class="stap-pijl" aria-hidden="true">↗</span>
+      </div>
+      <div class="stap-kaart s4">
+        <span class="stap-decor" aria-hidden="true">🏆</span>
+        <div><div class="stap-nr">STAP 04</div><h3>Word onderdeel van de club</h3><p>Speel toernooien, klim in speelsterkte en maak nieuwe vrienden.</p></div>
+        <span class="stap-pijl" aria-hidden="true">↗</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Drie pijlers ============ -->
+  <section class="sectie-grijs">
+    <div class="sectie-kop reveal">
+      <span class="eyebrow">Waar wij voor staan</span>
+      <h2>Onze drie <span class="accent">pijlers</span></h2>
+    </div>
+    <div class="pijlers-tekst reveal">
+      <p><strong>Plezier</strong> staat voorop — pickleball moet vooral leuk zijn, met een lach op de baan en net genoeg spanning om je scherp te houden, of je nu voor het eerst een paddle vasthoudt of al jaren meedraait.</p>
+      <p><strong>Gemeenschap</strong> is waar we het voor doen — op de baan ontstaan de leukste connecties, van hechte vriendschappen tot een club waar iedereen elkaar bij naam kent en groet.</p>
+      <p><strong>Groei</strong> zit in elk potje verstopt — elke rally leert je iets, elk seizoen word je sterker, en bij ons krijg je de ruimte om in je eigen tempo beter te worden.</p>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section id="faq" class="sectie-licht">
+    <div class="sectie-kop reveal">
+      <span class="eyebrow">Nog vragen?</span>
+      <h2>Veelgestelde <span class="accent">vragen</span></h2>
+    </div>
+    <div class="faq-lijst reveal">
+      <div class="faq-item" data-open="false">
+        <button type="button" class="faq-vraag">Moet ik ervaring hebben om mee te doen?<span class="faq-chevron" aria-hidden="true">⌄</span></button>
+        <div class="faq-antwoord"><div class="faq-antwoord-inner">Nee, helemaal niet. Kom gewoon een proefles doen — onze begeleiders leren je de basis vanaf nul.</div></div>
+      </div>
+      <div class="faq-item" data-open="false">
+        <button type="button" class="faq-vraag">Wat is de kitchen?<span class="faq-chevron" aria-hidden="true">⌄</span></button>
+        <div class="faq-antwoord"><div class="faq-antwoord-inner">De non-volleyzone vlak voor het net, waar je een bal alleen mag raken als hij eerst gestuiterd heeft.</div></div>
+      </div>
+      <div class="faq-item" data-open="false">
+        <button type="button" class="faq-vraag">Wat is dinking?<span class="faq-chevron" aria-hidden="true">⌄</span></button>
+        <div class="faq-antwoord"><div class="faq-antwoord-inner">Soms win je niet met kracht, maar met verleiding. Een dink is een zacht, bijna plagerig balletje net over het net, dat je tegenstander gek maakt van ongeduld.</div></div>
+      </div>
+      <div class="faq-item" data-open="false">
+        <button type="button" class="faq-vraag">Wat is gripdruk en waarom maakt dat uit?<span class="faq-chevron" aria-hidden="true">⌄</span></button>
+        <div class="faq-antwoord"><div class="faq-antwoord-inner">Hoe je je paddle vasthoudt, verraadt hoe je speelt. Losjes voor finesse, stevig voor pure power.</div></div>
+      </div>
+      <div class="faq-item" data-open="false">
+        <button type="button" class="faq-vraag">Hoe werkt de service precies?<span class="faq-chevron" aria-hidden="true">⌄</span></button>
+        <div class="faq-antwoord"><div class="faq-antwoord-inner">Onderhands, doelgericht en recht in de roos van het servicevak. Precisie is sexy, en bij ons leer je hoe je dat laat zien.</div></div>
+      </div>
+      <div class="faq-item" data-open="false">
+        <button type="button" class="faq-vraag">Wat is speelsterkte en hoe weet ik mijn niveau?<span class="faq-chevron" aria-hidden="true">⌄</span></button>
+        <div class="faq-antwoord"><div class="faq-antwoord-inner">Onze niveau-indicatie loopt van 1.0 tot 5.0 en laat zien waar jij nu staat — en waar je met een beetje lef naartoe kan groeien.</div></div>
+      </div>
+      <div class="faq-item" data-open="false">
+        <button type="button" class="faq-vraag">Is pickleball een gezonde sport?<span class="faq-chevron" aria-hidden="true">⌄</span></button>
+        <div class="faq-antwoord"><div class="faq-antwoord-inner">Zeker — het tilt je hartslag op zonder je gewrichten te slopen: sterke armen, een strakke core en een hoofd dat eindelijk stil wordt.</div></div>
+      </div>
+      <div class="faq-item" data-open="false">
+        <button type="button" class="faq-vraag">Is er iets voor de jeugd?<span class="faq-chevron" aria-hidden="true">⌄</span></button>
+        <div class="faq-antwoord"><div class="faq-antwoord-inner">Ja — voor onze jongste spelers houden we het simpel, veilig en vooral heel leuk, in een omgeving waar begeleiders zorgen voor een fijne en veilige sfeer.</div></div>
+      </div>
+      <div class="faq-item" data-open="false">
+        <button type="button" class="faq-vraag">Hoe zeg ik mijn lidmaatschap op?<span class="faq-chevron" aria-hidden="true">⌄</span></button>
+        <div class="faq-antwoord"><div class="faq-antwoord-inner">Zelf via je profiel in de app. Een maandlidmaatschap loopt tot het einde van de lopende maand, een jaarlidmaatschap tot het einde van het lopende contractjaar.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Testimonials ============ -->
+  <section class="testi-sectie">
+    <div class="testi-bg-tekst" aria-hidden="true">REVIEWS</div>
+    <div class="testi-avatars reveal" aria-hidden="true">
+      <div class="av">M</div><div class="av">S</div><div class="av">L</div><div class="av">R</div><div class="av">K</div>
+    </div>
+    <div class="sectie-kop reveal" style="position:relative;z-index:1;">
+      <span class="eyebrow" style="color:var(--gold);">Wat leden zeggen</span>
+      <h2 style="color:#fff;">Echte verhalen van de <span class="accent">baan</span></h2>
+    </div>
+    <!-- TODO: dit zijn voorbeeldreviews — vervangen door echte ledenreacties (met toestemming) voordat de pagina live gaat -->
+    <div class="testi-grid">
+      <div class="testi-kaart reveal">
+        <div class="testi-kop"><div class="av">M</div><div><div class="naam">Mila</div><div class="datum">Lid sinds 2025</div></div></div>
+        <div class="testi-sterren">★★★★★</div>
+        <div class="testi-titel">Eindelijk een sport die blijft plakken</div>
+        <p class="testi-quote">"Ik kwam voor een proefles en ben nooit meer weggegaan. De sfeer hier is aanstekelijk."</p>
+      </div>
+      <div class="testi-kaart reveal">
+        <div class="testi-kop"><div class="av">S</div><div><div class="naam">Sander</div><div class="datum">Lid sinds 2024</div></div></div>
+        <div class="testi-sterren">★★★★★</div>
+        <div class="testi-titel">Van tennisser tot pickleball-fanaat</div>
+        <p class="testi-quote">"Kleiner veld, net zoveel adrenaline. En de mensen maken het helemaal af."</p>
+      </div>
+      <div class="testi-kaart reveal">
+        <div class="testi-kop"><div class="av">L</div><div><div class="naam">Lotte</div><div class="datum">Lid sinds 2025</div></div></div>
+        <div class="testi-sterren">★★★★★</div>
+        <div class="testi-titel">Precies de dosis competitie die ik zocht</div>
+        <p class="testi-quote">"De toernooien geven net dat extra tintje. Serieus genoeg om te winnen, luchtig genoeg om te lachen."</p>
+      </div>
+    </div>
+    <div class="testi-samenvatting reveal"><strong>4,9 / 5</strong> — gebaseerd op ledenervaringen</div>
+  </section>
+
+  <!-- ============ Contact ============ -->
+  <section id="contact" class="sectie-licht">
+    <div class="sectie-kop reveal">
+      <span class="eyebrow">Kom erbij</span>
+      <h2>Klaar om kennis te maken?</h2>
+      <p>Laat je gegevens achter en wij nemen snel en enthousiast contact met je op.</p>
+    </div>
+    <div class="contact-grid reveal">
+      <form id="contact-form" novalidate>
+        <div class="veld">
+          <label class="label-verplicht" for="c-naam">Naam</label>
+          <input type="text" id="c-naam" name="naam" required autocomplete="name" />
+        </div>
+        <div class="veld">
+          <label class="label-verplicht" for="c-email">E-mail</label>
+          <input type="email" id="c-email" name="email" required autocomplete="email" />
+        </div>
+        <div class="veld">
+          <label class="label-verplicht" for="c-onderwerp">Onderwerp</label>
+          <input type="text" id="c-onderwerp" name="onderwerp" required />
+        </div>
+        <div class="veld">
+          <label class="label-verplicht" for="c-bericht">Bericht</label>
+          <textarea id="c-bericht" name="bericht" required></textarea>
+        </div>
+        <button class="knop knop-primair" type="submit" style="width:100%;">Versturen</button>
+        <p class="form-status" id="contact-status"></p>
+      </form>
+      <div>
+        <div class="kaart" style="margin-bottom:18px;">
+          <div class="contact-info-rij">
+            <span class="icoon" aria-hidden="true">✉️</span>
+            <div><div style="font-weight:700;">E-mail</div><a href="mailto:info@pickleballalmere.nl">info@pickleballalmere.nl</a></div>
+          </div>
+          <div class="contact-info-rij">
+            <span class="icoon" aria-hidden="true">📍</span>
+            <div><div style="font-weight:700;">Adres</div><div style="color:var(--ink-muted);font-size:14px;">Sporthal Almere Haven, Parkwerf 138, 1354 EB Almere</div></div>
+          </div>
+        </div>
+        <div class="embed-gate" style="aspect-ratio:4/3;" id="kaart-gate" data-embed-sleutel="pb_toestemming_kaart"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Newsletter ============ -->
+  <section class="nieuwsbrief-sectie sectie-grijs">
+    <div class="sectie-kop reveal" style="margin-bottom:0;">
+      <span class="eyebrow">Blijf op de hoogte</span>
+      <h2>Schrijf je in voor onze <span class="accent">nieuwsbrief</span></h2>
+      <p>Speeldagen, toernooi-updates en clubnieuws — rechtstreeks in je inbox.</p>
+    </div>
+    <form class="nieuwsbrief-vorm reveal" id="nieuwsbrief-form">
+      <input type="email" placeholder="jouw@email.nl" required aria-label="E-mailadres" />
+      <button type="submit" aria-label="Aanmelden">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2a1e02" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </form>
+    <p class="nieuwsbrief-status" id="nieuwsbrief-status"></p>
+    <p class="nieuwsbrief-disclaimer">We sturen nooit spam. Uitschrijven kan altijd. Zie ons <a href="/privacy/">privacybeleid</a>.</p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div>
+      <div class="footer-merk">
+        <img src="/assets/img/logo.png" alt="" />
+        <span>Almere Pickleball</span>
+      </div>
+      <p class="footer-tagline">Lef, lenigheid en een vleugje verleiding — op de baan in Almere.</p>
+      <div class="footer-social">
+        <!-- TODO: echte kanalen invullen zodra beschikbaar -->
+        <a class="social-knop" href="#" aria-label="Instagram" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2a1e02" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#2a1e02" stroke="none"/></svg>
+        </a>
+        <a class="social-knop" href="#" aria-label="Facebook" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2a1e02" stroke-width="2"><path d="M14 9h3V5h-3a4 4 0 0 0-4 4v2H7v4h3v7h4v-7h3l1-4h-4V9a1 1 0 0 1 1-1z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div>
+      <h4>Pagina</h4>
+      <ul>
+        <li><a href="#over-ons">→ Over ons</a></li>
+        <li><a href="#programmas">→ Programma's</a></li>
+        <li><a href="#prijzen">→ Prijzen</a></li>
+        <li><a href="#faq">→ Veelgestelde vragen</a></li>
+        <li><a href="#contact">→ Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Meer</h4>
+      <ul>
+        <li><a href="/">→ Hoofdwebsite</a></li>
+        <li><a href="/veelgestelde-vragen/">→ Veelgestelde vragen</a></li>
+        <li><a href="/privacy/">→ Privacybeleid</a></li>
+      </ul>
+    </div>
+  </div>
+  <!-- TODO: KvK-nummer en bankgegevens toevoegen zodra beschikbaar -->
+  <div class="footer-onder">
+    <span>© <span id="jaar"></span> Almere Pickleball</span>
+    <span>Almere, Nederland</span>
+  </div>
+</footer>
+</div><!-- /#site-inhoud -->
+
+<script>
+  document.getElementById('jaar').textContent = new Date().getFullYear();
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ------------------------------------------------------------------
+  // Toegangscode-gate: zie de toelichting bij .gate-locked in <head>/CSS —
+  // dit is een zachte drempel, geen echte toegangsbeveiliging. De code
+  // staat hieronder in platte tekst; iedereen die de pagina-broncode leest
+  // kan 'm vinden. Wijzig 'TOEGANGSCODE' hieronder om de code te wijzigen.
+  // ------------------------------------------------------------------
+  const TOEGANGSCODE = 'kriebel2026';
+  document.getElementById('gate-vorm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const invoer = document.getElementById('gate-code').value.trim().toLowerCase();
+    const fout = document.getElementById('gate-fout');
+    if (invoer === TOEGANGSCODE.toLowerCase()) {
+      try { localStorage.setItem('pb_toegang_ok', 'ja'); } catch (err) {}
+      document.documentElement.classList.remove('gate-locked');
+      fout.classList.remove('tonen');
+    } else {
+      fout.classList.add('tonen');
+    }
+  });
+
+  // ------------------------------------------------------------------
+  // Uitklapmenu (donker paneel rechtsboven, geen full-screen overlay).
+  // ------------------------------------------------------------------
+  const menuPaneel = document.getElementById('menu-paneel');
+  const menuOpenBtn = document.getElementById('menu-open-btn');
+  const menuSluitBtn = document.getElementById('menu-sluit-btn');
+  const menuScrim = document.getElementById('menu-scrim');
+  function openMenu() {
+    menuPaneel.classList.add('open');
+    menuScrim.classList.add('open');
+    menuOpenBtn.setAttribute('aria-expanded', 'true');
+  }
+  function sluitMenu() {
+    menuPaneel.classList.remove('open');
+    menuScrim.classList.remove('open');
+    menuOpenBtn.setAttribute('aria-expanded', 'false');
+  }
+  menuOpenBtn.addEventListener('click', () => {
+    menuPaneel.classList.contains('open') ? sluitMenu() : openMenu();
+  });
+  menuSluitBtn.addEventListener('click', sluitMenu);
+  menuScrim.addEventListener('click', sluitMenu);
+  menuPaneel.querySelectorAll('a, button').forEach((el) => el.addEventListener('click', sluitMenu));
+  document.getElementById('nav-home').addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }));
+
+  // data-scroll="id" knoppen laten naar een sectie scrollen (i.p.v. <a href>,
+  // zodat dezelfde knop-component overal herbruikbaar blijft).
+  document.querySelectorAll('[data-scroll]').forEach((el) => {
+    el.addEventListener('click', () => {
+      const doel = document.getElementById(el.dataset.scroll);
+      if (doel) doel.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
+  });
+
+  // ------------------------------------------------------------------
+  // Scroll-reveal: fade/slide-in zodra een element in beeld komt.
+  // ------------------------------------------------------------------
+  if (!reduceMotion && 'IntersectionObserver' in window) {
+    const reveals = document.querySelectorAll('.reveal');
+    reveals.forEach((el) => el.classList.add('reveal-init'));
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    reveals.forEach((el) => io.observe(el));
+  }
+
+  // ------------------------------------------------------------------
+  // Statistieken: getallen tellen op zodra de balk in beeld komt.
+  // ------------------------------------------------------------------
+  const statGetallen = document.querySelectorAll('.stat-getal');
+  if (statGetallen.length && 'IntersectionObserver' in window) {
+    const telOp = (el) => {
+      const doel = parseInt(el.dataset.countTo, 10);
+      if (reduceMotion) { el.textContent = doel; return; }
+      const duur = 1200;
+      const start = performance.now();
+      function stap(nu) {
+        const voortgang = Math.min((nu - start) / duur, 1);
+        const easedVoortgang = 1 - Math.pow(1 - voortgang, 3);
+        el.textContent = Math.round(doel * easedVoortgang);
+        if (voortgang < 1) requestAnimationFrame(stap);
+      }
+      requestAnimationFrame(stap);
+    };
+    const statIo = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) { telOp(entry.target); statIo.unobserve(entry.target); }
+      });
+    }, { threshold: 0.5 });
+    statGetallen.forEach((el) => statIo.observe(el));
+  } else {
+    statGetallen.forEach((el) => { el.textContent = el.dataset.countTo; });
+  }
+
+  // ------------------------------------------------------------------
+  // Teamcarrousel: pijlknoppen scrollen de rij met kaarten.
+  // ------------------------------------------------------------------
+  const teamCarousel = document.getElementById('team-carousel');
+  document.getElementById('team-links').addEventListener('click', () => {
+    teamCarousel.scrollBy({ left: -240, behavior: reduceMotion ? 'auto' : 'smooth' });
+  });
+  document.getElementById('team-rechts').addEventListener('click', () => {
+    teamCarousel.scrollBy({ left: 240, behavior: reduceMotion ? 'auto' : 'smooth' });
+  });
+
+  // ------------------------------------------------------------------
+  // Transformatie-carrousel: dots + track-verschuiving.
+  // ------------------------------------------------------------------
+  const transformTrack = document.getElementById('transform-track');
+  const transformDots = document.querySelectorAll('#transform-dots button');
+  let transformIndex = 0;
+  function toonTransformSlide(i) {
+    transformIndex = i;
+    transformTrack.style.transform = 'translateX(-' + (i * 100) + '%)';
+    transformDots.forEach((d, di) => d.classList.toggle('actief', di === i));
+  }
+  transformDots.forEach((dot, i) => dot.addEventListener('click', () => toonTransformSlide(i)));
+
+  // ------------------------------------------------------------------
+  // Prijzen: maandelijks/jaarlijks-toggle.
+  // ------------------------------------------------------------------
+  const prijzenToggle = document.getElementById('prijzen-toggle');
+  const prijzenWrap = document.getElementById('prijzen-wrap');
+  const labelMaandelijks = document.getElementById('label-maandelijks');
+  const labelJaarlijks = document.getElementById('label-jaarlijks');
+  prijzenToggle.addEventListener('click', () => {
+    const jaarlijks = !prijzenWrap.classList.contains('jaarlijks');
+    prijzenWrap.classList.toggle('jaarlijks', jaarlijks);
+    prijzenToggle.classList.toggle('aan', jaarlijks);
+    prijzenToggle.setAttribute('aria-pressed', String(jaarlijks));
+    labelMaandelijks.classList.toggle('actief-label', !jaarlijks);
+    labelJaarlijks.classList.toggle('actief-label', jaarlijks);
+  });
+
+  // ------------------------------------------------------------------
+  // FAQ-accordion.
+  // ------------------------------------------------------------------
+  document.querySelectorAll('.faq-item').forEach((item) => {
+    const vraag = item.querySelector('.faq-vraag');
+    const antwoord = item.querySelector('.faq-antwoord');
+    vraag.addEventListener('click', () => {
+      const open = item.dataset.open === 'true';
+      document.querySelectorAll('.faq-item[data-open="true"]').forEach((ander) => {
+        if (ander !== item) {
+          ander.dataset.open = 'false';
+          ander.querySelector('.faq-antwoord').style.maxHeight = null;
+        }
+      });
+      item.dataset.open = String(!open);
+      antwoord.style.maxHeight = !open ? antwoord.scrollHeight + 'px' : null;
+    });
+  });
+
+  // ------------------------------------------------------------------
+  // Consent-gate voor embeds (YouTube-video, Google Maps): toont eerst een
+  // toestemmingsvraag, laadt de iframe pas na een expliciete klik op
+  // "Inschakelen" — nooit stilzwijgend vooraf. Voorkeur wordt onthouden
+  // (localStorage) zodat een terugkerende bezoeker niet steeds opnieuw
+  // hoeft te bevestigen.
+  // ------------------------------------------------------------------
+  function zetEmbedGate(gateEl, opties) {
+    const sleutel = gateEl.dataset.embedSleutel;
+    const toestemming = localStorage.getItem(sleutel) === 'ja';
+    if (toestemming) {
+      gateEl.innerHTML = opties.bouwEmbed();
+      return;
+    }
+    gateEl.innerHTML =
+      '<div class="embed-gate-inhoud">' +
+      '<div class="embed-icoon" aria-hidden="true">' + opties.icoon + '</div>' +
+      '<div style="font-weight:700;font-size:15px;">' + opties.titel + '</div>' +
+      '<p>' + opties.uitleg + '</p>' +
+      '<div class="embed-gate-knoppen">' +
+      '<button type="button" class="knop knop-outline" data-actie="voorkeuren">Voorkeuren</button>' +
+      '<button type="button" class="knop knop-primair" data-actie="inschakelen">Inschakelen</button>' +
+      '</div>' +
+      '<div class="embed-gate-details" data-details>' + opties.details + '</div>' +
+      '</div>';
+    gateEl.querySelector('[data-actie="inschakelen"]').addEventListener('click', () => {
+      localStorage.setItem(sleutel, 'ja');
+      gateEl.innerHTML = opties.bouwEmbed();
+    });
+    gateEl.querySelector('[data-actie="voorkeuren"]').addEventListener('click', () => {
+      gateEl.querySelector('[data-details]').classList.toggle('tonen');
+    });
+  }
+
+  // TODO: vervang door de echte YouTube-video-ID van Almere Pickleball.
+  const YOUTUBE_VIDEO_ID = 'VIDEO_ID_HIER';
+
+  zetEmbedGate(document.getElementById('video-gate'), {
+    icoon: '🎬',
+    titel: 'Deze video wordt geladen via YouTube.',
+    uitleg: 'Wil je deze content tonen?',
+    details: 'YouTube (eigendom van Google) kan bij het afspelen cookies plaatsen en je IP-adres verwerken, volgens hun eigen voorwaarden. Wij laden de video pas nadat je hier toestemming geeft.',
+    bouwEmbed: () => {
+      if (YOUTUBE_VIDEO_ID === 'VIDEO_ID_HIER') {
+        return '<div class="embed-gate-inhoud"><div class="embed-icoon" aria-hidden="true">🏓</div><p style="margin-top:6px;">Video volgt binnenkort.</p></div>';
+      }
+      return '<iframe src="https://www.youtube-nocookie.com/embed/' + YOUTUBE_VIDEO_ID +
+        '" title="Almere Pickleball introductievideo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
+    },
+  });
+
+  zetEmbedGate(document.getElementById('kaart-gate'), {
+    icoon: '🗺️',
+    titel: 'Deze kaart wordt geladen via Google Maps.',
+    uitleg: 'Wil je deze content tonen?',
+    details: 'Google Maps kan bij het laden cookies plaatsen en je IP-adres verwerken, volgens hun eigen voorwaarden. Wij laden de kaart pas nadat je hier toestemming geeft.',
+    bouwEmbed: () =>
+      '<iframe src="https://www.google.com/maps?q=Sporthal+Almere+Haven,+Parkwerf+138,+Almere&output=embed" title="Locatie Sporthal Almere Haven" loading="lazy"></iframe>',
+  });
+
+  // ------------------------------------------------------------------
+  // Contactformulier: eenvoudige client-side validatie + bevestiging.
+  // TODO — koppel aan een Supabase-tabel/edge function (zelfde patroon als
+  // proefles/index.html) zodra de pagina live gaat.
+  // ------------------------------------------------------------------
+  document.getElementById('contact-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const status = document.getElementById('contact-status');
+    if (!form.checkValidity()) {
+      status.textContent = 'Vul alle verplichte velden in.';
+      status.className = 'form-status tonen fout';
+      return;
+    }
+    status.textContent = 'Bedankt! We nemen zo snel mogelijk contact met je op.';
+    status.className = 'form-status tonen ok';
+    form.reset();
+  });
+
+  // Nieuwsbrief-formulier: zelfde eenvoudige patroon (TODO: echte koppeling).
+  document.getElementById('nieuwsbrief-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const status = document.getElementById('nieuwsbrief-status');
+    status.textContent = 'Bedankt voor je aanmelding!';
+    status.classList.add('tonen');
+    e.target.reset();
+  });
+</script>
+</body>
+</html>
