@@ -292,10 +292,14 @@
   .prijs-kaart .naam { font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 15px; }
   .prijs-kaart .prijs { font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: 2.4rem; margin: 14px 0 4px; }
   .prijs-kaart .prijs small { font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 600; opacity: 0.7; }
-  .prijs-kaart .prijs .prijs-jaar { display: none; }
-  .prijzen-wrap.jaarlijks .prijs-maand { display: none; }
-  .prijzen-wrap.jaarlijks .prijs-jaar { display: inline; }
+  .prijs-kaart .prijs .prijs-jeugd { display: none; }
+  .prijzen-wrap.jeugd .prijs-kaart .prijs .prijs-volwassen { display: none; }
+  .prijzen-wrap.jeugd .prijs-kaart .prijs .prijs-jeugd { display: inline; }
   .prijs-kaart .omschrijving { font-size: 13.5px; opacity: 0.8; margin-bottom: 22px; }
+  .prijs-kaart .omschrijving .prijs-volwassen { display: block; }
+  .prijs-kaart .omschrijving .prijs-jeugd { display: none; }
+  .prijzen-wrap.jeugd .prijs-kaart .omschrijving .prijs-volwassen { display: none; }
+  .prijzen-wrap.jeugd .prijs-kaart .omschrijving .prijs-jeugd { display: block; }
   .prijs-kaart .feature-lijst { margin-bottom: 26px; flex-grow: 1; }
   .prijs-kaart.uitgelicht .icoon-vinkje { background: rgba(255,255,255,0.18); color: var(--gold); }
   .prijs-kaart .knop { width: 100%; }
@@ -477,7 +481,7 @@
     <div class="hero-vlak">
       <div class="hero-grid">
         <div class="hero-tekst">
-          <span class="trust-badge"><span class="sterren">★★★★★</span> 4,9 — leden-tevredenheid</span>
+          <span class="trust-badge">🏓 2 vaste speelavonden per week — 10 banen in Almere</span>
           <h1>Voel je die <span class="accent-goud">kriebel</span><br />al?</h1>
           <p class="lead">
             Almere Pickleball is de plek waar lef, lenigheid en een vleugje verleiding
@@ -551,19 +555,18 @@
   <section class="sectie-grijs">
     <div class="stats-balk">
       <div class="stat-item reveal">
-        <div class="stat-getal" data-count-to="150">0</div>
-        <div class="stat-label">Actieve leden<sup>*</sup></div>
+        <div class="stat-getal" data-count-to="10">0</div>
+        <div class="stat-label">Banen in Almere<br />(8 op dinsdag, 2 op donderdag)</div>
       </div>
       <div class="stat-item reveal">
-        <div class="stat-getal" data-count-to="8">0</div>
-        <div class="stat-label">Banen op dinsdagavond</div>
+        <div class="stat-getal" data-count-to="44">0</div>
+        <div class="stat-label">Speelplekken per week</div>
       </div>
       <div class="stat-item reveal">
-        <div class="stat-getal" data-count-to="32">0</div>
-        <div class="stat-label">Spelers per speelavond</div>
+        <div class="stat-getal" data-count-to="11">0</div>
+        <div class="stat-label">Maanden per jaar spelen<br />(alles behalve juli)</div>
       </div>
     </div>
-    <!-- TODO: * exact ledenaantal controleren met bestuur voordat de pagina live gaat -->
   </section>
 
   <!-- ============ Transformatie ============ -->
@@ -611,9 +614,9 @@
         <div class="programma-kop"><h3>Proefles</h3><span class="programma-pijl" aria-hidden="true">↗</span></div>
         <p class="beschrijving">Nieuw lid? Kom drie keer gratis kennismaken voordat je iets kiest.</p>
         <ul class="feature-lijst">
-          <li><span class="icoon-vinkje">✓</span> 3 gratis proeflessen</li>
+          <li><span class="icoon-vinkje">✓</span> 3 gratis proeflessen, 3 maanden geldig</li>
           <li><span class="icoon-vinkje">✓</span> Geen verplichtingen</li>
-          <li><span class="icoon-vinkje">✓</span> Begeleiding voor beginners</li>
+          <li><span class="icoon-vinkje">✓</span> Al eerder gespeeld? Losse proefles voor €4,25</li>
         </ul>
       </div>
       <div class="programma-illustratie i1" aria-hidden="true">🏓</div>
@@ -638,8 +641,8 @@
         <p class="beschrijving">Speel voor de eer in clubtoernooien of schrijf je in voor landelijke evenementen.</p>
         <ul class="feature-lijst">
           <li><span class="icoon-vinkje">✓</span> Mix, vrouwen, mannen en open klasses</li>
-          <li><span class="icoon-vinkje">✓</span> Poules met live standen</li>
-          <li><span class="icoon-vinkje">✓</span> Landelijke toernooien in de app</li>
+          <li><span class="icoon-vinkje">✓</span> Niveaus: beginner, gevorderd, competitie, open</li>
+          <li><span class="icoon-vinkje">✓</span> Poules met live standen, plus landelijke toernooien</li>
         </ul>
       </div>
       <div class="programma-illustratie i3" aria-hidden="true">🏆</div>
@@ -648,11 +651,11 @@
     <div class="kaart hover-kaart programma-kaart reveal">
       <div>
         <div class="programma-kop"><h3>Jeugd</h3><span class="programma-pijl" aria-hidden="true">↗</span></div>
-        <p class="beschrijving">Voor onze jongste spelers houden we het simpel, veilig en vooral heel leuk.</p>
+        <p class="beschrijving">Voor onze jongste spelers (t/m 17 jaar) houden we het simpel, veilig en vooral heel leuk.</p>
         <ul class="feature-lijst">
           <li><span class="icoon-vinkje">✓</span> Bewegen, buiten zijn, vriendschappen sluiten</li>
           <li><span class="icoon-vinkje">✓</span> Begeleiders zorgen voor een fijne sfeer</li>
-          <li><span class="icoon-vinkje">✓</span> Eigen jeugdgroep, eigen tempo</li>
+          <li><span class="icoon-vinkje">✓</span> Jeugdtarief: vanaf €10 per maand</li>
         </ul>
       </div>
       <div class="programma-illustratie i4" aria-hidden="true">🧒</div>
@@ -694,16 +697,16 @@
     </div>
 
     <div class="prijzen-toggle-rij reveal">
-      <span class="actief-label" id="label-maandelijks">Maandelijks</span>
-      <button type="button" class="toggle-switch" id="prijzen-toggle" aria-pressed="false" aria-label="Wissel tussen maandelijks en jaarlijks"></button>
-      <span id="label-jaarlijks">Jaarlijks <span class="bespaar-badge">bespaar 20%</span></span>
+      <span class="actief-label" id="label-volwassen">Volwassen</span>
+      <button type="button" class="toggle-switch" id="prijzen-toggle" aria-pressed="false" aria-label="Wissel tussen volwassen- en jeugdtarieven"></button>
+      <span id="label-jeugd">Jeugd <span class="bespaar-badge">t/m 17 jaar</span></span>
     </div>
 
     <div class="prijs-grid prijzen-wrap reveal" id="prijzen-wrap">
       <div class="kaart prijs-kaart">
-        <div class="naam">Proef</div>
+        <div class="naam">Proefles</div>
         <div class="prijs">Gratis</div>
-        <p class="omschrijving">3 proeflessen, geen verplichtingen.</p>
+        <p class="omschrijving">3 proeflessen, 3 maanden geldig — voor iedereen, ongeacht leeftijd.</p>
         <ul class="feature-lijst">
           <li><span class="icoon-vinkje">✓</span> Aanmelden voor elke speelavond</li>
           <li><span class="icoon-vinkje">✓</span> Begeleiding voor beginners</li>
@@ -714,11 +717,17 @@
 
       <div class="kaart prijs-kaart uitgelicht">
         <span class="badge-gekozen">Meest gekozen</span>
-        <div class="naam">Flex</div>
-        <div class="prijs"><span class="prijs-maand">€25<small>/maand</small></span><span class="prijs-jaar">€20<small>/maand</small></span></div>
-        <p class="omschrijving">1× per week spelen, maandelijks opzegbaar.</p>
+        <div class="naam">Maandlidmaatschap</div>
+        <div class="prijs">
+          <span class="prijs-volwassen">€15,75<small>/maand</small></span>
+          <span class="prijs-jeugd">€10<small>/maand</small></span>
+        </div>
+        <p class="omschrijving">
+          <span class="prijs-volwassen">1× per week. 2× per week: €31,50/maand.</span>
+          <span class="prijs-jeugd">1× per week. 2× per week: €20/maand.</span>
+        </p>
         <ul class="feature-lijst">
-          <li><span class="icoon-vinkje">✓</span> Aanmelden voor 1 speelavond per week</li>
+          <li><span class="icoon-vinkje">✓</span> Vaste dag naar keuze: dinsdag of donderdag</li>
           <li><span class="icoon-vinkje">✓</span> Deelname aan clubtoernooien</li>
           <li><span class="icoon-vinkje">✓</span> Opzeggen t/m einde van de maand</li>
         </ul>
@@ -726,18 +735,27 @@
       </div>
 
       <div class="kaart prijs-kaart">
-        <div class="naam">Onbeperkt</div>
-        <div class="prijs"><span class="prijs-maand">€35<small>/maand</small></span><span class="prijs-jaar">€28<small>/maand</small></span></div>
-        <p class="omschrijving">Zo vaak spelen als je wilt, het hele seizoen.</p>
+        <div class="naam">Jaarlidmaatschap</div>
+        <div class="prijs">
+          <span class="prijs-volwassen">€187<small>/jaar</small></span>
+          <span class="prijs-jeugd">€100<small>/jaar</small></span>
+        </div>
+        <p class="omschrijving">
+          <span class="prijs-volwassen">1× per week. 2× per week: €374/jaar.</span>
+          <span class="prijs-jeugd">1× per week. 2× per week: €200/jaar.</span>
+        </p>
         <ul class="feature-lijst">
-          <li><span class="icoon-vinkje">✓</span> Onbeperkt aanmelden, alle speelavonden</li>
+          <li><span class="icoon-vinkje">✓</span> Voordeliger per maand dan maandelijks betalen</li>
           <li><span class="icoon-vinkje">✓</span> Voorrang bij toernooi-inschrijving</li>
-          <li><span class="icoon-vinkje">✓</span> Jaarcontract met opzegtermijn</li>
+          <li><span class="icoon-vinkje">✓</span> Opzeggen t/m einde van het contractjaar</li>
         </ul>
         <button type="button" class="knop knop-primair" data-scroll="contact">Meld je aan</button>
       </div>
     </div>
-    <p class="prijzen-voetnoot reveal">* Richtprijzen — definitieve tarieven worden vastgesteld door het bestuur.</p>
+    <p class="prijzen-voetnoot reveal">
+      Liever flexibel? Een strippenkaart (10 strippen, 6 maanden geldig) kost €67,50 (volwassen) / €50 (jeugd).
+      Losse speelavond zonder abonnement: €8,50 (volwassen) / €5,50 (jeugd).
+    </p>
   </section>
 
   <!-- ============ Hoe het werkt ============ -->
@@ -821,7 +839,7 @@
       </div>
       <div class="faq-item" data-open="false">
         <button type="button" class="faq-vraag">Is er iets voor de jeugd?<span class="faq-chevron" aria-hidden="true">⌄</span></button>
-        <div class="faq-antwoord"><div class="faq-antwoord-inner">Ja — voor onze jongste spelers houden we het simpel, veilig en vooral heel leuk, in een omgeving waar begeleiders zorgen voor een fijne en veilige sfeer.</div></div>
+        <div class="faq-antwoord"><div class="faq-antwoord-inner">Ja — spelers t/m 17 jaar spelen mee op dezelfde speelavonden, tegen een lager jeugdtarief (vanaf €10 per maand), in een omgeving waar begeleiders zorgen voor een fijne en veilige sfeer.</div></div>
       </div>
       <div class="faq-item" data-open="false">
         <button type="button" class="faq-vraag">Hoe zeg ik mijn lidmaatschap op?<span class="faq-chevron" aria-hidden="true">⌄</span></button>
@@ -861,7 +879,7 @@
         <p class="testi-quote">"De toernooien geven net dat extra tintje. Serieus genoeg om te winnen, luchtig genoeg om te lachen."</p>
       </div>
     </div>
-    <div class="testi-samenvatting reveal"><strong>4,9 / 5</strong> — gebaseerd op ledenervaringen</div>
+    <div class="testi-samenvatting reveal">Binnenkort hier: echte ervaringen van onze eigen leden.</div>
   </section>
 
   <!-- ============ Contact ============ -->
@@ -1104,15 +1122,15 @@
   // ------------------------------------------------------------------
   const prijzenToggle = document.getElementById('prijzen-toggle');
   const prijzenWrap = document.getElementById('prijzen-wrap');
-  const labelMaandelijks = document.getElementById('label-maandelijks');
-  const labelJaarlijks = document.getElementById('label-jaarlijks');
+  const labelVolwassen = document.getElementById('label-volwassen');
+  const labelJeugd = document.getElementById('label-jeugd');
   prijzenToggle.addEventListener('click', () => {
-    const jaarlijks = !prijzenWrap.classList.contains('jaarlijks');
-    prijzenWrap.classList.toggle('jaarlijks', jaarlijks);
-    prijzenToggle.classList.toggle('aan', jaarlijks);
-    prijzenToggle.setAttribute('aria-pressed', String(jaarlijks));
-    labelMaandelijks.classList.toggle('actief-label', !jaarlijks);
-    labelJaarlijks.classList.toggle('actief-label', jaarlijks);
+    const jeugd = !prijzenWrap.classList.contains('jeugd');
+    prijzenWrap.classList.toggle('jeugd', jeugd);
+    prijzenToggle.classList.toggle('aan', jeugd);
+    prijzenToggle.setAttribute('aria-pressed', String(jeugd));
+    labelVolwassen.classList.toggle('actief-label', !jeugd);
+    labelJeugd.classList.toggle('actief-label', jeugd);
   });
 
   // ------------------------------------------------------------------
