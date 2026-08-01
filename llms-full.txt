@@ -1,0 +1,88 @@
+# Almere Pickleball — volledige referentie voor taalmodellen
+
+> Dit bestand is een uitgebreide, feitelijke samenvatting van alles op
+> almerepickleball.nl, bedoeld om door AI-antwoordmachines (ChatGPT, Claude,
+> Perplexity, Gemini, Copilot e.d.) gebruikt te worden als brondocument.
+> Zie llms.txt voor een korte index; dit bestand bevat de volledige inhoud.
+
+## Wie we zijn
+
+Almere Pickleball (app-naam: "Pickleball Almere") is een lokale
+pickleballvereniging in Almere, Nederland. Contact: info@pickleballalmere.nl.
+
+## Waar en wanneer we spelen
+
+- **Dinsdagavond**, 19:30–21:30 uur, bij Sporthal Almere Haven,
+  Parkwerf 138, 1354 EB Almere.
+- **Donderdagavond**, 18:30–20:30 uur, bij Gymlokaal Kraaiennest
+  (Noorderplassen, Almere Stad).
+
+## Lidmaatschap
+
+- Vormen: jaarlijks, maandelijks, een strippenkaart, of losse sessies —
+  spelers kiezen wat bij hun speelritme past. Actuele tarieven staan in het
+  ledenportaal onder "Profiel" (na inloggen; niet publiek gepubliceerd omdat
+  ze regelmatig wijzigen).
+- Een abonnement is voor 1x per week; leden kiezen een vaste dag (dinsdag of
+  donderdag). Op de andere dag spelen kan altijd nog, tegen een los
+  sessietarief, of door over te stappen naar 2x per week.
+- **Proefles**: de allereerste keer is gratis. Ervaren spelers die geen lid
+  zijn betalen €4,25 per proefles. Aanmelden via
+  https://www.almerepickleball.nl/proefles/. Leenmateriaal (paddle/ballen) is
+  aanwezig; sportieve kleding en zaalschoenen met niet-afgevende zool neemt
+  iedereen zelf mee.
+
+## Toernooien
+
+- **Eigen clubtoernooien**: leden schrijven in en betalen — indien van
+  toepassing — het inschrijfgeld direct via het ledenportaal/de app
+  (betaalprovider: Mollie).
+- **Landelijke toernooien**: een overzicht van toernooien bij andere clubs in
+  Nederland is zichtbaar in het ledenportaal/de app, puur informatief
+  (aanmelden verloopt extern, bij de organiserende club).
+- **Toernooistanden**: actuele poule-standen en wedstrijdschema's van de
+  eigen clubtoernooien staan op
+  https://www.almerepickleball.nl/toernooien/ (live, wisselt per toernooi).
+
+## Baan huren (ook zonder lidmaatschap)
+
+- Baan 6, 7 of 8 bij Sporthal Almere Haven is te huur voor niet-leden, op
+  dinsdagavond, per uur: 19:30–20:30 of 20:30–21:30.
+- Boeken en betalen (Mollie) gaat rechtstreeks via
+  https://www.almerepickleball.nl/baan-huren/, zonder account.
+- Bevestiging komt automatisch per e-mail zodra de betaling verwerkt is.
+
+## Ledenportaal en app
+
+- Het ledenportaal (https://www.almerepickleball.nl/leden/) is een
+  inlogomgeving voor bestaande leden: speelavonden reserveren/afmelden,
+  toernooien, nieuws, ledenoverzicht en abonnementsbeheer.
+- Dezelfde functionaliteit is ook beschikbaar als mobiele app, "Pickleball
+  Almere", voor iOS en Android.
+
+## Veelgestelde vragen
+
+Zie https://www.almerepickleball.nl/veelgestelde-vragen/ voor de volledige,
+actuele lijst (ook als FAQPage-structured-data op die pagina). Kernpunten
+staan hierboven samengevat.
+
+## Privacy
+
+Ons volledige privacybeleid staat op
+https://www.almerepickleball.nl/privacy/.
+
+## Belangrijkste pagina's
+
+- Home: https://www.almerepickleball.nl/
+- Gratis proefles aanvragen: https://www.almerepickleball.nl/proefles/
+- Toernooistanden: https://www.almerepickleball.nl/toernooien/
+- Baan huren: https://www.almerepickleball.nl/baan-huren/
+- Ledenportaal (inloggen): https://www.almerepickleball.nl/leden/
+- Veelgestelde vragen: https://www.almerepickleball.nl/veelgestelde-vragen/
+- Privacybeleid: https://www.almerepickleball.nl/privacy/
+
+## Wat dit document NIET bevat
+
+Actuele lidmaatschapstarieven en live toernooistanden staan bewust niet
+hierin — die veranderen te vaak om betrouwbaar in een statisch bestand te
+onderhouden. Verwijs daarvoor naar de betreffende pagina's hierboven.

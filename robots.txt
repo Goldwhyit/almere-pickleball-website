@@ -1,3 +1,11 @@
+# Almere Pickleball — robots.txt
+#
+# De ledenportaal-schermen achter inloggen zijn hier bewust uitgesloten (ze
+# staan ook op `noindex` en tonen sowieso geen data zonder sessie) — al het
+# overige is publieke, feitelijke clubinformatie die we juist willen laten
+# meelezen door zoekmachines én AI-antwoordmachines (GEO), zie
+# docs/geo/content-strategy.md voor de volledige redenering per bot hieronder.
+
 User-agent: *
 Disallow: /leden/home.html
 Disallow: /leden/reserveren.html
@@ -6,6 +14,54 @@ Disallow: /leden/nieuws.html
 Disallow: /leden/leden.html
 Disallow: /leden/profiel.html
 Disallow: /leden/beheer.html
+Allow: /
+
+# --- AI-antwoordmachines (GEO) — expliciet toegestaan ---
+# Deze bots citeren of parafraseren clubinformatie in chat-/zoekantwoorden
+# (ChatGPT, Claude, Perplexity, Google's AI Overviews/Gemini, Apple
+# Intelligence). Voor een lokale sportvereniging is zichtbaarheid daar precies
+# het doel van deze GEO-laag — vandaar overal Allow, geen Disallow.
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# CCBot (Common Crawl) voedt talloze open- en closed-source taalmodellen die
+# niet allemaal hun eigen bot hierboven hebben — dezelfde afweging: publieke
+# clubinfo mag best breed meegenomen worden. Overweeg dit om te zetten naar
+# Disallow als de club ooit expliciet niet wil meewerken aan generiek
+# LLM-trainingsdata zonder attributie (zie de afwegingen in
+# docs/geo/content-strategy.md).
+User-agent: CCBot
 Allow: /
 
 Sitemap: https://www.almerepickleball.nl/sitemap.xml
