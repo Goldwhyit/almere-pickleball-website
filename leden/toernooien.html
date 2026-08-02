@@ -166,10 +166,10 @@
     overlay.id = 'leden-popup-overlay';
     overlay.innerHTML =
       '<div class="popup-kaart">' +
-      '<div class="popup-kop"><h3>' + titel + ' — ' + leden.length + (max != null ? '/' + max : '') + '</h3>' +
+      '<div class="popup-kop"><h3>' + escapeHtml(titel) + ' — ' + leden.length + (max != null ? '/' + max : '') + '</h3>' +
       '<button type="button" class="popup-sluit" aria-label="Sluiten">✕</button></div>' +
       (leden.length
-        ? leden.map(l => '<div class="rank-regel"><span class="avatar">' + initialen(l.naam) + '</span><span class="naam">' + l.naam + '</span></div>').join('')
+        ? leden.map(l => '<div class="rank-regel"><span class="avatar">' + escapeHtml(initialen(l.naam)) + '</span><span class="naam">' + escapeHtml(l.naam) + '</span></div>').join('')
         : '<div class="popup-leeg">Nog niemand aangemeld.</div>') +
       '</div>';
     overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
@@ -221,9 +221,9 @@
       } else {
         actie = '<button class="knop aanmelden" data-actie="inschrijven" data-index="' + i + '">Inschrijven</button>';
       }
-      const omschrijvingHtml = t.omschrijving ? '<p class="omschrijving">' + t.omschrijving + '</p>' : '';
-      const locatieHtml = t.locatie ? '<div class="locatie-regel"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-11a7 7 0 1 0-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>' + t.locatie + '</div>' : '';
-      return '<div class="toernooi-regel"><div class="naam">' + t.naam + '</div>' + locatieHtml +
+      const omschrijvingHtml = t.omschrijving ? '<p class="omschrijving">' + escapeHtml(t.omschrijving) + '</p>' : '';
+      const locatieHtml = t.locatie ? '<div class="locatie-regel"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-11a7 7 0 1 0-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>' + escapeHtml(t.locatie) + '</div>' : '';
+      return '<div class="toernooi-regel"><div class="naam">' + escapeHtml(t.naam) + '</div>' + locatieHtml +
         '<div class="details">' + new Date(t.datum).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) +
         ' · ' + details + '</div>' + omschrijvingHtml +
         '<button type="button" class="deelnemers-knop" data-deelnemers-index="' + i + '"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M15 15.5c2.2.3 4 2 4 4.5"/></svg>' + spelers + '/' + t.max_deelnemers + ' deelnemers →</button>' +
@@ -361,26 +361,26 @@
       const email = t.email && t.email.trim() ? t.email.trim() : null;
       const link = externeLink(t.aanmelden_via);
       const detailRegels = [
-        '<div class="details"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>' + datumTekst + (t.tijden ? ' · ' + t.tijden : '') + '</div>',
-        '<div class="details"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.58 7-12A7 7 0 0 0 5 9c0 4.42 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>' + t.plaats + (t.adres ? ' · ' + t.adres : '') + '</div>',
+        '<div class="details"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>' + datumTekst + (t.tijden ? ' · ' + escapeHtml(t.tijden) : '') + '</div>',
+        '<div class="details"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.58 7-12A7 7 0 0 0 5 9c0 4.42 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>' + escapeHtml(t.plaats) + (t.adres ? ' · ' + escapeHtml(t.adres) : '') + '</div>',
       ];
-      if (t.toernooi_type) detailRegels.push('<div class="details">' + t.toernooi_type + '</div>');
-      if (t.kosten) detailRegels.push('<div class="details">Kosten: ' + t.kosten + '</div>');
-      if (t.sluiting_inschrijving) detailRegels.push('<div class="details">Sluiting inschrijving: ' + t.sluiting_inschrijving + '</div>');
+      if (t.toernooi_type) detailRegels.push('<div class="details">' + escapeHtml(t.toernooi_type) + '</div>');
+      if (t.kosten) detailRegels.push('<div class="details">Kosten: ' + escapeHtml(t.kosten) + '</div>');
+      if (t.sluiting_inschrijving) detailRegels.push('<div class="details">Sluiting inschrijving: ' + escapeHtml(t.sluiting_inschrijving) + '</div>');
       let actie = '';
       if (email || link) {
         actie = '<div class="actie">' +
           (email ? '<button class="knop mail-knop" data-mail-index="' + i + '">Inschrijven</button>' : '') +
-          (link ? '<a class="knop link-knop" href="' + link + '" target="_blank" rel="noopener" style="text-decoration:none;text-align:center">Bekijk</a>' : '') +
+          (link ? '<a class="knop link-knop" href="' + escapeHtml(link) + '" target="_blank" rel="noopener" style="text-decoration:none;text-align:center">Bekijk</a>' : '') +
           '</div>';
       }
       const tekstHelft = '<div class="tekst-helft">' +
-        '<div class="naam-rij"><span class="naam">' + t.naam + '</span>' +
+        '<div class="naam-rij"><span class="naam">' + escapeHtml(t.naam) + '</span>' +
         '<span class="landelijk-badge">Landelijk</span></div>' +
         detailRegels.join('') + actie + '</div>';
       if (t.flyer_url) {
         return '<div class="landelijk-kaart met-foto" style="border-top:none">' +
-          '<div class="foto-helft"><img src="' + t.flyer_url + '" alt="" /></div>' +
+          '<div class="foto-helft"><img src="' + escapeHtml(t.flyer_url) + '" alt="" /></div>' +
           tekstHelft + '</div>';
       }
       return '<div class="landelijk-kaart zonder-foto" style="border-top:none">' + tekstHelft + '</div>';
@@ -459,7 +459,7 @@
         '<div class="training-kop"><span class="dag">' +
         dagnamen[sessieInfo.start.getDay() === 0 ? 6 : sessieInfo.start.getDay() - 1] + ' ' +
         sessieInfo.start.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + '</span></div>' +
-        '<div class="training-locatie">' + sessieInfo.start.toTimeString().slice(0, 5) + ' · ' + sessieInfo.locatie + '</div>' +
+        '<div class="training-locatie">' + sessieInfo.start.toTimeString().slice(0, 5) + ' · ' + escapeHtml(sessieInfo.locatie) + '</div>' +
         '<div class="stat-rij">' +
         '<button type="button" class="stat-tegel klikbaar" id="training-aanmeldingen-tegel"><div class="waarde">' + sessieInfo.aanmeldingen + '</div><div class="label">Aanmeldingen →</div></button>' +
         '<div class="stat-tegel"><div class="waarde">' + sessieInfo.banen + '</div><div class="label">Banen ingezet</div></div>' +
@@ -469,8 +469,8 @@
 
     const rankingHtml = ranking.length ? ranking.map((l, i) =>
       '<div class="rank-regel"><span class="positie">' + (i + 1) + '</span>' +
-      '<span class="avatar">' + initialen(l.naam) + '</span>' +
-      '<span class="naam">' + l.naam + '</span>' +
+      '<span class="avatar">' + escapeHtml(initialen(l.naam)) + '</span>' +
+      '<span class="naam">' + escapeHtml(l.naam) + '</span>' +
       '<span class="rating">' + (l.rating != null ? Number(l.rating).toFixed(2) : '–') + '</span></div>'
     ).join('') : '';
 

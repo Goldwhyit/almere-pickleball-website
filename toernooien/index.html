@@ -125,6 +125,20 @@ const titelEl = document.getElementById('titel');
 const selectEl = document.getElementById('toernooi-select');
 let toernooien = [];
 
+// Publieke, niet-ingelogde pagina — spelersnamen komen uiteindelijk van
+// leden.naam (elk lid kan zijn eigen naam vrij instellen), dus altijd
+// escapen voordat het de innerHTML in gaat, anders kan een lid met een
+// kwaadaardige "naam" iedere anonieme bezoeker van deze pagina raken.
+function escapeHtml(waarde) {
+  if (waarde === null || waarde === undefined) return '';
+  return String(waarde)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
 async function rpc(naam, params) {
   const resp = await fetch(REST_BASE + '/rpc/' + naam, { method: 'POST', headers, body: JSON.stringify(params) });
   if (!resp.ok) throw new Error('Kon gegevens niet laden.');
@@ -146,7 +160,7 @@ function berekenStand(pouleId, wedstrijden, teamIds) {
 
 function teamNaam(team) {
   if (!team) return '?';
-  return team.speler2_naam ? team.speler1_naam + ' & ' + team.speler2_naam : team.speler1_naam;
+  return team.speler2_naam ? escapeHtml(team.speler1_naam) + ' &amp; ' + escapeHtml(team.speler2_naam) : escapeHtml(team.speler1_naam);
 }
 
 // Beide spelersnamen van een team onder elkaar (zelfde wedstrijdrij-layout
@@ -154,7 +168,7 @@ function teamNaam(team) {
 // samengevoegde "Naam & Naam vs Naam & Naam"-tekst meer).
 function teamRegels(team) {
   if (!team) return '?';
-  return team.speler2_naam ? team.speler1_naam + '<br>' + team.speler2_naam : team.speler1_naam;
+  return team.speler2_naam ? escapeHtml(team.speler1_naam) + '<br>' + escapeHtml(team.speler2_naam) : escapeHtml(team.speler1_naam);
 }
 
 async function laadToernooien() {
@@ -166,7 +180,7 @@ async function laadToernooien() {
     return;
   }
   selectEl.innerHTML = toernooien.map(t =>
-    '<option value="' + t.id + '">' + t.naam + ' — ' + new Date(t.datum).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) + '</option>'
+    '<option value="' + t.id + '">' + escapeHtml(t.naam) + ' — ' + new Date(t.datum).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) + '</option>'
   ).join('');
   await laadToernooi(toernooien[0].id);
 }
@@ -220,7 +234,7 @@ async function laadToernooi(toernooiId) {
         '<span class="team rechts">' + teamRegels(teamsById[w.team2_id]) + '</span>' +
         '</div>';
     }).join('');
-    return '<div class="kaart"><h2>' + pouleNamen[pouleId] + '</h2>' +
+    return '<div class="kaart"><h2>' + escapeHtml(pouleNamen[pouleId]) + '</h2>' +
       '<table class="stand"><thead><tr><th>Team</th><th class="num">GS</th><th class="num">W</th><th class="num">Saldo</th><th class="num">Pt</th></tr></thead>' +
       '<tbody>' + rijen + '</tbody></table>' + wedstrijdenHtml + '</div>';
   }).join('');

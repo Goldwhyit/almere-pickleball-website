@@ -229,8 +229,8 @@
     });
     const wachtend = rows.filter(r => !r.goedgekeurd);
     if (!wachtend.length) { el.innerHTML = '<p class="details">Geen proefleden in afwachting.</p>'; return; }
-    el.innerHTML = wachtend.map(r => '<div class="rij"><div class="info"><div class="naam">' + r.leden.naam + '</div>' +
-      '<div class="sub">' + r.leden.email + '</div></div>' +
+    el.innerHTML = wachtend.map(r => '<div class="rij"><div class="info"><div class="naam">' + escapeHtml(r.leden.naam) + '</div>' +
+      '<div class="sub">' + escapeHtml(r.leden.email) + '</div></div>' +
       '<div class="acties"><button class="mini-knop goed" data-lid="' + r.lid_id + '">Goedkeuren</button></div></div>').join('');
     el.querySelectorAll('[data-lid]').forEach(btn => btn.addEventListener('click', async () => {
       try { await rpc('keur_proef_goed', { p_lid: btn.dataset.lid }); await laadProefleden(el); }
@@ -394,7 +394,7 @@
     });
     if (!rows.length) { el.innerHTML = '<p class="details">Geen aankomende toernooien.</p>'; return; }
     window.__toernooienLijst = rows;
-    el.innerHTML = rows.map((t, i) => '<div class="rij"><div class="info"><div class="naam">' + t.naam + '</div>' +
+    el.innerHTML = rows.map((t, i) => '<div class="rij"><div class="info"><div class="naam">' + escapeHtml(t.naam) + '</div>' +
       '<div class="sub">' + new Date(t.datum).toLocaleDateString('nl-NL') + '</div></div>' +
       '<div class="acties">' +
       '<button class="mini-knop neutraal" data-bewerk="' + i + '">Bewerken</button>' +
@@ -422,7 +422,7 @@
 
     el.innerHTML =
       '<div class="veld-rij"><label>Speelavond</label><select id="b-speeldag">' +
-      speeldagen.map(sd => '<option value="' + sd.id + '">' + sd.locatie + ' (' + dagnamen[sd.weekdag - 1] + ')</option>').join('') +
+      speeldagen.map(sd => '<option value="' + sd.id + '">' + escapeHtml(sd.locatie) + ' (' + dagnamen[sd.weekdag - 1] + ')</option>').join('') +
       '</select></div>' +
       '<div class="veld-twee">' +
       '<div class="veld-rij"><label>Datum</label><input type="date" id="b-datum" /></div>' +
@@ -435,7 +435,7 @@
         ? blokkades.map(b => {
             const sd = speeldagen.find(s => s.id === b.speeldag_id);
             return '<div class="rij"><div class="info"><div class="naam">' + new Date(b.datum).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) + '</div>' +
-              '<div class="sub">' + (sd ? sd.locatie : '?') + ' · ' + b.reden + '</div></div>' +
+              '<div class="sub">' + (sd ? escapeHtml(sd.locatie) : '?') + ' · ' + escapeHtml(b.reden) + '</div></div>' +
               '<div class="acties"><button class="mini-knop fout" data-verwijder="' + b.id + '">Verwijderen</button></div></div>';
           }).join('')
         : '<p class="details">Geen geblokkeerde data.</p>') +
@@ -460,7 +460,7 @@
   // ---------- Abonnementen prijzen ----------
   async function laadPrijzen(el) {
     const rows = await haalOp('abonnementen', { select: 'id,naam,vorm,categorie,sessies_per_week,prijs,actief', order: 'categorie.asc,vorm.asc' });
-    el.innerHTML = rows.map(a => '<div class="rij"><div class="info"><div class="naam">' + a.naam + '</div>' +
+    el.innerHTML = rows.map(a => '<div class="rij"><div class="info"><div class="naam">' + escapeHtml(a.naam) + '</div>' +
       '<div class="sub">' + a.categorie + ' · ' + a.vorm + (a.sessies_per_week ? ' · ' + a.sessies_per_week + 'x/week' : '') + '</div></div>' +
       '<span>€ <input type="number" step="0.01" class="prijs-invoer" data-abo="' + a.id + '" value="' + Number(a.prijs).toFixed(2) + '" /></span></div>').join('') +
       '<button class="knop aanmelden" id="prijzen-opslaan-knop" type="button" style="margin-top:12px">Prijzen opslaan</button>' +
@@ -512,10 +512,10 @@
     window.__baanverhuurLijst = rows;
     el.innerHTML = rows.map((r, i) => {
       const start = new Date(r.start_tijd), eind = new Date(r.eind_tijd);
-      return '<div class="rij"><div class="info"><div class="naam">' + (r.banen ? r.banen.naam : '?') + ' · ' + r.naam + '</div>' +
+      return '<div class="rij"><div class="info"><div class="naam">' + (r.banen ? escapeHtml(r.banen.naam) : '?') + ' · ' + escapeHtml(r.naam) + '</div>' +
         '<div class="sub">' + start.toLocaleDateString('nl-NL') + ' ' + start.toTimeString().slice(0, 5) + '–' + eind.toTimeString().slice(0, 5) +
         ' · €' + Number(r.prijs).toFixed(2) + '</div>' +
-        '<div class="sub">' + r.email + ' · ' + r.telefoon + '</div>' +
+        '<div class="sub">' + escapeHtml(r.email) + ' · ' + escapeHtml(r.telefoon) + '</div>' +
         '<div class="sub">Mollie: ' + (r.mollie_payment_id || 'nog geen betaling gestart') + '</div></div>' +
         '<div class="acties"><span class="badge-status ' + r.status + '">' + r.status + '</span>' +
         (r.status !== 'geannuleerd' ? '<button class="mini-knop fout" data-annuleer="' + i + '">Annuleren</button>' : '') +
@@ -536,8 +536,8 @@
       status: 'in.(actief,in_afwachting)', order: 'created_at.desc', limit: '50',
     });
     if (!rows.length) { el.innerHTML = '<p class="details">Geen actieve abonnementen.</p>'; return; }
-    el.innerHTML = rows.map(r => '<div class="rij"><div class="info"><div class="naam">' + (r.leden ? r.leden.naam : '?') + '</div>' +
-      '<div class="sub">' + (r.abonnementen ? r.abonnementen.naam : '') + '</div></div>' +
+    el.innerHTML = rows.map(r => '<div class="rij"><div class="info"><div class="naam">' + (r.leden ? escapeHtml(r.leden.naam) : '?') + '</div>' +
+      '<div class="sub">' + (r.abonnementen ? escapeHtml(r.abonnementen.naam) : '') + '</div></div>' +
       '<div class="acties">' +
       (r.status === 'in_afwachting'
         ? '<span class="badge-status in_afwachting">wacht op Mollie</span>'
@@ -556,8 +556,8 @@
       type: 'eq.abonnement_upgrade', order: 'created_at.desc', limit: '30',
     });
     if (!rows.length) { el.innerHTML = '<p class="details">Nog geen overstappen naar 2x per week.</p>'; return; }
-    el.innerHTML = rows.map(r => '<div class="rij"><div class="info"><div class="naam">' + (r.leden ? r.leden.naam : '?') + '</div>' +
-      '<div class="sub">' + r.omschrijving + ' · €' + Number(r.bedrag).toFixed(2) + ' · ' +
+    el.innerHTML = rows.map(r => '<div class="rij"><div class="info"><div class="naam">' + (r.leden ? escapeHtml(r.leden.naam) : '?') + '</div>' +
+      '<div class="sub">' + escapeHtml(r.omschrijving) + ' · €' + Number(r.bedrag).toFixed(2) + ' · ' +
       new Date(r.created_at).toLocaleDateString('nl-NL') + '</div></div>' +
       '<div class="acties"><span class="badge-status ' + (r.status === 'geslaagd' ? 'verwerkt' : r.status) + '">' + r.status + '</span></div></div>').join('');
   }
@@ -571,7 +571,7 @@
       status: 'eq.in_behandeling', order: 'created_at.asc',
     });
     if (!rows.length) { el.innerHTML = '<p class="details">Geen wedstrijden in behandeling.</p>'; return; }
-    el.innerHTML = rows.map(w => '<div class="rij"><div class="info"><div class="naam">' + (w.leden ? w.leden.naam : '?') + '</div>' +
+    el.innerHTML = rows.map(w => '<div class="rij"><div class="info"><div class="naam">' + (w.leden ? escapeHtml(w.leden.naam) : '?') + '</div>' +
       '<div class="sub">' + new Date(w.datum).toLocaleDateString('nl-NL') + ' · ' + typeLabels[w.type] + ' · ' + w.eigen_score + '-' + w.tegen_score + '</div></div>' +
       '<div class="acties"><button class="mini-knop goed" data-goed="' + w.id + '">Goedkeuren</button>' +
       '<button class="mini-knop fout" data-af="' + w.id + '">Afkeuren</button></div></div>').join('');

@@ -110,12 +110,12 @@
     const overlay = document.createElement('div');
     overlay.className = 'popup-overlay';
     overlay.id = 'home-popup';
-    overlay.innerHTML = '<div class="popup-kaart"><div class="popup-kop"><h3>' + titel + '</h3>' +
+    overlay.innerHTML = '<div class="popup-kaart"><div class="popup-kop"><h3>' + escapeHtml(titel) + '</h3>' +
       '<button type="button" class="popup-sluit" aria-label="Sluiten">✕</button></div>' +
       (leden.length
         ? leden.map(l => '<div class="lid-regel">' +
-            (l.avatar_url ? '<img class="lid-avatar" src="' + l.avatar_url + '" alt="" />' : '<span class="lid-avatar">' + initialen(l.naam) + '</span>') +
-            '<span>' + l.naam + '</span></div>').join('')
+            (l.avatar_url ? '<img class="lid-avatar" src="' + escapeHtml(l.avatar_url) + '" alt="" />' : '<span class="lid-avatar">' + escapeHtml(initialen(l.naam)) + '</span>') +
+            '<span>' + escapeHtml(l.naam) + '</span></div>').join('')
         : '<p class="details">Nog niemand aangemeld.</p>') +
       '</div>';
     overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
@@ -148,7 +148,7 @@
 
     if (actief.length) {
       const naam = actief[0].abonnementen ? actief[0].abonnementen.naam : '';
-      el.innerHTML = '<div class="status-regel"><span class="status-badge">' + naam + '</span></div>' + statsHtml +
+      el.innerHTML = '<div class="status-regel"><span class="status-badge">' + escapeHtml(naam) + '</span></div>' + statsHtml +
         '<p style="margin-top:10px"><a href="/leden/profiel.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Beheren →</a></p>';
       return;
     }
@@ -193,7 +193,7 @@
       volgende.start.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + ', ' +
       volgende.start.toTimeString().slice(0, 5) + '–' + volgende.eindTijd.slice(0, 5) +
       (benIkAangemeld ? '<span class="aangemeld-badge">✓ Aangemeld</span>' : '') + '</span><br>' +
-      '<span class="locatie">' + volgende.locatie + '</span></span></div>' +
+      '<span class="locatie">' + escapeHtml(volgende.locatie) + '</span></span></div>' +
       '<button type="button" class="aanmelders-knop" id="zie-aanmelders-knop"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M15 15.5c2.2.3 4 2 4 4.5"/></svg>' + reserveringen.length + '/' + volgende.maxSpelers + ' aangemeld — bekijk wie →</button>' +
       '<p style="margin-top:10px"><a href="/leden/reserveren.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Aanmelden/afmelden →</a></p>';
 
@@ -217,11 +217,11 @@
 
     let html = '';
     if (!nieuws.length && !landelijk.length) { el.textContent = 'Nog geen nieuwsberichten.'; return; }
-    html += nieuws.map(n => '<div class="nieuws-item"><h3>' + n.titel + '</h3><p>' + n.inhoud + '</p></div>').join('');
+    html += nieuws.map(n => '<div class="nieuws-item"><h3>' + escapeHtml(n.titel) + '</h3><p>' + escapeHtml(n.inhoud) + '</p></div>').join('');
     if (landelijk.length) {
       const t = landelijk[0];
-      html += '<div class="landelijk-item"><div class="naam"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M17 5h2.5a1.5 1.5 0 0 1 1.5 1.5c0 2-1.5 3.5-3.5 3.5M7 5H4.5A1.5 1.5 0 0 0 3 6.5C3 8.5 4.5 10 6.5 10"/></svg>' + t.naam + '</div>' +
-        '<div class="sub">' + new Date(t.datum_start).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + ' · ' + t.plaats + ' · landelijk toernooi</div></div>';
+      html += '<div class="landelijk-item"><div class="naam"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M17 5h2.5a1.5 1.5 0 0 1 1.5 1.5c0 2-1.5 3.5-3.5 3.5M7 5H4.5A1.5 1.5 0 0 0 3 6.5C3 8.5 4.5 10 6.5 10"/></svg>' + escapeHtml(t.naam) + '</div>' +
+        '<div class="sub">' + new Date(t.datum_start).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + ' · ' + escapeHtml(t.plaats) + ' · landelijk toernooi</div></div>';
     }
     html += '<p style="margin-top:10px"><a href="/leden/nieuws.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Al het nieuws →</a>' +
       ' <a href="/leden/toernooien.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none;margin-left:10px">Landelijke toernooien →</a></p>';

@@ -294,12 +294,12 @@
       '<div class="popup-lid-layout">' +
       '<div class="popup-lid-foto" style="' + kaartStijl + '">' +
       (lid.avatar_url
-        ? '<img src="' + lid.avatar_url + '" alt="" />'
-        : '<div class="popup-lid-initialen">' + initialen(lid.naam) + '</div>') +
+        ? '<img src="' + escapeHtml(lid.avatar_url) + '" alt="" />'
+        : '<div class="popup-lid-initialen">' + escapeHtml(initialen(lid.naam)) + '</div>') +
       '</div>' +
       '<div class="popup-lid-details">' +
-      '<div class="naam">' + lid.naam + '</div>' +
-      '<span class="niveau-badge">' + (niveauLabels[lid.niveau] || lid.niveau || '') + '</span>' +
+      '<div class="naam">' + escapeHtml(lid.naam) + '</div>' +
+      '<span class="niveau-badge">' + escapeHtml(niveauLabels[lid.niveau] || lid.niveau || '') + '</span>' +
       '<div class="popup-lid-stats">' +
       '<div class="popup-lid-stat-regel"><span class="label">Rating</span><span class="waarde">' + (lid.rating != null ? Number(lid.rating).toFixed(2) : '–') + '</span></div>' +
       '<div class="popup-lid-stat-regel"><span class="label">Speelavonden</span><span class="waarde">' + s.gespeeld + '</span></div>' +
@@ -325,9 +325,9 @@
         const rating = l.rating != null ? Number(l.rating).toFixed(2) : '–';
         return '<div class="lid-regel">' +
           '<span class="rang-nummer">' + (i + 1) + '</span>' +
-          (l.avatar_url ? '<img class="avatar" src="' + l.avatar_url + '" alt="" />' : '<span class="avatar">' + initialen(l.naam) + '</span>') +
-          '<span style="flex:1"><span class="lid-naam">' + l.naam + '</span>' +
-          '<div class="lid-sub">' + subtitel(l) + '</div></span>' +
+          (l.avatar_url ? '<img class="avatar" src="' + escapeHtml(l.avatar_url) + '" alt="" />' : '<span class="avatar">' + escapeHtml(initialen(l.naam)) + '</span>') +
+          '<span style="flex:1"><span class="lid-naam">' + escapeHtml(l.naam) + '</span>' +
+          '<div class="lid-sub">' + escapeHtml(subtitel(l)) + '</div></span>' +
           '<span class="lid-rating">' + rating + '</span></div>';
       }).join('');
       ledenDeck = null;
@@ -344,16 +344,16 @@
       return '<div class="lid-kaart" tabindex="0" style="' + kaartStijl + '">' +
         '<div class="lid-kaart-surface">' +
         (l.avatar_url
-          ? '<img class="lid-kaart-foto" src="' + l.avatar_url + '" alt="" />'
-          : '<div class="lid-kaart-foto-leeg" aria-hidden="true">' + initialen(l.naam) + '</div>') +
+          ? '<img class="lid-kaart-foto" src="' + escapeHtml(l.avatar_url) + '" alt="" />'
+          : '<div class="lid-kaart-foto-leeg" aria-hidden="true">' + escapeHtml(initialen(l.naam)) + '</div>') +
         '<span class="lid-kaart-inside" aria-hidden="true"></span>' +
         '<div class="lid-kaart-head">' +
-        '<div class="naam">' + l.naam + '</div>' +
-        '<p class="lid-kaart-niveau">' + (niveauLabels[l.niveau] || l.niveau || '') + '</p>' +
+        '<div class="naam">' + escapeHtml(l.naam) + '</div>' +
+        '<p class="lid-kaart-niveau">' + escapeHtml(niveauLabels[l.niveau] || l.niveau || '') + '</p>' +
         '</div>' +
         '<div class="lid-kaart-bar">' +
-        '<span class="lid-kaart-chip">' + initialen(l.naam) + '</span>' +
-        '<span class="lid-kaart-meta"><b>Rating ' + ratingTxt + '</b><i>' + subtitel(l) + '</i></span>' +
+        '<span class="lid-kaart-chip">' + escapeHtml(initialen(l.naam)) + '</span>' +
+        '<span class="lid-kaart-meta"><b>Rating ' + ratingTxt + '</b><i>' + escapeHtml(subtitel(l)) + '</i></span>' +
         '<button type="button" class="lid-kaart-cta" data-details-index="' + i + '">Details</button>' +
         '</div>' +
         '</div></div>';

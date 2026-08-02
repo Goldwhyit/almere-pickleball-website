@@ -119,9 +119,9 @@
     const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=8&data=' + qrData;
     const tekst = ticketTekst(t, referentie);
     app.innerHTML =
-      '<p class="toelichting">Bedankt voor je boeking, ' + t.naam + '! Bewaar dit ticket, of maak een schermafbeelding als bewijs.</p>' +
+      '<p class="toelichting">Bedankt voor je boeking, ' + escapeHtml(t.naam) + '! Bewaar dit ticket, of maak een schermafbeelding als bewijs.</p>' +
       '<div class="ticket">' +
-      '<div class="baan">' + t.baan_naam + '</div>' +
+      '<div class="baan">' + escapeHtml(t.baan_naam) + '</div>' +
       '<div class="datum">' + dagFormat.format(start) + '</div>' +
       '<div class="tijd">' + tijdFormat.format(start) + '–' + tijdFormat.format(eind) + ' uur</div>' +
       '<img src="' + qrUrl + '" width="160" height="160" alt="QR-code van je ticket" />' +
@@ -136,7 +136,7 @@
       '<a class="deel-knop" href="sms:?body=' + encodeURIComponent(tekst) + '">Via sms</a>' +
       '<a class="deel-knop" href="https://wa.me/?text=' + encodeURIComponent(tekst) + '" target="_blank" rel="noopener">Via WhatsApp</a>' +
       '</div>' +
-      '<div class="mail-notitie">Je ontvangt ook een bevestiging per e-mail op ' + t.email + '.</div>';
+      '<div class="mail-notitie">Je ontvangt ook een bevestiging per e-mail op ' + escapeHtml(t.email) + '.</div>';
   }
 
   function toonWachten() {

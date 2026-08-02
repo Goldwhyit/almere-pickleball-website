@@ -124,11 +124,11 @@
     overlay.className = 'popup-overlay';
     overlay.id = 'nieuws-popup';
     overlay.innerHTML = '<div class="popup-kaart">' +
-      '<div class="popup-kop"><h3>' + n.titel + '</h3><button type="button" class="popup-sluit" aria-label="Sluiten">✕</button></div>' +
+      '<div class="popup-kop"><h3>' + escapeHtml(n.titel) + '</h3><button type="button" class="popup-sluit" aria-label="Sluiten">✕</button></div>' +
       '<div class="popup-lichaam">' +
       '<span class="categorie-badge categorie-' + categorie + '">' + categorieLabels[categorie] + '</span>' +
-      '<p class="lichaam" style="margin-top:10px">' + n.inhoud + '</p>' +
-      '<div class="voetregel" style="margin-top:14px">' + (n.bron ? n.bron + ' · ' : '') + datumWeergave + '</div>' +
+      '<p class="lichaam" style="margin-top:10px">' + escapeHtml(n.inhoud) + '</p>' +
+      '<div class="voetregel" style="margin-top:14px">' + (n.bron ? escapeHtml(n.bron) + ' · ' : '') + datumWeergave + '</div>' +
       '</div></div>';
     overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
     overlay.querySelector('.popup-sluit').addEventListener('click', () => overlay.remove());
@@ -153,17 +153,17 @@
       const datumWeergave = n.datum_tekst ||
         new Date(n.gepubliceerd_op).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
       const foto = n.afbeelding_url
-        ? '<img class="foto" src="' + n.afbeelding_url + '" alt="" loading="lazy" />'
+        ? '<img class="foto" src="' + escapeHtml(n.afbeelding_url) + '" alt="" loading="lazy" />'
         : '<div class="foto-placeholder">' + categorieIconen[categorie] + '</div>';
       const bronLink = n.link
-        ? '<a href="' + n.link + '" target="_blank" rel="noopener">Meer lezen →</a>'
+        ? '<a href="' + escapeHtml(n.link) + '" target="_blank" rel="noopener">Meer lezen →</a>'
         : '';
       return '<div class="nieuws-kaart" style="border:none;box-shadow:none;position:relative">' + foto +
         '<div class="inhoud-vlak">' +
         '<span class="categorie-badge categorie-' + categorie + '">' + categorieLabels[categorie] + '</span>' +
-        '<h3>' + n.titel + '</h3>' +
-        '<p class="lichaam">' + n.inhoud + '</p>' +
-        '<div class="voetregel"><span>' + (n.bron ? n.bron + ' · ' : '') + datumWeergave + '</span>' + bronLink + '</div>' +
+        '<h3>' + escapeHtml(n.titel) + '</h3>' +
+        '<p class="lichaam">' + escapeHtml(n.inhoud) + '</p>' +
+        '<div class="voetregel"><span>' + (n.bron ? escapeHtml(n.bron) + ' · ' : '') + datumWeergave + '</span>' + bronLink + '</div>' +
         '</div></div>';
     });
 

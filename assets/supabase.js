@@ -15,6 +15,23 @@ const AUTH_BASE = SUPABASE_URL + '/auth/v1';
 const FUNCTIES_BASE = SUPABASE_URL + '/functions/v1';
 const SESSIE_SLEUTEL = 'pb_almere_sessie';
 
+// Alle pagina's bouwen kaarten/lijsten via string-concatenatie in
+// .innerHTML — elke waarde die uiteindelijk van een gebruiker komt (naam,
+// e-mail, telefoon, omschrijving, ...) moet hier eerst doorheen, anders kan
+// bijvoorbeeld een lid zijn eigen "naam" op <script>-inhoud zetten en
+// daarmee de browser van andere leden/de admin laten uitvoeren (stored XSS).
+// Gebruik ook in attribuutcontext (src="...", value="...") — quotes worden
+// hier ook geëscaped.
+function escapeHtml(waarde) {
+  if (waarde === null || waarde === undefined) return '';
+  return String(waarde)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
 function huidigeSessie() {
   try {
     return JSON.parse(localStorage.getItem(SESSIE_SLEUTEL) || 'null');

@@ -230,7 +230,7 @@
       '<div class="banen">' +
       instellingen.map(b =>
         '<button type="button" class="baan-optie' + (b.baan_id === gekozenBaan ? ' actief' : '') + '" data-baan="' + b.baan_id + '">' +
-        b.baan_naam + '</button>'
+        escapeHtml(b.baan_naam) + '</button>'
       ).join('') +
       '</div></div>' +
       '<div class="kaart"><h2>Kies een datum en tijd</h2>' +
