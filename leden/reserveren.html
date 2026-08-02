@@ -279,6 +279,13 @@
     });
 
     function koppelKaartEvents(kaartEl) {
+      // Zelfde kaartkleur-per-locatie als de app (Reserveren-scherm): de
+      // locatieklasse van de binnenste rij wordt gespiegeld naar de hele
+      // swipe-kaart, zodat het volledige kaartoppervlak de kleur krijgt
+      // i.p.v. alleen de accentrand.
+      const regel = kaartEl.querySelector('.speeldag-regel');
+      kaartEl.classList.toggle('locatie-haven', !!regel?.classList.contains('locatie-haven'));
+      kaartEl.classList.toggle('locatie-noordenplassen', !!regel?.classList.contains('locatie-noordenplassen'));
       kaartEl.querySelectorAll('[data-actie]').forEach(btn => btn.addEventListener('click', () => {
         if (btn.dataset.actie === 'afmelden') afmelden(btn.dataset.id, btn);
         else aanmelden(window.__sessies[Number(btn.dataset.index)], btn, btn.dataset.actie === 'aanmelden-bijbetalen');

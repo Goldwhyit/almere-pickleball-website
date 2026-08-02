@@ -192,7 +192,7 @@
     const el = document.getElementById('almere-inhoud');
     const vandaag = new Date().toISOString().substring(0, 10);
     const toernooien = await haalOp('toernooien', {
-      select: 'id,naam,datum,omschrijving,klasse,niveau,inschrijfwijze,inschrijfgeld,inschrijving_open,max_deelnemers',
+      select: 'id,naam,datum,omschrijving,klasse,niveau,inschrijfwijze,inschrijfgeld,inschrijving_open,max_deelnemers,locatie',
       datum: 'gte.' + vandaag, order: 'datum.asc',
     });
     if (!toernooien.length) { el.textContent = 'Geen aankomende toernooien.'; return; }
@@ -222,7 +222,8 @@
         actie = '<button class="knop aanmelden" data-actie="inschrijven" data-index="' + i + '">Inschrijven</button>';
       }
       const omschrijvingHtml = t.omschrijving ? '<p class="omschrijving">' + t.omschrijving + '</p>' : '';
-      return '<div class="toernooi-regel"><div class="naam">' + t.naam + '</div>' +
+      const locatieHtml = t.locatie ? '<div class="locatie-regel"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-11a7 7 0 1 0-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>' + t.locatie + '</div>' : '';
+      return '<div class="toernooi-regel"><div class="naam">' + t.naam + '</div>' + locatieHtml +
         '<div class="details">' + new Date(t.datum).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) +
         ' · ' + details + '</div>' + omschrijvingHtml +
         '<button type="button" class="deelnemers-knop" data-deelnemers-index="' + i + '"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M15 15.5c2.2.3 4 2 4 4.5"/></svg>' + spelers + '/' + t.max_deelnemers + ' deelnemers →</button>' +

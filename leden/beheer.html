@@ -278,12 +278,15 @@
   // ---------- Toernooien (aanmaken, bewerken, verwijderen) ----------
   let bewerkToernooiId = null;
 
-  function toernooiFormulierHtml() {
+  function toernooiFormulierHtml(locaties) {
+    const locatieOpties = '<option value="">Geen locatie gekozen</option>' +
+      (locaties || []).map(l => '<option value="' + l + '">' + l + '</option>').join('');
     return '<div class="veld-rij"><label>Naam</label><input type="text" id="t-naam" /></div>' +
       '<div class="veld-twee">' +
       '<div class="veld-rij"><label>Datum</label><input type="date" id="t-datum" /></div>' +
       '<div class="veld-rij"><label>Max. deelnemers</label><input type="number" id="t-max" value="32" /></div>' +
       '</div>' +
+      '<div class="veld-rij"><label>Locatie (optioneel)</label><select id="t-locatie">' + locatieOpties + '</select></div>' +
       '<div class="veld-twee">' +
       '<div class="veld-rij"><label>Klasse</label><select id="t-klasse">' +
       Object.keys(klasseLabels).map(k => '<option value="' + k + '">' + klasseLabels[k] + '</option>').join('') + '</select></div>' +
@@ -309,6 +312,7 @@
     document.getElementById('t-naam').value = '';
     document.getElementById('t-datum').value = '';
     document.getElementById('t-max').value = '32';
+    document.getElementById('t-locatie').value = '';
     document.getElementById('t-klasse').value = 'open';
     document.getElementById('t-niveau').value = 'open';
     document.getElementById('t-inschrijfwijze').value = 'paar';
@@ -325,6 +329,7 @@
     document.getElementById('t-naam').value = t.naam;
     document.getElementById('t-datum').value = t.datum;
     document.getElementById('t-max').value = t.max_deelnemers || 32;
+    document.getElementById('t-locatie').value = t.locatie || '';
     document.getElementById('t-klasse').value = t.klasse || 'open';
     document.getElementById('t-niveau').value = t.niveau || 'open';
     document.getElementById('t-inschrijfwijze').value = t.inschrijfwijze || 'paar';
@@ -345,6 +350,7 @@
       klasse: document.getElementById('t-klasse').value,
       niveau: document.getElementById('t-niveau').value,
       inschrijfwijze: document.getElementById('t-inschrijfwijze').value,
+      locatie: document.getElementById('t-locatie').value.trim() || null,
       max_deelnemers: Number(document.getElementById('t-max').value) || 32,
       inschrijfgeld: document.getElementById('t-inschrijfgeld').value ? Number(document.getElementById('t-inschrijfgeld').value) : null,
       min_leeftijd: document.getElementById('t-min-leeftijd').value ? Number(document.getElementById('t-min-leeftijd').value) : null,
@@ -353,8 +359,10 @@
     };
   }
 
-  function bouwToernooienBeheer(el) {
-    el.innerHTML = toernooiFormulierHtml();
+  async function bouwToernooienBeheer(el) {
+    const speeldagen = await haalOp('speeldagen', { select: 'locatie', actief: 'eq.true' });
+    const locaties = [...new Set(speeldagen.map(s => s.locatie))];
+    el.innerHTML = toernooiFormulierHtml(locaties);
     bewerkToernooiId = null;
     document.getElementById('t-plaatsen-knop').addEventListener('click', async () => {
       const meldingEl = document.getElementById('t-melding');
@@ -381,7 +389,7 @@
     if (!el) return;
     const vandaag = new Date().toISOString().substring(0, 10);
     const rows = await haalOp('toernooien', {
-      select: 'id,naam,datum,klasse,niveau,inschrijfwijze,max_deelnemers,inschrijfgeld,min_leeftijd,max_leeftijd,omschrijving,inschrijving_open',
+      select: 'id,naam,datum,klasse,niveau,inschrijfwijze,locatie,max_deelnemers,inschrijfgeld,min_leeftijd,max_leeftijd,omschrijving,inschrijving_open',
       datum: 'gte.' + vandaag, order: 'datum.asc',
     });
     if (!rows.length) { el.innerHTML = '<p class="details">Geen aankomende toernooien.</p>'; return; }

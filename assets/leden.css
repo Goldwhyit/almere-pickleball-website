@@ -82,6 +82,33 @@ main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
 .locatie-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
 .locatie-dot.locatie-haven { background: var(--navy); }
 .locatie-dot.locatie-noordenplassen { background: #e0821f; }
+
+/* Kraaiennest (Noordenplassen)/Haven — zelfde kaart-kleuren als in de app
+   (Reserveren-scherm): het hele swipe-kaart-oppervlak krijgt de
+   locatiekleur i.p.v. alleen een accentrand. Klasse wordt door
+   reserveren.html's onRender-callback op de .swipe-kaart gezet. */
+.swipe-kaart.locatie-haven {
+  background: linear-gradient(160deg, #0057ff, #0046cc);
+  border-color: transparent; color: #f8f7f4;
+}
+.swipe-kaart.locatie-noordenplassen {
+  background: linear-gradient(160deg, #c2185b, #9c1249);
+  border-color: transparent; color: #f8f7f4;
+}
+.swipe-kaart.locatie-haven .locatie,
+.swipe-kaart.locatie-noordenplassen .locatie { color: rgba(248,247,244,0.85); }
+.swipe-kaart.locatie-haven .locatie-dot,
+.swipe-kaart.locatie-noordenplassen .locatie-dot { background: #f8f7f4; }
+.swipe-kaart.locatie-haven .knop.aanmelden,
+.swipe-kaart.locatie-haven .knop.afmelden {
+  background: rgba(255,255,255,0.18); color: #f8f7f4;
+}
+.swipe-kaart.locatie-noordenplassen .knop.aanmelden {
+  background: #fff275; color: #241a02;
+}
+.swipe-kaart.locatie-noordenplassen .knop.afmelden {
+  background: transparent; color: #fff275; border: 1.5px solid #fff275;
+}
 .knop {
   padding: 8px 14px; border-radius: 8px; border: none; font-size: 13px; font-weight: 700;
   cursor: pointer; white-space: nowrap;
@@ -98,15 +125,28 @@ main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
 .nieuws-item h3 { margin: 0 0 4px; font-size: 14.5px; }
 .nieuws-item p { margin: 0; font-size: 13.5px; color: var(--ink-muted); line-height: 1.5; }
 .laden { text-align: center; color: var(--ink-muted); padding: 30px; }
-.toernooi-regel { padding: 12px 0; border-top: 1px solid var(--line); }
-.toernooi-regel:first-of-type { border-top: none; padding-top: 0; }
-.toernooi-regel .naam { font-weight: 700; font-size: 14.5px; }
-.toernooi-regel .details { color: var(--ink-muted); font-size: 12.5px; margin-top: 2px; }
+/* Toernooikaart (Almere) — zelfde kaart-kleuren als in de app
+   (Toernooien-scherm, tab Almere): een volledig gekleurde kaart i.p.v.
+   een lijstrij, met een gele actieknop. */
+.toernooi-regel {
+  background: linear-gradient(160deg, #0057ff, #0046cc);
+  color: #f8f7f4; border-radius: 16px; padding: 16px 18px; margin-bottom: 12px;
+}
+.toernooi-regel .naam { font-weight: 700; font-size: 14.5px; color: #f8f7f4; }
+.toernooi-regel .details { color: rgba(248,247,244,0.85); font-size: 12.5px; margin-top: 2px; }
+.toernooi-regel .locatie-regel {
+  display: flex; align-items: center; gap: 4px; color: rgba(248,247,244,0.85); font-size: 12.5px; margin-top: 4px;
+}
+.toernooi-regel .omschrijving { color: rgba(248,247,244,0.85); }
+.toernooi-regel .deelnemers-knop { color: #f8f7f4; }
 .toernooi-regel .actie { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 .toernooi-regel select {
-  padding: 8px 10px; border-radius: 8px; border: 1.5px solid var(--line);
-  background: var(--paper); color: var(--ink); font-size: 13px; flex: 1; min-width: 140px;
+  padding: 8px 10px; border-radius: 8px; border: 1.5px solid rgba(248,247,244,0.4);
+  background: rgba(255,255,255,0.12); color: #f8f7f4; font-size: 13px; flex: 1; min-width: 140px;
 }
+.toernooi-regel .knop.aanmelden { background: #fff275; color: #241a02; }
+.toernooi-regel .knop.afmelden { background: transparent; color: #fff275; border: 1.5px solid #fff275; }
+.toernooi-regel .knop.vol { background: rgba(255,255,255,0.14); color: rgba(248,247,244,0.7); }
 .pil-toggle { display: flex; gap: 6px; margin-bottom: 14px; background: rgba(0,91,191,0.06); border-radius: 999px; padding: 4px; }
 .pil-toggle button {
   flex: 1; padding: 8px; border: none; border-radius: 999px; background: transparent; color: var(--ink-muted);

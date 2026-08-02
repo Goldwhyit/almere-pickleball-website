@@ -82,10 +82,16 @@
   table.stand th { color: var(--ink-muted); font-weight: 600; font-size: 11px; text-transform: uppercase; }
   table.stand th.num, table.stand td.num { text-align: center; font-variant-numeric: tabular-nums; }
   table.stand tbody tr:nth-child(odd) { background: rgba(0,91,191,0.04); }
-  .wedstrijd { display: flex; justify-content: space-between; padding: 7px 4px; font-size: 14px; border-top: 1px solid var(--line); }
+  .wedstrijd { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 4px; font-size: 13.5px; border-top: 1px solid var(--line); }
   .wedstrijd:first-of-type { border-top: none; }
-  .wedstrijd .score { font-weight: 700; font-variant-numeric: tabular-nums; }
-  .wedstrijd .score.leeg { color: var(--ink-muted); font-weight: 400; font-size: 12.5px; }
+  .wedstrijd .team { flex: 1; line-height: 1.4; }
+  .wedstrijd .team.rechts { text-align: right; }
+  .wedstrijd .score {
+    font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap;
+    background: rgba(0,91,191,0.08); border-radius: 10px; padding: 6px 12px;
+  }
+  .wedstrijd .score.leeg { color: var(--ink-muted); font-weight: 400; font-size: 12px; background: none; }
+  .toernooi-locatie { display: inline-flex; align-items: center; gap: 5px; margin: 4px 0 0; color: #cfe0f0; font-size: 13px; }
   .leeg-melding { text-align: center; color: var(--ink-muted); padding: 40px 20px; }
   .mini-footer { text-align: center; font-size: 12px; color: var(--ink-muted); margin: 30px 0 10px; }
   .mini-footer a { color: var(--ink-muted); }
@@ -97,6 +103,10 @@
   <div id="thema-plek" style="position:absolute;top:20px;right:20px;"></div>
   <h1 id="titel">Toernooien</h1>
   <p data-i18n="subToernooien">Poule-standen en wedstrijdschema, live bijgewerkt.</p>
+  <p class="toernooi-locatie" id="locatie-regel" style="display:none;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-11a7 7 0 1 0-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+    <span id="locatie-tekst"></span>
+  </p>
 </header>
 <main>
   <select id="toernooi-select"></select>
@@ -139,6 +149,14 @@ function teamNaam(team) {
   return team.speler2_naam ? team.speler1_naam + ' & ' + team.speler2_naam : team.speler1_naam;
 }
 
+// Beide spelersnamen van een team onder elkaar (zelfde wedstrijdrij-layout
+// als de app: team A links, team B rechts, score ertussen — geen
+// samengevoegde "Naam & Naam vs Naam & Naam"-tekst meer).
+function teamRegels(team) {
+  if (!team) return '?';
+  return team.speler2_naam ? team.speler1_naam + '<br>' + team.speler2_naam : team.speler1_naam;
+}
+
 async function laadToernooien() {
   toernooien = await rpc('publieke_toernooien', {});
   if (!toernooien.length) {
@@ -159,6 +177,13 @@ async function laadToernooi(toernooiId) {
   app.textContent = 'Even laden…';
   const tn = toernooien.find(t => t.id === toernooiId);
   titelEl.textContent = tn ? tn.naam : 'Toernooien';
+  const locatieRegel = document.getElementById('locatie-regel');
+  if (tn && tn.locatie) {
+    document.getElementById('locatie-tekst').textContent = tn.locatie;
+    locatieRegel.style.display = 'inline-flex';
+  } else {
+    locatieRegel.style.display = 'none';
+  }
 
   const [teams, poules, wedstrijden] = await Promise.all([
     rpc('publieke_toernooi_teams', { p_toernooi_id: toernooiId }),
@@ -189,8 +214,11 @@ async function laadToernooi(toernooiId) {
     ).join('');
     const wedstrijdenHtml = wedstrijden.filter(w => w.poule_id === Number(pouleId)).map(w => {
       const gespeeld = w.score1 !== null;
-      return '<div class="wedstrijd"><span>' + teamNaam(teamsById[w.team1_id]) + ' vs ' + teamNaam(teamsById[w.team2_id]) + '</span>' +
-        '<span class="score' + (gespeeld ? '' : ' leeg') + '">' + (gespeeld ? w.score1 + ' – ' + w.score2 : 'nog te spelen') + '</span></div>';
+      return '<div class="wedstrijd">' +
+        '<span class="team">' + teamRegels(teamsById[w.team1_id]) + '</span>' +
+        '<span class="score' + (gespeeld ? '' : ' leeg') + '">' + (gespeeld ? w.score1 + ' – ' + w.score2 : 'nog te spelen') + '</span>' +
+        '<span class="team rechts">' + teamRegels(teamsById[w.team2_id]) + '</span>' +
+        '</div>';
     }).join('');
     return '<div class="kaart"><h2>' + pouleNamen[pouleId] + '</h2>' +
       '<table class="stand"><thead><tr><th>Team</th><th class="num">GS</th><th class="num">W</th><th class="num">Saldo</th><th class="num">Pt</th></tr></thead>' +
