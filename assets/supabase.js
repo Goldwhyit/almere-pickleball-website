@@ -59,7 +59,44 @@ function vereisSessie() {
     window.location.href = '/leden/';
     return null;
   }
+  startActiefControle();
   return huidigeSessie();
+}
+
+/// Website-equivalent van de realtime kill-switch in de app: er is hier
+/// geen websocket-/Realtime-infrastructuur (bewust vanilla REST), dus in
+/// plaats daarvan een periodieke poll die een lopende sessie alsnog binnen
+/// 60s beëindigt zodra een admin het lid deactiveert.
+let _actiefControleTimer = null;
+function startActiefControle() {
+  if (_actiefControleTimer) return;
+  _actiefControleTimer = setInterval(async () => {
+    const sessie = huidigeSessie();
+    if (!sessie) return;
+    const reden = await inlogBlokkade(sessie.access_token, sessie.user_id);
+    if (reden) {
+      verwijderSessie();
+      window.location.href = '/leden/?geblokkeerd=' + reden;
+    }
+  }, 60000);
+}
+
+/// Checkt leden.actief + ouderlijke-toestemmingsstatus via een los token
+/// (nog niet in localStorage bewaard) — voor gebruik vlak vóór
+/// bewaarSessie() in inloggen(). Retourneert null (mag inloggen),
+/// 'gedeactiveerd' of 'ouderlijketoestemming'.
+async function inlogBlokkade(accessToken, uid) {
+  const resp = await fetch(
+    REST_BASE + '/leden?select=actief,ouder_toestemming_vereist,ouder_toestemming_gegeven_op&id=eq.' + uid,
+    { headers: { apikey: ANON_KEY, Authorization: 'Bearer ' + accessToken } },
+  );
+  if (!resp.ok) return null;
+  const rijen = await resp.json().catch(() => []);
+  if (!rijen.length) return null;
+  const lid = rijen[0];
+  if (lid.actief === false) return 'gedeactiveerd';
+  if (lid.ouder_toestemming_vereist && !lid.ouder_toestemming_gegeven_op) return 'ouderlijketoestemming';
+  return null;
 }
 
 async function inloggen(email, wachtwoord) {
@@ -71,6 +108,13 @@ async function inloggen(email, wachtwoord) {
   const data = await resp.json();
   if (!resp.ok) {
     throw new Error(data.error_description || data.msg || 'Inloggen mislukt. Controleer je e-mailadres en wachtwoord.');
+  }
+  const reden = await inlogBlokkade(data.access_token, data.user.id);
+  if (reden === 'gedeactiveerd') {
+    throw new Error('Dit account is gedeactiveerd. Neem contact op met de club.');
+  }
+  if (reden === 'ouderlijketoestemming') {
+    throw new Error('We wachten nog op de bevestiging van je ouder/voogd via e-mail voordat je kunt inloggen.');
   }
   bewaarSessie({
     access_token: data.access_token,

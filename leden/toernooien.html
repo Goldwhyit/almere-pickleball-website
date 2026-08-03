@@ -235,7 +235,7 @@
     const partnerSelects = el.querySelectorAll('[data-partner-voor]');
     if (partnerSelects.length) {
       if (!alleLeden) {
-        alleLeden = await haalOp('leden', { select: 'id,naam', order: 'naam.asc' });
+        alleLeden = await haalOp('leden', { select: 'id,naam', actief: 'eq.true', order: 'naam.asc' });
       }
       partnerSelects.forEach(sel => {
         alleLeden.filter(l => l.id !== sessie.user_id).forEach(l => {
@@ -450,7 +450,7 @@
     const el = document.getElementById('training-inhoud');
     const [sessieInfo, ranking] = await Promise.all([
       volgendeTrainingssessie(),
-      haalOp('leden', { select: 'naam,rating', order: 'rating.desc', limit: '10' }),
+      haalOp('leden', { select: 'naam,rating', actief: 'eq.true', order: 'rating.desc', limit: '10' }),
     ]);
 
     let sessieHtml = '<p class="details">Geen speelavonden gevonden binnen de komende weken.</p>';

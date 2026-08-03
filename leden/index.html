@@ -97,6 +97,7 @@
     <div id="herstel-melding"></div>
   </form>
   <a href="#" id="wachtwoord-vergeten-link" class="terug" data-i18n="wachtwoordVergeten" style="margin-top:14px">Wachtwoord vergeten?</a>
+  <a class="terug" href="/leden/registreren.html">Nog geen account? Registreren</a>
   <a class="terug" href="/" data-i18n="terugNaarSite">← Terug naar de website</a>
   <p style="text-align:center;margin-top:14px;font-size:12px">
     <a href="/veelgestelde-vragen/" style="color:var(--ink-muted)" data-i18n="veelgesteldeVragen">Veelgestelde vragen</a>
@@ -111,6 +112,14 @@
 <script src="/assets/supabase.js"></script>
 <script>
   if (isIngelogd()) window.location.href = '/leden/home.html';
+
+  const geblokkeerdReden = new URLSearchParams(window.location.search).get('geblokkeerd');
+  if (geblokkeerdReden === 'gedeactiveerd') {
+    document.getElementById('fout-melding').textContent = 'Je account is gedeactiveerd. Neem contact op met de club.';
+  } else if (geblokkeerdReden === 'ouderlijketoestemming') {
+    document.getElementById('fout-melding').textContent =
+      'We wachten nog op de bevestiging van je ouder/voogd via e-mail voordat je kunt inloggen.';
+  }
 
   // Speelt de intro-video af na een geslaagde login, en gaat pas daarna
   // naar het homescherm — met een skip-knop en een veiligheidstimer voor

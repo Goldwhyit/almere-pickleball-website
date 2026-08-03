@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<script>(function(){try{var t=localStorage.getItem('pb_thema');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ouderlijke toestemming — Almere Pickleball</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" type="image/png" href="/assets/img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --navy: #2457ff; --navy-deep: #003d82; --gold: #ffd23f; --gold-deep: #b8860a;
+    --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1);
+    --danger: #b3261e; --goed: #1e8a4c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  }
+  :root[data-theme="dark"] { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  :root[data-theme="light"] { --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1); }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    font-family: 'Manrope', -apple-system, sans-serif; background: var(--paper); color: var(--ink); padding: 24px;
+  }
+  .kaart {
+    width: 100%; max-width: 420px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 20px; padding: 32px 28px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); text-align: center;
+  }
+  .merk { font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 12px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--navy); }
+  :root[data-theme="dark"] .merk { color: #8ab6ec; }
+  .icoon { font-size: 40px; margin: 14px 0 6px; }
+  .icoon.goed { color: var(--goed); }
+  .icoon.fout { color: var(--danger); }
+  h1 { font-family: 'Unbounded', sans-serif; font-size: 19px; margin: 0 0 8px; }
+  p { color: var(--ink-muted); font-size: 14.5px; line-height: 1.5; margin: 0; }
+  p a { color: var(--navy); }
+  :root[data-theme="dark"] p a { color: #8ab6ec; }
+  .laden { color: var(--ink-muted); font-size: 14.5px; }
+  .terug { display: block; margin-top: 20px; font-size: 13px; color: var(--ink-muted); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="kaart">
+  <img src="/assets/img/logo.png" alt="Almere Pickleball" width="56" height="54" style="display: block; margin: 0 auto 8px;" />
+  <div class="merk">Almere Pickleball</div>
+  <div id="inhoud" class="laden">Bezig met controleren…</div>
+</div>
+<script src="/assets/supabase.js"></script>
+<script>
+  async function verwerk() {
+    const el = document.getElementById('inhoud');
+    const token = new URLSearchParams(window.location.search).get('token');
+    if (!token) {
+      el.innerHTML = '<div class="icoon fout">✕</div><h1>Geen geldige link</h1>' +
+        '<p>Er ontbreekt een token in deze link. Controleer of je de volledige link uit de e-mail hebt geopend.</p>';
+      return;
+    }
+    try {
+      const resultaat = await rpc('bevestig_ouder_toestemming', { p_token: token });
+      if (resultaat === 'ok') {
+        el.innerHTML = '<div class="icoon goed">✓</div><h1>Toestemming bevestigd</h1>' +
+          '<p>Bedankt! De aanmelding is nu compleet en het account kan gebruikt worden.</p>';
+      } else if (resultaat === 'verlopen') {
+        el.innerHTML = '<div class="icoon fout">✕</div><h1>Link verlopen</h1>' +
+          '<p>Deze bevestigingslink is verlopen. Neem contact op met de club via ' +
+          '<a href="mailto:info@pickleballalmere.nl">info@pickleballalmere.nl</a> voor een nieuwe link.</p>';
+      } else {
+        el.innerHTML = '<div class="icoon fout">✕</div><h1>Ongeldige link</h1>' +
+          '<p>Deze link is al gebruikt of ongeldig. Neem bij vragen contact op via ' +
+          '<a href="mailto:info@pickleballalmere.nl">info@pickleballalmere.nl</a>.</p>';
+      }
+    } catch (e) {
+      el.innerHTML = '<div class="icoon fout">✕</div><h1>Er ging iets mis</h1>' +
+        '<p>' + e.message + '</p>';
+    }
+  }
+  verwerk();
+</script>
+<script src="/assets/theme.js"></script>
+</body>
+</html>

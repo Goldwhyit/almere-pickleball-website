@@ -147,9 +147,11 @@
     betalingen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="13" rx="2"/><line x1="3" y1="10.5" x2="21" y2="10.5"/><line x1="6.5" y1="15" x2="10.5" y2="15"/></svg>',
     upgrades: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16V8M8.5 11.5L12 8l3.5 3.5" stroke-linejoin="round"/></svg>',
     wedstrijden: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v18" stroke-linecap="round"/><path d="M5 4h11l-2.5 3.5L16 11H5" stroke-linejoin="round"/></svg>',
+    leden: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.3 2.9-5.8 5.5-5.8s5.5 2.5 5.5 5.8"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 12.3c2.2.3 3.8 2.1 3.8 4.4" /></svg>',
   };
 
   const SECTIES = [
+    { key: 'leden', label: 'Leden beheren' },
     { key: 'proefleden', label: 'Proefleden' },
     { key: 'nieuws', label: 'Nieuws' },
     { key: 'toernooien', label: 'Toernooien' },
@@ -212,12 +214,14 @@
       speeldagen: 'Speeldagen & feestdagen blokkeren', prijzen: 'Abonnementsprijzen',
       instellingen: 'Club-instellingen', baanverhuur: 'Baanverhuur', betalingen: 'Betalingen',
       upgrades: 'Abo-upgrades naar 2x per week', wedstrijden: 'Gemelde wedstrijden',
+      leden: 'Leden beheren',
     };
     const lichaam = toonPopup(titels[key]);
     ({
       proefleden: laadProefleden, nieuws: bouwNieuwsForm, toernooien: bouwToernooienBeheer,
       speeldagen: laadSpeeldagenBeheer, prijzen: laadPrijzen, instellingen: laadInstellingen,
       baanverhuur: laadBaanverhuur, betalingen: laadBetalingen, upgrades: laadUpgrades, wedstrijden: laadWedstrijden,
+      leden: laadLedenBeheer,
     })[key](lichaam);
   }
 
@@ -235,6 +239,74 @@
     el.querySelectorAll('[data-lid]').forEach(btn => btn.addEventListener('click', async () => {
       try { await rpc('keur_proef_goed', { p_lid: btn.dataset.lid }); await laadProefleden(el); }
       catch (e) { alert(e.message); }
+    }));
+  }
+
+  // ---------- Leden beheren (actief/inactief + ouderlijke toestemming) ----
+  async function laadLedenBeheer(el) {
+    el.innerHTML = '<input type="search" class="zoekbalk" id="lb-zoek" placeholder="Zoek op naam of e-mail…" style="margin-bottom:10px;width:100%" />' +
+      '<div id="lb-lijst"><div class="laden">Laden…</div></div>';
+    window.__ledenBeheerLijst = await haalOp('leden', {
+      select: 'id,naam,email,actief,ouder_email,ouder_toestemming_vereist,ouder_toestemming_gegeven_op',
+      order: 'naam.asc',
+    });
+    renderLedenBeheer();
+    document.getElementById('lb-zoek').addEventListener('input', renderLedenBeheer);
+  }
+
+  function renderLedenBeheer() {
+    const zoekEl = document.getElementById('lb-zoek');
+    const lijstEl = document.getElementById('lb-lijst');
+    if (!zoekEl || !lijstEl) return;
+    const zoek = zoekEl.value.trim().toLowerCase();
+    const gefilterd = window.__ledenBeheerLijst.filter(l =>
+      l.naam.toLowerCase().includes(zoek) || (l.email || '').toLowerCase().includes(zoek));
+    if (!gefilterd.length) { lijstEl.innerHTML = '<p class="details">Geen leden gevonden.</p>'; return; }
+    lijstEl.innerHTML = gefilterd.map(l => {
+      const ouderWachtend = l.ouder_toestemming_vereist && !l.ouder_toestemming_gegeven_op;
+      return '<div class="rij"><div class="info"><div class="naam">' + escapeHtml(l.naam) +
+        (l.actief === false ? ' <span style="color:var(--accent);font-weight:600">· Inactief</span>' : '') +
+        (l.ouder_toestemming_vereist
+          ? (ouderWachtend
+              ? ' <span style="color:var(--accent);font-weight:600">· Wacht op ouderlijke toestemming</span>'
+              : ' <span style="color:#148c5a;font-weight:600">· Ouderlijke toestemming bevestigd</span>')
+          : '') + '</div>' +
+        '<div class="sub">' + escapeHtml(l.email || '') + '</div></div>' +
+        '<div class="acties"><button class="mini-knop ' + (l.actief === false ? 'goed' : 'fout') + '" data-lid="' + l.id + '">' +
+        (l.actief === false ? 'Activeren' : 'Deactiveren') + '</button>' +
+        (ouderWachtend
+          ? '<button class="mini-knop neutraal" data-ouder-resend="' + l.id + '">Opnieuw versturen</button>' +
+            '<button class="mini-knop neutraal" data-ouder-bevestig="' + l.id + '">Handmatig bevestigen</button>'
+          : '') +
+        '</div></div>';
+    }).join('');
+    lijstEl.querySelectorAll('[data-ouder-resend]').forEach(btn => btn.addEventListener('click', async () => {
+      const lid = window.__ledenBeheerLijst.find(l => l.id === btn.dataset.ouderResend);
+      try {
+        await functieAanroepen('stuur-ouder-toestemming', { ouder_email: lid.ouder_email || '', lid_id: lid.id });
+        alert('Opnieuw verstuurd.');
+      } catch (e) { alert(e.message); }
+    }));
+    lijstEl.querySelectorAll('[data-ouder-bevestig]').forEach(btn => btn.addEventListener('click', async () => {
+      const lid = window.__ledenBeheerLijst.find(l => l.id === btn.dataset.ouderBevestig);
+      if (!confirm('Ouderlijke toestemming voor ' + lid.naam + ' handmatig vastleggen?')) return;
+      try {
+        await rpc('zet_ouder_toestemming_handmatig', { p_lid: lid.id });
+        lid.ouder_toestemming_gegeven_op = new Date().toISOString();
+        renderLedenBeheer();
+      } catch (e) { alert(e.message); }
+    }));
+    lijstEl.querySelectorAll('[data-lid]').forEach(btn => btn.addEventListener('click', async () => {
+      const lid = window.__ledenBeheerLijst.find(l => l.id === btn.dataset.lid);
+      const nieuw = lid.actief === false;
+      const vraag = nieuw ? (lid.naam + ' weer activeren?')
+        : (lid.naam + ' deactiveren? Dit lid kan hierna niet meer inloggen (een lopende sessie wordt binnen een minuut beëindigd) en verdwijnt uit ledenlijsten, ranglijsten en kiezers.');
+      if (!confirm(vraag)) return;
+      try {
+        await rpc('zet_lid_actief', { p_lid: lid.id, p_actief: nieuw });
+        lid.actief = nieuw;
+        renderLedenBeheer();
+      } catch (e) { alert(e.message); }
     }));
   }
 

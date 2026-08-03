@@ -418,7 +418,7 @@
 
   async function laadLeden() {
     const [leden, stats] = await Promise.all([
-      haalOp('leden', { select: 'id,naam,niveau,rating,avatar_url,geslacht', order: 'naam.asc' }),
+      haalOp('leden', { select: 'id,naam,niveau,rating,avatar_url,geslacht', actief: 'eq.true', order: 'naam.asc' }),
       haalOp('lid_avond_statistieken', { select: 'lid_id,gespeeld,gewonnen' }),
     ]);
     alleLeden = leden;

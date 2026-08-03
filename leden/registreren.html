@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<script>(function(){try{var t=localStorage.getItem('pb_thema');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Registreren — Almere Pickleball</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" type="image/png" href="/assets/img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --navy: #2457ff; --navy-deep: #003d82; --gold: #ffd23f; --gold-deep: #b8860a;
+    --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1);
+    --danger: #b3261e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  }
+  :root[data-theme="dark"] { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  :root[data-theme="light"] { --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1); }
+  #thema-plek { position: fixed; top: 16px; right: 16px; z-index: 50; display: flex; gap: 8px; align-items: center; }
+  .thema-knop, .taal-knop {
+    background: var(--card); border: 1.5px solid var(--line); border-radius: 999px; height: 38px;
+    cursor: pointer; color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,0.08); font-family: inherit;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .thema-knop { width: 38px; }
+  .thema-knop svg { width: 17px; height: 17px; }
+  .taal-knop { min-width: 38px; padding: 0 12px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.02em; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center;
+    font-family: 'Manrope', -apple-system, sans-serif; background: var(--paper); color: var(--ink);
+    padding: 24px 24px 60px;
+  }
+  .kaart {
+    width: 100%; max-width: 460px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 20px; padding: 28px 26px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); margin-top: 24px;
+  }
+  .merk { font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 12px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--navy); text-align: center; }
+  @media (prefers-color-scheme: dark) { .merk { color: #8ab6ec; } }
+  :root[data-theme="dark"] .merk { color: #8ab6ec; }
+  h1 { font-family: 'Unbounded', sans-serif; font-size: 21px; margin: 8px 0 16px; text-align: center; }
+
+  .voortgang { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 10px; }
+  .voortgang-balk { flex: 1; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  .voortgang-balk-vulling { height: 100%; background: var(--navy); border-radius: 999px; transition: width 0.2s ease; }
+  :root[data-theme="dark"] .voortgang-balk-vulling { background: #8ab6ec; }
+  .stap-label { font-size: 11.5px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+  :root[data-theme="dark"] .stap-label { color: #8ab6ec; }
+
+  label { font-size: 13px; font-weight: 600; color: var(--ink-muted); display: block; margin-top: 14px; }
+  label:first-of-type { margin-top: 0; }
+  label .verplicht { color: var(--danger); }
+  input[type=text], input[type=tel], input[type=email], input[type=password], input[type=date], textarea {
+    width: 100%; margin-top: 6px; padding: 11px 12px; border-radius: 10px; border: 1.5px solid var(--line);
+    background: var(--paper); color: var(--ink); font-size: 15px; font-family: inherit; max-width: 100%;
+  }
+  textarea { resize: vertical; }
+  .rij-twee { display: flex; gap: 8px; }
+  .rij-twee > div { flex: 1; }
+  .rij-twee > div:first-child { flex: 3; }
+  .rij-twee > div:last-child { flex: 2; }
+  .hint { font-size: 12px; color: var(--ink-muted); margin-top: 5px; }
+
+  .drie-knoppen { display: flex; gap: 8px; margin-top: 6px; }
+  .keuzeknop {
+    flex: 1; padding: 12px 6px; border-radius: 12px; border: 1.5px solid var(--line); background: transparent;
+    color: var(--ink); font-family: inherit; cursor: pointer; text-align: center;
+  }
+  .keuzeknop.actief { border-color: var(--navy); background: rgba(36,87,255,0.08); color: var(--navy); }
+  :root[data-theme="dark"] .keuzeknop.actief { border-color: #8ab6ec; background: rgba(138,182,236,0.12); color: #8ab6ec; }
+  .keuzeknop .label-tekst { font-size: 12.5px; font-weight: 700; display: block; }
+
+  .niveau-kaarten { display: flex; gap: 8px; margin-top: 8px; }
+  .niveau-kaart {
+    flex: 1; padding: 14px 6px; border-radius: 14px; border: 1.5px solid var(--line); background: transparent;
+    color: var(--ink); font-family: inherit; cursor: pointer; text-align: center;
+  }
+  .niveau-kaart.actief { border-color: var(--navy); border-width: 2px; background: rgba(36,87,255,0.06); }
+  :root[data-theme="dark"] .niveau-kaart.actief { border-color: #8ab6ec; background: rgba(138,182,236,0.1); }
+  .niveau-kaart .titel { font-weight: 700; font-size: 13px; display: block; }
+  .niveau-kaart .uitleg { font-size: 10px; color: var(--ink-muted); display: block; margin-top: 2px; }
+
+  .vorm-pillen { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .vorm-pil {
+    padding: 9px 15px; border-radius: 999px; border: 1.5px solid var(--line); background: transparent;
+    color: var(--ink); font-family: inherit; font-weight: 700; font-size: 12.5px; cursor: pointer;
+  }
+  .vorm-pil.actief { border-color: var(--navy); background: rgba(36,87,255,0.08); color: var(--navy); }
+  :root[data-theme="dark"] .vorm-pil.actief { border-color: #8ab6ec; background: rgba(138,182,236,0.12); color: #8ab6ec; }
+
+  .plan-opties, .betaal-opties { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .plan-optie {
+    display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 12px;
+    border: 1.5px solid var(--line); background: transparent; color: var(--ink); font-family: inherit;
+    cursor: pointer; text-align: left; width: 100%;
+  }
+  .plan-optie.actief { border-color: var(--gold-deep); background: rgba(255,210,63,0.14); }
+  .plan-optie .stip { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--line); flex-shrink: 0; margin-top: 2px; }
+  .plan-optie.actief .stip { border-color: var(--gold-deep); background: var(--gold); }
+  .plan-optie .titel { font-weight: 700; font-size: 13.5px; }
+  .plan-optie .sub { font-size: 12px; color: var(--ink-muted); margin-top: 1px; }
+
+  .samenvatting-kaart {
+    border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 18px; background: var(--paper);
+  }
+  .samenvatting-kaart .titel { font-weight: 700; font-size: 14px; }
+  .samenvatting-kaart .sub { font-size: 12.5px; color: var(--ink-muted); margin-top: 2px; }
+
+  .knoppen-rij { display: flex; gap: 10px; margin-top: 22px; }
+  button.primair, button.secundair {
+    padding: 13px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; border: none;
+  }
+  button.primair { flex: 2; background: var(--gold); color: #241a02; }
+  button.primair:disabled { opacity: 0.45; cursor: not-allowed; }
+  button.secundair { flex: 1; background: transparent; border: 1.5px solid var(--line); color: var(--ink); }
+  .fout { color: var(--danger); font-size: 13.5px; margin-top: 12px; text-align: center; }
+  .terug-link { display: block; text-align: center; margin-top: 20px; font-size: 13px; color: var(--ink-muted); text-decoration: none; }
+  .gelukt { text-align: center; padding: 10px 0; }
+  .gelukt .icoon { font-size: 40px; color: #1e8a4c; }
+  .gelukt h2 { font-family: 'Unbounded', sans-serif; font-size: 17px; margin: 10px 0 6px; }
+  .gelukt p { color: var(--ink-muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<div id="thema-plek"></div>
+<div class="kaart">
+  <img src="/assets/img/logo.png" alt="Almere Pickleball" width="64" height="62" style="display: block; margin: 0 auto 8px;" />
+  <div class="merk">Almere Pickleball</div>
+  <h1>Word lid</h1>
+
+  <form id="reg-form">
+    <div class="voortgang">
+      <span class="stap-label" id="stap-label">Stap 1 van 3</span>
+      <div class="voortgang-balk"><div class="voortgang-balk-vulling" id="voortgang-vulling" style="width: 33.3%"></div></div>
+    </div>
+
+    <div id="stap-0">
+      <div class="rij-twee">
+        <div><label>Voornaam <span class="verplicht">*</span><input type="text" id="voornaam-invoer" autocomplete="given-name" /></label></div>
+        <div><label>Tussenvoegsel<input type="text" id="tussenvoegsel-invoer" autocomplete="off" /></label></div>
+      </div>
+      <label>Achternaam <span class="verplicht">*</span><input type="text" id="achternaam-invoer" autocomplete="family-name" /></label>
+      <label>Telefoonnummer<input type="tel" id="telefoon-invoer" autocomplete="tel" /></label>
+      <label>Geslacht (voor toernooiklassen)</label>
+      <div class="drie-knoppen" id="geslacht-knoppen">
+        <button type="button" class="keuzeknop" data-geslacht="m"><span class="label-tekst">Man</span></button>
+        <button type="button" class="keuzeknop" data-geslacht="v"><span class="label-tekst">Vrouw</span></button>
+        <button type="button" class="keuzeknop" data-geslacht="x"><span class="label-tekst">Anders</span></button>
+      </div>
+      <label>E-mailadres <span class="verplicht">*</span><input type="email" id="email-invoer" autocomplete="email" /></label>
+      <label>Geboortedatum <span class="verplicht">*</span><input type="date" id="geboortedatum-invoer" autocomplete="bday" /></label>
+      <div id="ouder-email-veld" style="display: none;">
+        <label>E-mailadres ouder/voogd <span class="verplicht">*</span><input type="email" id="ouder-email-invoer" /></label>
+        <p class="hint" style="margin-top: 5px;">Voor leden onder de 18 vragen we digitale toestemming van een ouder/voogd per e-mail.</p>
+      </div>
+      <label>Adres<input type="text" id="adres-invoer" placeholder="Straat, huisnummer, postcode en plaats" /></label>
+      <label>Ervaring<textarea id="ervaring-invoer" rows="2" placeholder="Je pickleball- of racketsportervaring (optioneel)"></textarea></label>
+      <label>Medische informatie<textarea id="medische-info-invoer" rows="2" placeholder="Allergieën, suikerziekte, hartklachten, blessures, bloedgroep (optioneel)"></textarea></label>
+      <label style="margin-top: 20px; font-weight: 700; color: var(--ink);">Noodcontact</label>
+      <label>Naam noodcontact<input type="text" id="noodcontact-naam-invoer" /></label>
+      <label>Telefoon noodcontact<input type="tel" id="noodcontact-telefoon-invoer" /></label>
+    </div>
+
+    <div id="stap-1" style="display: none;">
+      <label style="font-weight: 700; color: var(--ink);">Speelniveau</label>
+      <p class="hint" style="margin-top: 0;">Kies het niveau dat het beste bij je past</p>
+      <div class="niveau-kaarten" id="niveau-kaarten">
+        <button type="button" class="niveau-kaart" data-niveau="beginner"><span class="titel">Beginner</span><span class="uitleg">Nog nooit gespeeld</span></button>
+        <button type="button" class="niveau-kaart" data-niveau="gevorderd"><span class="titel">Gevorderd</span><span class="uitleg">Speelt al regelmatig</span></button>
+        <button type="button" class="niveau-kaart" data-niveau="competitie"><span class="titel">Competitie</span><span class="uitleg">Competitie-ervaring</span></button>
+      </div>
+
+      <label style="margin-top: 20px; font-weight: 700; color: var(--ink);">Kies je abonnement</label>
+      <p class="hint" id="categorie-hint" style="margin-top: 0; display: none;"></p>
+      <div class="vorm-pillen" id="vorm-pillen"></div>
+      <div class="plan-opties" id="plan-opties"></div>
+      <div class="betaal-opties" id="betaal-opties"></div>
+    </div>
+
+    <div id="stap-2" style="display: none;">
+      <div class="samenvatting-kaart" id="samenvatting-kaart"></div>
+      <label>Kies een wachtwoord<input type="password" id="wachtwoord-invoer" autocomplete="new-password" /></label>
+      <p class="hint">Minimaal 8 tekens.</p>
+    </div>
+
+    <div class="knoppen-rij">
+      <button type="button" class="secundair" id="terug-knop" style="display: none;">Terug</button>
+      <button type="button" class="primair" id="volgende-knop">Volgende stap</button>
+      <button type="submit" class="primair" id="verstuur-knop" style="display: none;">Account aanmaken</button>
+    </div>
+    <div id="fout-melding"></div>
+  </form>
+
+  <div id="gelukt-kaart" class="gelukt" style="display: none;"></div>
+
+  <a class="terug-link" href="/leden/">← Al een account? Log hier in</a>
+</div>
+<script src="/assets/supabase.js"></script>
+<script>
+  const VORM_VOLGORDE = ['jaar', 'maand', 'strippenkaart', 'sessie', 'proef'];
+  const VORM_LABELS = { jaar: 'Jaar', maand: 'Maand', strippenkaart: 'Strippenkaart', sessie: 'Per sessie', proef: 'Proef' };
+  const euro = (n) => '€' + Number(n).toFixed(2).replace('.', ',');
+
+  let stap = 0;
+  let geslacht = null;
+  let niveau = 'beginner';
+  let abonnementen = [];
+  let vormFilter = null;
+  let gekozenAbonnement = null;
+  let betaalwijze = null;
+  let bezig = false;
+
+  async function laadAbonnementen() {
+    abonnementen = await haalOp('abonnementen', { select: '*', actief: 'eq.true', order: 'categorie.asc,id.asc' });
+  }
+
+  function leeftijd() {
+    const raw = document.getElementById('geboortedatum-invoer').value;
+    if (!raw) return null;
+    const d = new Date(raw + 'T00:00:00');
+    const nu = new Date();
+    let jaren = nu.getFullYear() - d.getFullYear();
+    if (nu.getMonth() < d.getMonth() || (nu.getMonth() === d.getMonth() && nu.getDate() < d.getDate())) jaren--;
+    return jaren;
+  }
+  function leeftijdscategorie() {
+    const l = leeftijd();
+    return (l !== null && l < 18) ? 'jeugd' : 'volwassen';
+  }
+  function abonnementenVoorLeeftijd() {
+    const cat = leeftijdscategorie();
+    return abonnementen.filter(a => a.categorie === 'alle' || a.categorie === cat);
+  }
+  function beschikbareVormen() {
+    const lijst = abonnementenVoorLeeftijd();
+    return VORM_VOLGORDE.filter(v => lijst.some(a => a.vorm === v));
+  }
+  function matchendePlannen() {
+    if (!vormFilter) return [];
+    return abonnementenVoorLeeftijd().filter(a => a.vorm === vormFilter);
+  }
+  function omschrijving(a) {
+    switch (a.vorm) {
+      case 'jaar': return euro(a.prijs) + ' per jaar';
+      case 'maand': return euro(a.prijs) + ' per maand';
+      case 'strippenkaart': return euro(a.prijs) + ' · ' + a.strippen + ' strippen, ' + a.geldig_maanden + ' mnd geldig';
+      case 'proef': return 'Gratis — 3 proeflessen';
+      default: return euro(a.prijs) + ' per speeldag';
+    }
+  }
+  function betaalopties() {
+    const a = gekozenAbonnement;
+    if (!a) return [];
+    switch (a.vorm) {
+      case 'jaar': {
+        const korting = a.jaarkorting_pct || 0;
+        const metKorting = Number(a.prijs) * (100 - korting) / 100;
+        return [
+          ['maandelijkse_incasso', 'Maandelijkse incasso (' + euro(a.prijs / 12) + ')'],
+          ['jaarlijks_vooruit', 'In 1x vooruit, ' + korting + '% korting (' + euro(metKorting) + ')'],
+        ];
+      }
+      case 'maand': return [['maandelijkse_incasso', 'Maandelijkse incasso']];
+      case 'strippenkaart': return [['eenmalig', 'Eenmalige betaling']];
+      case 'proef': return [['gratis', 'Gratis — 3 proeflessen']];
+      default: return [['per_sessie', 'Betalen per speeldag']];
+    }
+  }
+
+  function kiesVorm(vorm) {
+    vormFilter = vorm;
+    const matches = matchendePlannen();
+    gekozenAbonnement = matches.length === 1 ? matches[0] : null;
+    betaalwijze = gekozenAbonnement ? betaalopties()[0][0] : null;
+    renderStap1();
+    bijwerkenKnoppen();
+  }
+
+  function kiesAbonnement(a) {
+    gekozenAbonnement = a;
+    betaalwijze = betaalopties()[0][0];
+    renderStap1();
+    bijwerkenKnoppen();
+  }
+
+  function renderStap1() {
+    const cat = leeftijdscategorie();
+    const hintEl = document.getElementById('categorie-hint');
+    if (document.getElementById('geboortedatum-invoer').value) {
+      hintEl.style.display = 'block';
+      hintEl.textContent = 'Op basis van je geboortedatum: ' + (cat === 'jeugd' ? 'Jeugd' : 'Volwassen');
+    } else {
+      hintEl.style.display = 'none';
+    }
+
+    document.getElementById('vorm-pillen').innerHTML = beschikbareVormen().map(v =>
+      '<button type="button" class="vorm-pil' + (vormFilter === v ? ' actief' : '') + '" data-vorm="' + v + '">' + VORM_LABELS[v] + '</button>'
+    ).join('');
+    document.querySelectorAll('#vorm-pillen [data-vorm]').forEach(btn =>
+      btn.addEventListener('click', () => kiesVorm(btn.dataset.vorm)));
+
+    const matches = matchendePlannen();
+    const planEl = document.getElementById('plan-opties');
+    if (matches.length > 1) {
+      planEl.innerHTML = matches.map((a, i) => '<button type="button" class="plan-optie' +
+        (gekozenAbonnement === a ? ' actief' : '') + '" data-plan-index="' + i + '">' +
+        '<span class="stip"></span><span><span class="titel">' + escapeHtml(a.naam) + '</span>' +
+        '<span class="sub">' + omschrijving(a) + '</span></span></button>').join('');
+      planEl.querySelectorAll('[data-plan-index]').forEach(btn =>
+        btn.addEventListener('click', () => kiesAbonnement(matches[Number(btn.dataset.planIndex)])));
+    } else if (gekozenAbonnement) {
+      planEl.innerHTML = '<p class="hint" style="margin-top: 8px;">' + omschrijving(gekozenAbonnement) + '</p>';
+    } else {
+      planEl.innerHTML = '';
+    }
+
+    const betaalEl = document.getElementById('betaal-opties');
+    const opties = betaalopties();
+    if (gekozenAbonnement && opties.length > 1) {
+      betaalEl.innerHTML = opties.map(([waarde, label]) => '<button type="button" class="plan-optie' +
+        (betaalwijze === waarde ? ' actief' : '') + '" data-betaalwijze="' + waarde + '">' +
+        '<span class="stip"></span><span class="titel">' + label + '</span></button>').join('');
+      betaalEl.querySelectorAll('[data-betaalwijze]').forEach(btn =>
+        btn.addEventListener('click', () => { betaalwijze = btn.dataset.betaalwijze; renderStap1(); }));
+    } else {
+      betaalEl.innerHTML = '';
+    }
+  }
+
+  document.getElementById('geslacht-knoppen').querySelectorAll('[data-geslacht]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      geslacht = btn.dataset.geslacht;
+      document.querySelectorAll('#geslacht-knoppen [data-geslacht]').forEach(b => b.classList.toggle('actief', b === btn));
+    });
+  });
+  document.getElementById('niveau-kaarten').querySelectorAll('[data-niveau]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      niveau = btn.dataset.niveau;
+      document.querySelectorAll('#niveau-kaarten [data-niveau]').forEach(b => b.classList.toggle('actief', b === btn));
+    });
+  });
+  document.querySelector('#niveau-kaarten [data-niveau="beginner"]').classList.add('actief');
+
+  document.getElementById('geboortedatum-invoer').addEventListener('change', () => {
+    vormFilter = null;
+    gekozenAbonnement = null;
+    betaalwijze = null;
+    bijwerkenOuderVeld();
+    renderStap1();
+    bijwerkenKnoppen();
+  });
+  ['voornaam-invoer', 'achternaam-invoer', 'email-invoer', 'ouder-email-invoer'].forEach(id =>
+    document.getElementById(id).addEventListener('input', bijwerkenKnoppen));
+
+  function bijwerkenOuderVeld() {
+    document.getElementById('ouder-email-veld').style.display =
+      leeftijdscategorie() === 'jeugd' ? 'block' : 'none';
+  }
+
+  function stap0Compleet() {
+    if (!document.getElementById('voornaam-invoer').value.trim() ||
+        !document.getElementById('achternaam-invoer').value.trim() ||
+        !document.getElementById('email-invoer').value.trim() ||
+        !document.getElementById('geboortedatum-invoer').value) {
+      return false;
+    }
+    if (leeftijdscategorie() === 'jeugd' &&
+        !document.getElementById('ouder-email-invoer').value.trim()) {
+      return false;
+    }
+    return true;
+  }
+  function stap1Compleet() { return gekozenAbonnement != null; }
+  function stapMagVerder() {
+    if (stap === 0) return stap0Compleet();
+    if (stap === 1) return stap1Compleet();
+    return true;
+  }
+  function bijwerkenKnoppen() {
+    document.getElementById('volgende-knop').disabled = !stapMagVerder();
+  }
+
+  function toonStap() {
+    document.getElementById('stap-0').style.display = stap === 0 ? 'block' : 'none';
+    document.getElementById('stap-1').style.display = stap === 1 ? 'block' : 'none';
+    document.getElementById('stap-2').style.display = stap === 2 ? 'block' : 'none';
+    document.getElementById('stap-label').textContent = 'Stap ' + (stap + 1) + ' van 3';
+    document.getElementById('voortgang-vulling').style.width = ((stap + 1) / 3 * 100) + '%';
+    document.getElementById('terug-knop').style.display = stap > 0 ? 'block' : 'none';
+    document.getElementById('volgende-knop').style.display = stap < 2 ? 'block' : 'none';
+    document.getElementById('verstuur-knop').style.display = stap === 2 ? 'block' : 'none';
+    if (stap === 2) renderSamenvatting();
+    bijwerkenKnoppen();
+    document.getElementById('fout-melding').textContent = '';
+  }
+
+  function renderSamenvatting() {
+    const el = document.getElementById('samenvatting-kaart');
+    if (!gekozenAbonnement) { el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    el.innerHTML = '<div class="titel">' + escapeHtml(gekozenAbonnement.naam) + '</div>' +
+      '<div class="sub">' + omschrijving(gekozenAbonnement) + '</div>';
+  }
+
+  document.getElementById('volgende-knop').addEventListener('click', () => {
+    if (!stapMagVerder()) return;
+    stap++;
+    toonStap();
+  });
+  document.getElementById('terug-knop').addEventListener('click', () => {
+    stap--;
+    toonStap();
+  });
+
+  function volledigeNaam() {
+    return [document.getElementById('voornaam-invoer').value.trim(),
+      document.getElementById('tussenvoegsel-invoer').value.trim(),
+      document.getElementById('achternaam-invoer').value.trim()].filter(Boolean).join(' ');
+  }
+
+  async function slaAbonnementOp() {
+    const a = gekozenAbonnement;
+    if (Number(a.prijs) <= 0) {
+      const isStrippenkaart = a.vorm === 'strippenkaart' || a.vorm === 'proef';
+      const nu = new Date();
+      const rij = { lid_id: huidigeSessie().user_id, abonnement_id: a.id, betaalwijze };
+      if (isStrippenkaart) {
+        rij.strippen_resterend = a.strippen;
+        rij.geldig_tot = new Date(nu.getFullYear(), nu.getMonth() + Number(a.geldig_maanden), nu.getDate())
+          .toISOString().substring(0, 10);
+      }
+      await voegToe('lid_abonnementen', rij);
+      return { betaald: false };
+    }
+    const data = await functieAanroepen('create-mollie-payment', {
+      type: 'abonnement', abonnement_id: a.id, betaalwijze,
+    });
+    if (!data.checkoutUrl) throw new Error(data.error || 'Kon de betaling niet openen.');
+    return { betaald: true, checkoutUrl: data.checkoutUrl };
+  }
+
+  document.getElementById('reg-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (bezig || !gekozenAbonnement) return;
+    const foutEl = document.getElementById('fout-melding');
+    const wachtwoord = document.getElementById('wachtwoord-invoer').value;
+    foutEl.textContent = '';
+    if (wachtwoord.length < 8) {
+      foutEl.textContent = 'Je wachtwoord moet minstens 8 tekens hebben.';
+      return;
+    }
+    bezig = true;
+    const knop = document.getElementById('verstuur-knop');
+    knop.disabled = true;
+    knop.textContent = 'Bezig…';
+    try {
+      const isJeugd = leeftijdscategorie() === 'jeugd';
+      const ouderEmail = document.getElementById('ouder-email-invoer').value.trim();
+      await registreren(document.getElementById('email-invoer').value.trim(), wachtwoord, {
+        naam: volledigeNaam(),
+        telefoon: document.getElementById('telefoon-invoer').value.trim(),
+        geslacht: geslacht || '',
+        geboortedatum: document.getElementById('geboortedatum-invoer').value || '',
+        taal: 'nl',
+        adres: document.getElementById('adres-invoer').value.trim(),
+        ervaring: document.getElementById('ervaring-invoer').value.trim(),
+        medische_info: document.getElementById('medische-info-invoer').value.trim(),
+        noodcontact_naam: document.getElementById('noodcontact-naam-invoer').value.trim(),
+        noodcontact_telefoon: document.getElementById('noodcontact-telefoon-invoer').value.trim(),
+        niveau,
+        ouder_email: isJeugd ? ouderEmail : '',
+      });
+      const resultaat = await slaAbonnementOp();
+      if (isJeugd) {
+        try {
+          await functieAanroepen('stuur-ouder-toestemming', { ouder_email: ouderEmail });
+        } catch (_) {
+          // Best-effort, net als de ticketmail in mollie-webhook — een
+          // mislukte mail mag de registratie zelf niet laten mislukken; een
+          // beheerder kan 'm alsnog opnieuw versturen vanuit het beheerscherm.
+        }
+      }
+      if (resultaat.betaald) {
+        window.location.href = resultaat.checkoutUrl;
+      } else if (isJeugd) {
+        verwijderSessie();
+        toonWachtOpOuder();
+      } else {
+        toonGelukt();
+      }
+    } catch (err) {
+      foutEl.textContent = err.message;
+      knop.disabled = false;
+      knop.textContent = 'Account aanmaken';
+      bezig = false;
+    }
+  });
+
+  function toonGelukt() {
+    document.getElementById('reg-form').style.display = 'none';
+    const kaart = document.getElementById('gelukt-kaart');
+    kaart.style.display = 'block';
+    kaart.innerHTML = '<div class="icoon">✓</div><h2>Welkom bij Almere Pickleball!</h2>' +
+      '<p>Je account is aangemaakt en je abonnement is vastgelegd.</p>' +
+      '<a class="terug-link" href="/leden/home.html">Naar het ledenportaal →</a>';
+  }
+
+  function toonWachtOpOuder() {
+    document.getElementById('reg-form').style.display = 'none';
+    const kaart = document.getElementById('gelukt-kaart');
+    kaart.style.display = 'block';
+    kaart.innerHTML = '<div class="icoon">✓</div><h2>Bijna klaar!</h2>' +
+      '<p>We hebben een e-mail gestuurd naar het adres van de ouder/voogd. Zodra die de link bevestigt, kan er ingelogd worden.</p>' +
+      '<a class="terug-link" href="/leden/">Terug naar inloggen</a>';
+  }
+
+  toonStap();
+  laadAbonnementen().then(() => renderStap1()).catch(() => {
+    document.getElementById('fout-melding').textContent = 'De abonnementen konden niet geladen worden. Vernieuw de pagina.';
+  });
+</script>
+<script src="/assets/theme.js"></script>
+<script>initThemeKnop('thema-plek');</script>
+</body>
+</html>

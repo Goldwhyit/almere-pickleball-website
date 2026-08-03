@@ -463,7 +463,7 @@
   async function laadRatingSectie() {
     const el = document.getElementById('rating-inhoud');
     if (!alleLeden) {
-      alleLeden = await haalOp('leden', { select: 'id,naam', order: 'naam.asc' });
+      alleLeden = await haalOp('leden', { select: 'id,naam', actief: 'eq.true', order: 'naam.asc' });
     }
     const gemeld = await haalOp('gemelde_wedstrijden', {
       select: 'id,datum,type,eigen_score,tegen_score,status,nieuwe_rating',
