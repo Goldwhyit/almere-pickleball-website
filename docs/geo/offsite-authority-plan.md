@@ -9,7 +9,7 @@ linkbuilding-bureau nodig):
 
 Zorg dat overal waar de club online vermeld staat exact dezelfde naam
 ("Almere Pickleball"), hetzelfde adres (Parkwerf 138, 1354 EB Almere) en
-hetzelfde e-mailadres (info@pickleballalmere.nl) gebruikt worden — precies
+hetzelfde e-mailadres (info@almerepickleball.nl) gebruikt worden — precies
 de gegevens die nu ook in de `SportsClub`-JSON-LD staan. Inconsistente
 vermeldingen (bv. een oud adres op een sportbond-website) verzwakken hoe
 zeker een AI-model is over welk feit correct is.
