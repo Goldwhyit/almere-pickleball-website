@@ -618,7 +618,17 @@
         : '<button class="mini-knop ' + (r.betaald ? 'goed' : 'fout') + '" data-la="' + r.id + '" data-betaald="' + r.betaald + '">' + (r.betaald ? 'Betaald' : 'Niet betaald') + '</button>')
       + '</div></div>').join('');
     el.querySelectorAll('[data-la]').forEach(btn => btn.addEventListener('click', async () => {
-      await werkBij('lid_abonnementen', { id: 'eq.' + btn.dataset.la }, { betaald: btn.dataset.betaald !== 'true' });
+      const nieuw = btn.dataset.betaald !== 'true';
+      await werkBij('lid_abonnementen', { id: 'eq.' + btn.dataset.la }, { betaald: nieuw });
+      if (nieuw) {
+        // Betaling is bevestigd (contant/eigen overschrijving): eventuele
+        // openstaande herinnering voor dit abonnement is dan afgehandeld —
+        // anders blijft de banner op home.html ten onrechte "nog niet
+        // betaald" tonen, en weigert create-mollie-payment een nieuwe
+        // betaalpoging omdat lid_abonnementen.betaald al true is. Matcht
+        // _wijzigBetaald in admin_screen.dart (app).
+        await werkBij('betaal_herinneringen', { lid_abonnement_id: 'eq.' + btn.dataset.la, voldaan: 'eq.false' }, { voldaan: true });
+      }
       await laadBetalingen(el);
     }));
   }
