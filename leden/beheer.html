@@ -79,6 +79,32 @@
   }
   .veld-twee { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   @media (max-width: 420px) { .veld-twee { grid-template-columns: 1fr; } }
+  /* Club-instellingen-kaarten: zelfde afwisselende "mens"/"womens"-kleuren
+     als de nieuws-coverflow (assets/leden.css, #141D38/#FCDB32 en
+     #3447AA/#FBEAEB) — matcht _instellingKaart in admin_screen.dart (app). */
+  .instelling-kaart { border-radius: 14px; padding: 14px; margin-bottom: 14px; }
+  .instelling-kaart.mens { background: #141D38; }
+  .instelling-kaart.womens { background: #3447AA; }
+  .instelling-titel { font-weight: 700; font-size: 14.5px; margin-bottom: 4px; }
+  .instelling-kaart.mens .instelling-titel { color: #FCDB32; }
+  .instelling-kaart.womens .instelling-titel { color: #FBEAEB; }
+  .instelling-uitleg { font-size: 12px; margin-bottom: 10px; }
+  .instelling-kaart.mens .instelling-uitleg { color: rgba(252,219,50,0.75); }
+  .instelling-kaart.womens .instelling-uitleg { color: rgba(251,234,235,0.75); }
+  .instelling-kaart textarea, .instelling-kaart input[type="date"] {
+    width: 100%; box-sizing: border-box; padding: 9px 11px; border-radius: 8px; font-size: 13.5px;
+    font-family: inherit; background: rgba(255,255,255,0.08); color: #fff;
+    border: 1.5px solid rgba(255,255,255,0.25); color-scheme: dark;
+  }
+  .instelling-kaart.mens textarea, .instelling-kaart.mens input[type="date"] { border-color: rgba(252,219,50,0.4); }
+  .instelling-kaart.womens textarea, .instelling-kaart.womens input[type="date"] { border-color: rgba(251,234,235,0.4); }
+  .instelling-datums { display: flex; align-items: center; gap: 10px; }
+  .instelling-datums input { flex: 1; }
+  .instelling-datums span { color: #fff; }
+  .instelling-opslaan-rij { display: flex; justify-content: flex-end; margin-top: 10px; }
+  .instelling-opslaan-knop { padding: 8px 16px; border-radius: 8px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; }
+  .instelling-kaart.mens .instelling-opslaan-knop { background: #FCDB32; color: #141D38; }
+  .instelling-kaart.womens .instelling-opslaan-knop { background: #FBEAEB; color: #3447AA; }
   .rij {
     display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
     padding: 12px 14px; flex-wrap: wrap; background: var(--paper); border: 1px solid var(--line);
@@ -462,7 +488,7 @@
     const vandaag = new Date().toISOString().substring(0, 10);
     const rows = await haalOp('toernooien', {
       select: 'id,naam,datum,klasse,niveau,inschrijfwijze,locatie,max_deelnemers,inschrijfgeld,min_leeftijd,max_leeftijd,omschrijving,inschrijving_open',
-      datum: 'gte.' + vandaag, order: 'datum.asc',
+      datum: 'gte.' + vandaag, order: 'created_at.desc',
     });
     if (!rows.length) { el.innerHTML = '<p class="details">Geen aankomende toernooien.</p>'; return; }
     window.__toernooienLijst = rows;
@@ -488,11 +514,21 @@
 
   // ---------- Speeldagen & blokkeren ----------
   async function laadSpeeldagenBeheer(el) {
-    const speeldagen = await haalOp('speeldagen', { select: 'id,weekdag,start_tijd,eind_tijd,locatie', actief: 'eq.true', order: 'weekdag.asc' });
+    const speeldagen = await haalOp('speeldagen', { select: 'id,weekdag,start_tijd,eind_tijd,locatie,aantal_banen', actief: 'eq.true', order: 'weekdag.asc' });
     const vandaag = new Date().toISOString().substring(0, 10);
     const blokkades = await haalOp('speeldag_uitzonderingen', { select: 'id,speeldag_id,datum,reden', datum: 'gte.' + vandaag, order: 'datum.asc' });
 
     el.innerHTML =
+      '<h2 style="margin-bottom:8px">Aantal banen</h2>' +
+      speeldagen.map(sd => '<div class="rij"><div class="info"><div class="naam">' + escapeHtml(sd.locatie) + '</div>' +
+        '<div class="sub">' + dagnamen[sd.weekdag - 1] + ' · ' + sd.start_tijd.slice(0, 5) + '–' + sd.eind_tijd.slice(0, 5) + '</div></div>' +
+        '<div class="acties" style="align-items:center;gap:10px">' +
+        '<button class="mini-knop neutraal" data-banen-min="' + sd.id + '" type="button">−</button>' +
+        '<span id="banen-aantal-' + sd.id + '" style="font-weight:700;min-width:16px;text-align:center">' + sd.aantal_banen + '</span>' +
+        '<button class="mini-knop neutraal" data-banen-plus="' + sd.id + '" type="button">+</button>' +
+        '</div></div>').join('') +
+      '<div style="margin-top:20px">' +
+      '<h2 style="margin-bottom:8px">Datum blokkeren</h2>' +
       '<div class="veld-rij"><label>Speelavond</label><select id="b-speeldag">' +
       speeldagen.map(sd => '<option value="' + sd.id + '">' + escapeHtml(sd.locatie) + ' (' + dagnamen[sd.weekdag - 1] + ')</option>').join('') +
       '</select></div>' +
@@ -502,6 +538,7 @@
       '</div>' +
       '<button class="knop afmelden" id="b-blokkeer-knop" type="button">Datum blokkeren</button>' +
       '<div id="b-melding"></div>' +
+      '</div>' +
       '<div style="margin-top:16px"><h2 style="margin-bottom:8px">Geblokkeerde data</h2>' +
       (blokkades.length
         ? blokkades.map(b => {
@@ -513,6 +550,20 @@
         : '<p class="details">Geen geblokkeerde data.</p>') +
       '</div>';
 
+    el.querySelectorAll('[data-banen-min]').forEach(btn => btn.addEventListener('click', async () => {
+      const sd = speeldagen.find(s => s.id === Number(btn.dataset.banenMin));
+      if (sd.aantal_banen <= 1) return;
+      sd.aantal_banen -= 1;
+      document.getElementById('banen-aantal-' + sd.id).textContent = sd.aantal_banen;
+      await werkBij('speeldagen', { id: 'eq.' + sd.id }, { aantal_banen: sd.aantal_banen });
+    }));
+    el.querySelectorAll('[data-banen-plus]').forEach(btn => btn.addEventListener('click', async () => {
+      const sd = speeldagen.find(s => s.id === Number(btn.dataset.banenPlus));
+      if (sd.aantal_banen >= 8) return;
+      sd.aantal_banen += 1;
+      document.getElementById('banen-aantal-' + sd.id).textContent = sd.aantal_banen;
+      await werkBij('speeldagen', { id: 'eq.' + sd.id }, { aantal_banen: sd.aantal_banen });
+    }));
     document.getElementById('b-blokkeer-knop').addEventListener('click', async () => {
       const meldingEl = document.getElementById('b-melding');
       const datum = document.getElementById('b-datum').value;
@@ -554,26 +605,52 @@
     const rows = await haalOp('club_instellingen', { select: 'betaalinstructies,seizoen_start,seizoen_eind,uitnodig_tekst', id: 'eq.true' });
     const ci = rows[0] || {};
     el.innerHTML =
-      '<div class="veld-twee">' +
-      '<div class="veld-rij"><label>Seizoen start</label><input type="date" id="i-seizoen-start" value="' + (ci.seizoen_start || '') + '" /></div>' +
-      '<div class="veld-rij"><label>Seizoen eind</label><input type="date" id="i-seizoen-eind" value="' + (ci.seizoen_eind || '') + '" /></div>' +
+      '<div class="instelling-kaart mens">' +
+      '<div class="instelling-titel">Betaalinstructies</div>' +
+      '<div class="instelling-uitleg">Deze tekst zien leden bij het afrekenen per bank/contant.</div>' +
+      '<textarea id="i-betaalinstructies" rows="4">' + escapeHtml(ci.betaalinstructies || '') + '</textarea>' +
+      '<div class="instelling-opslaan-rij"><button class="instelling-opslaan-knop" data-opslaan="betaalinstructies" type="button">Opslaan</button></div>' +
       '</div>' +
-      '<div class="veld-rij"><label>Betaalinstructies</label><textarea id="i-betaalinstructies" rows="4">' + escapeHtml(ci.betaalinstructies || '') + '</textarea></div>' +
-      '<div class="veld-rij"><label>Uitnodigingstekst</label><textarea id="i-uitnodig-tekst" rows="4">' + escapeHtml(ci.uitnodig_tekst || '') + '</textarea></div>' +
-      '<button class="knop aanmelden" id="i-opslaan-knop" type="button">Opslaan</button>' +
+      '<div class="instelling-kaart womens">' +
+      '<div class="instelling-titel">Seizoensgrenzen</div>' +
+      '<div class="instelling-uitleg">Bepaalt o.a. de geprorateerde prijs bij een overstap naar 2x per week en de boekbare periode voor baanverhuur.</div>' +
+      '<div class="instelling-datums">' +
+      '<input type="date" id="i-seizoen-start" value="' + (ci.seizoen_start || '') + '" />' +
+      '<span>—</span>' +
+      '<input type="date" id="i-seizoen-eind" value="' + (ci.seizoen_eind || '') + '" />' +
+      '</div>' +
+      '<div class="instelling-opslaan-rij"><button class="instelling-opslaan-knop" data-opslaan="seizoen" type="button">Opslaan</button></div>' +
+      '</div>' +
+      '<div class="instelling-kaart mens">' +
+      '<div class="instelling-titel">Uitnodigingstekst</div>' +
+      '<div class="instelling-uitleg">Tekst die gedeeld wordt bij "Nieuw lid uitnodigen".</div>' +
+      '<textarea id="i-uitnodig-tekst" rows="4">' + escapeHtml(ci.uitnodig_tekst || '') + '</textarea>' +
+      '<div class="instelling-opslaan-rij"><button class="instelling-opslaan-knop" data-opslaan="uitnodiging" type="button">Opslaan</button></div>' +
+      '</div>' +
       '<div id="i-melding"></div>';
-    document.getElementById('i-opslaan-knop').addEventListener('click', async () => {
+
+    const opslaan = async (veld) => {
       const meldingEl = document.getElementById('i-melding');
       try {
-        await werkBij('club_instellingen', { id: 'eq.true' }, {
-          seizoen_start: document.getElementById('i-seizoen-start').value,
-          seizoen_eind: document.getElementById('i-seizoen-eind').value,
-          betaalinstructies: document.getElementById('i-betaalinstructies').value.trim() || null,
-          uitnodig_tekst: document.getElementById('i-uitnodig-tekst').value.trim(),
-        });
+        if (veld === 'betaalinstructies') {
+          await werkBij('club_instellingen', { id: 'eq.true' }, {
+            betaalinstructies: document.getElementById('i-betaalinstructies').value.trim() || null,
+          });
+        } else if (veld === 'seizoen') {
+          await werkBij('club_instellingen', { id: 'eq.true' }, {
+            seizoen_start: document.getElementById('i-seizoen-start').value,
+            seizoen_eind: document.getElementById('i-seizoen-eind').value,
+          });
+        } else {
+          await werkBij('club_instellingen', { id: 'eq.true' }, {
+            uitnodig_tekst: document.getElementById('i-uitnodig-tekst').value.trim(),
+          });
+        }
         melding(meldingEl, 'Instellingen opgeslagen.', false);
       } catch (e) { melding(meldingEl, e.message, true); }
-    });
+    };
+    el.querySelectorAll('[data-opslaan]').forEach(btn =>
+      btn.addEventListener('click', () => opslaan(btn.dataset.opslaan)));
   }
 
   // ---------- Baanverhuur ----------
@@ -592,6 +669,10 @@
         '<div class="sub">' + escapeHtml(r.email) + ' · ' + escapeHtml(r.telefoon) + '</div>' +
         '<div class="sub">Mollie: ' + (r.mollie_payment_id || 'nog geen betaling gestart') + '</div></div>' +
         '<div class="acties"><span class="badge-status ' + r.status + '">' + r.status + '</span>' +
+        (r.status === 'bevestigd'
+          ? '<button class="mini-knop neutraal" data-ticket-inzien="' + i + '">Ticket inzien</button>' +
+            '<button class="mini-knop neutraal" data-ticket-versturen="' + i + '">Ticket opnieuw versturen</button>'
+          : '') +
         (r.status !== 'geannuleerd' ? '<button class="mini-knop fout" data-annuleer="' + i + '">Annuleren</button>' : '') +
         '</div></div>';
     }).join('');
@@ -601,6 +682,41 @@
       await werkBij('baan_verhuur', { id: 'eq.' + r.id }, { status: 'geannuleerd' });
       await laadBaanverhuur(el);
     }));
+    el.querySelectorAll('[data-ticket-versturen]').forEach(btn => btn.addEventListener('click', async () => {
+      const r = window.__baanverhuurLijst[Number(btn.dataset.ticketVersturen)];
+      btn.disabled = true;
+      try {
+        await functieAanroepen('resend-verhuur-ticket', { verhuur_id: r.id, modus: 'versturen' });
+        alert('Ticket opnieuw verstuurd naar ' + r.email + '.');
+      } catch (e) { alert(e.message); } finally { btn.disabled = false; }
+    }));
+    el.querySelectorAll('[data-ticket-inzien]').forEach(btn => btn.addEventListener('click', async () => {
+      const r = window.__baanverhuurLijst[Number(btn.dataset.ticketInzien)];
+      try {
+        const { ticket } = await functieAanroepen('resend-verhuur-ticket', { verhuur_id: r.id, modus: 'inzien' });
+        toonTicketPopup(ticket);
+      } catch (e) { alert(e.message); }
+    }));
+  }
+
+  function toonTicketPopup(ticket) {
+    const bestaand = document.getElementById('ticket-popup');
+    if (bestaand) bestaand.remove();
+    const overlay = document.createElement('div');
+    overlay.className = 'popup-overlay';
+    overlay.id = 'ticket-popup';
+    overlay.innerHTML = '<div class="popup-kaart" style="max-width:360px">' +
+      '<div class="popup-kop"><h3>' + escapeHtml(ticket.baanNaam) + '</h3><button type="button" class="popup-sluit" aria-label="Sluiten">✕</button></div>' +
+      '<div class="popup-lichaam" style="text-align:center">' +
+      '<div style="font-weight:700;font-size:16px">' + escapeHtml(ticket.datum) + '</div>' +
+      '<div style="color:var(--ink-muted);margin-bottom:12px">' + escapeHtml(ticket.tijd) + '</div>' +
+      '<img src="' + ticket.qrUrl + '" width="160" height="160" alt="QR-code" />' +
+      '<div style="margin-top:12px;font-size:12.5px;color:var(--ink-muted)">Referentie ' + escapeHtml(ticket.referentie) + '</div>' +
+      '<div style="font-weight:700;margin-top:4px">€' + escapeHtml(ticket.prijs) + '</div>' +
+      '</div></div>';
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+    overlay.querySelector('.popup-sluit').addEventListener('click', () => overlay.remove());
+    document.body.appendChild(overlay);
   }
 
   // ---------- Betalingen ----------
