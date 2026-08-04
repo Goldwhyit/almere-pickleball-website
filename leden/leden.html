@@ -171,6 +171,19 @@
     color: var(--ink); box-shadow: 0 8px 24px rgba(4,27,51,0.2); max-width: 88vw; text-align: center;
   }
   .mini-toast.zichtbaar { transform: translate(-50%, 0); opacity: 1; }
+  /* "Nieuw lid uitnodigen" — 1-op-1 _uitnodigenKaart in leden_screen.dart. */
+  .uitnodig-kaart {
+    display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+    border: none; cursor: pointer; font-family: inherit;
+  }
+  .uitnodig-icoon {
+    width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; background: rgba(36,87,255,0.1);
+    color: var(--navy); display: flex; align-items: center; justify-content: center;
+  }
+  .uitnodig-icoon svg { width: 22px; height: 22px; }
+  .uitnodig-tekst { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .uitnodig-titel { font-weight: 600; font-size: 14.5px; color: var(--ink); }
+  .uitnodig-sub { font-size: 12.5px; color: var(--ink-muted); }
 </style>
 </head>
 <body>
@@ -204,6 +217,13 @@
     </div>
     <div id="leden-inhoud" class="laden">Laden…</div>
   </div>
+  <button type="button" class="kaart uitnodig-kaart" id="uitnodig-knop">
+    <span class="uitnodig-icoon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 3-6.2 6.5-6.2s6.5 2.6 6.5 6.2"/><line x1="18.5" y1="8" x2="18.5" y2="13"/><line x1="16" y1="10.5" x2="21" y2="10.5"/></svg></span>
+    <span class="uitnodig-tekst">
+      <span class="uitnodig-titel">Nieuw lid uitnodigen</span>
+      <span class="uitnodig-sub">Groei de community en nodig je vrienden uit om mee te spelen.</span>
+    </span>
+  </button>
 </main>
 <div id="nav-plek"></div>
 <script src="/assets/supabase.js"></script>
@@ -429,6 +449,29 @@
 
   laadLeden().catch(e => {
     document.getElementById('leden-inhoud').textContent = e.message;
+  });
+
+  /// "Nieuw lid uitnodigen" — Web Share API met klembord-fallback voor
+  /// browsers zonder ondersteuning (voornamelijk desktop). Tekst komt uit
+  /// club_instellingen (door de beheerder instelbaar), matcht de app se
+  /// _nodigVriendUit()/_uitnodigenKaart in leden_screen.dart.
+  document.getElementById('uitnodig-knop').addEventListener('click', async () => {
+    let tekst = 'Kom pickleballen bij Almere Pickleball!';
+    try {
+      const rows = await haalOp('club_instellingen', { select: 'uitnodig_tekst', id: 'eq.true' });
+      if (rows[0] && rows[0].uitnodig_tekst) tekst = rows[0].uitnodig_tekst;
+    } catch (e) { /* val terug op de standaardtekst hierboven */ }
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Almere Pickleball', text: tekst }); }
+      catch (e) { /* gebruiker annuleerde het deelvenster — geen actie nodig */ }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(tekst);
+      toonToast('Tekst gekopieerd naar klembord');
+    } catch (e) {
+      toonToast('Kon de tekst niet kopiëren.');
+    }
   });
 </script>
 </body>

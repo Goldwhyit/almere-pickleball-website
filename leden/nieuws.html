@@ -12,40 +12,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/assets/leden.css" />
 <style>
-  #nieuws-inhoud { display: flex; flex-direction: column; gap: 14px; }
-  .nieuws-kaart {
-    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
-    overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  /* Categoriefilter-pillen — 1-op-1 _categoriePil in nieuws_screen.dart. */
+  .nieuws-categorieen { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; margin-bottom: 20px; }
+  .categorie-pil {
+    flex-shrink: 0; padding: 10px 18px; border-radius: 999px; font-size: 13.5px; font-weight: 600;
+    background: #fff; color: var(--ink); border: 1.5px solid rgba(11,20,32,0.15); cursor: pointer; font-family: inherit;
+    white-space: nowrap;
   }
-  .nieuws-kaart .foto { width: 100%; height: 170px; object-fit: cover; display: block; background: var(--paper); }
-  .nieuws-kaart .foto-placeholder {
-    width: 100%; height: 90px; display: flex; align-items: center; justify-content: center;
-    font-size: 32px; background: rgba(36,87,255,0.06);
+  :root[data-theme="dark"] .categorie-pil { background: var(--card); color: var(--ink); border-color: rgba(255,255,255,0.15); }
+  .categorie-pil.actief {
+    background: var(--navy); color: #fff; border-color: var(--navy);
+    box-shadow: 0 0 8px rgba(36,87,255,0.2);
   }
-  .nieuws-kaart .inhoud-vlak { padding: 16px 18px; }
-  .categorie-badge {
-    display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 8px;
+  .nieuws-titelblok { margin-bottom: 16px; }
+  .nieuws-titelblok h2 { margin: 0; font-size: 22px; font-family: 'Unbounded', sans-serif; }
+  .nieuws-titelblok p { margin: 4px 0 0; color: var(--ink-muted); font-size: 14px; }
+  .nieuws-leeg-categorie {
+    text-align: center; padding: 48px 32px; color: var(--ink-muted); font-size: 14px;
   }
-  .categorie-club { background: rgba(36,87,255,0.12); color: var(--navy); }
-  @media (prefers-color-scheme: dark) { .categorie-club { color: #8ab6ec; } }
-  .categorie-toernooi { background: rgba(184,134,10,0.14); color: var(--gold-deep); }
-  @media (prefers-color-scheme: dark) { .categorie-toernooi { color: var(--gold); } }
-  .categorie-bond { background: rgba(228,29,35,0.1); color: var(--accent); }
-  .categorie-jeugd { background: rgba(20,140,90,0.12); color: #148c5a; }
-  .categorie-algemeen { background: rgba(91,107,125,0.12); color: var(--ink-muted); }
-  .nieuws-kaart h3 { margin: 0 0 6px; font-size: 16px; }
-  .nieuws-kaart .lichaam { margin: 0 0 10px; font-size: 14px; line-height: 1.6; color: var(--ink); white-space: pre-line; }
-  .nieuws-kaart .voetregel {
-    display: flex; justify-content: space-between; align-items: center; gap: 10px;
-    font-size: 12px; color: var(--ink-muted); border-top: 1px solid var(--line); padding-top: 10px;
-  }
-  .nieuws-kaart .voetregel a {
-    display: inline-block; padding: 5px 14px; border-radius: 999px; font-weight: 700; text-decoration: none;
-    background: var(--navy); color: #fff; white-space: nowrap;
-  }
-  .foto-placeholder svg { width: 30px; height: 30px; color: var(--navy); }
-  @media (prefers-color-scheme: dark) { .foto-placeholder svg { color: #8ab6ec; } }
   .popup-overlay {
     position: fixed; inset: 0; background: rgba(4,27,51,0.45); z-index: 100;
     display: flex; align-items: center; justify-content: center; padding: 16px;
@@ -69,6 +53,14 @@
     font-size: 15px; cursor: pointer; color: var(--ink-muted); flex-shrink: 0;
   }
   .popup-lichaam { padding: 18px 20px; }
+  .popup-lichaam .lichaam { margin: 10px 0 0; font-size: 14px; line-height: 1.6; white-space: pre-line; }
+  .popup-lichaam img { width: 100%; height: 160px; object-fit: cover; border-radius: 14px; }
+  .popup-acties { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 20px; border-top: 1px solid var(--line); }
+  .popup-acties button {
+    padding: 9px 16px; border-radius: 10px; font-size: 13.5px; font-weight: 700; cursor: pointer; font-family: inherit; border: none;
+  }
+  .popup-acties .verberg-knop { background: transparent; color: var(--ink-muted); }
+  .popup-acties .sluit-knop { background: var(--navy); color: #fff; }
 </style>
 </head>
 <body>
@@ -81,10 +73,10 @@
   <div id="account-plek"></div>
 </header>
 <main>
-  <div class="swipe-banner">
-    <span class="helft"><span class="pijl">←</span> <span>Niet <strong>geïnteresseerd</strong></span></span>
-    <span class="scheiding"></span>
-    <span class="helft rechts"><span><strong>Meer lezen</strong></span> <span class="pijl">→</span></span>
+  <div class="nieuws-categorieen" id="nieuws-categorieen"></div>
+  <div class="nieuws-titelblok">
+    <h2>Clubnieuws</h2>
+    <p>Het laatste nieuws van de club en uit de pickleballwereld.</p>
   </div>
   <div id="nieuws-deck" class="laden">Laden…</div>
 </main>
@@ -93,104 +85,132 @@
 <script src="/assets/theme.js"></script>
 <script src="/assets/i18n.js"></script>
 <script src="/assets/nav.js"></script>
-<script src="/assets/swipe-deck.js"></script>
+<script src="/assets/coverflow-deck.js"></script>
 <script>
   const sessie = vereisSessie();
   initNav('nieuws');
 
-  const categorieLabels = { club: 'Club', toernooi: 'Toernooi', bond: 'Bond', jeugd: 'Jeugd', algemeen: 'Algemeen' };
-  // Sportpassende iconen i.p.v. algemene emoji — zelfde stroke-stijl als assets/nav.js.
-  const categorieIconen = {
-    club: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="13" rx="5"/><circle cx="18.5" cy="6" r="1.4" fill="currentColor" stroke="none"/><line x1="12" y1="15" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/></svg>',
-    toernooi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M9 14L7 21l5-3 5 3-2-7" stroke-linejoin="round"/></svg>',
-    bond: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11v2a2 2 0 0 0 2 2h1l2 5h2l-1-5h2l9 4V6l-9 4H8a2 2 0 0 0-2 2z" stroke-linejoin="round"/></svg>',
-    jeugd: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M15 15.5c2.2.3 4 2 4 4.5"/></svg>',
-    algemeen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg>',
-  };
+  const CATEGORIE_VOLGORDE = ['toernooi', 'bond', 'club', 'jeugd', 'algemeen'];
+  const categorieLabels = { alle: 'Alle', toernooi: 'Toernooi', bond: 'Bond', club: 'Club', jeugd: 'Jeugd', algemeen: 'Algemeen' };
 
-  // "Niet geïnteresseerd" is een pure voorkeur van dit toestel — er is geen
-  // serverkant-concept van genegeerd nieuws per lid, dus onthouden we dit
-  // lokaal (net als bij landelijke toernooien).
+  let alleBerichten = [];
+  let categorie = 'alle';
+  let nieuwsDeck = null;
+
   function nieuwsSleutel(n) { return String(n.id); }
-  function geefVerborgen() { return JSON.parse(localStorage.getItem('pb_nieuws_verborgen') || '[]'); }
 
   function toonVolledigNieuws(n) {
     const bestaand = document.getElementById('nieuws-popup');
     if (bestaand) bestaand.remove();
-    const categorie = n.categorie && categorieLabels[n.categorie] ? n.categorie : 'algemeen';
-    const datumWeergave = n.datum_tekst ||
-      new Date(n.gepubliceerd_op).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
     const overlay = document.createElement('div');
     overlay.className = 'popup-overlay';
     overlay.id = 'nieuws-popup';
     overlay.innerHTML = '<div class="popup-kaart">' +
       '<div class="popup-kop"><h3>' + escapeHtml(n.titel) + '</h3><button type="button" class="popup-sluit" aria-label="Sluiten">✕</button></div>' +
       '<div class="popup-lichaam">' +
-      '<span class="categorie-badge categorie-' + categorie + '">' + categorieLabels[categorie] + '</span>' +
-      '<p class="lichaam" style="margin-top:10px">' + escapeHtml(n.inhoud) + '</p>' +
-      '<div class="voetregel" style="margin-top:14px">' + (n.bron ? escapeHtml(n.bron) + ' · ' : '') + datumWeergave + '</div>' +
+      (n.afbeelding_url ? '<img src="' + escapeHtml(n.afbeelding_url) + '" alt="" />' : '') +
+      '<p class="lichaam">' + escapeHtml(n.inhoud) + '</p>' +
+      '</div>' +
+      '<div class="popup-acties">' +
+      '<button type="button" class="verberg-knop" id="verberg-nieuws-knop">Verbergen</button>' +
+      '<button type="button" class="sluit-knop" id="sluit-nieuws-knop">Sluiten</button>' +
       '</div></div>';
     overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
     overlay.querySelector('.popup-sluit').addEventListener('click', () => overlay.remove());
+    document.getElementById('sluit-nieuws-knop').addEventListener('click', () => overlay.remove());
+    document.getElementById('verberg-nieuws-knop').addEventListener('click', async () => {
+      overlay.remove();
+      await verbergBericht(n.id);
+    });
     document.body.appendChild(overlay);
   }
 
-  let nieuwsDeck = null;
+  /// Servergebonden verbergen (nieuws_verborgen-tabel, per lid) i.p.v. de
+  /// vroegere localStorage-lijst — zo blijft een verborgen bericht ook op
+  /// de app verborgen, en andersom. Matcht nieuws_screen.dart's
+  /// _verbergBericht/_laden().
+  async function verbergBericht(nieuwsId) {
+    try {
+      await voegToe('nieuws_verborgen', { lid_id: sessie.user_id, nieuws_id: nieuwsId });
+    } catch (e) { /* al verborgen of race met een ander apparaat — negeren */ }
+    await laadNieuws();
+  }
+
+  function openBericht(n) {
+    if (n.link && n.link.startsWith('http')) {
+      window.open(n.link, '_blank', 'noopener');
+    } else {
+      toonVolledigNieuws(n);
+    }
+  }
+
+  function bouwKaart(n) {
+    const foto = n.afbeelding_url
+      ? '<img class="cf-foto" src="' + escapeHtml(n.afbeelding_url) + '" alt="" />'
+      : '<div class="cf-foto-leeg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.5 9.5 L14.5 14.5 M14.5 9.5 L9.5 14.5"/></svg></div>';
+    const label = categorieLabels[n.categorie] || categorieLabels.algemeen;
+    return foto +
+      '<div class="cf-onderlaag">' +
+      '<span class="cf-badge">' + escapeHtml(label) + '</span>' +
+      '<div class="cf-titel">' + escapeHtml(n.titel) + '</div>' +
+      '</div>';
+  }
+
+  function renderCategorieen(aanwezig) {
+    const el = document.getElementById('nieuws-categorieen');
+    const opties = ['alle', ...aanwezig];
+    el.innerHTML = opties.map(c =>
+      '<button type="button" class="categorie-pil' + (c === categorie ? ' actief' : '') + '" data-categorie="' + c + '">' +
+      categorieLabels[c] + '</button>'
+    ).join('');
+    el.querySelectorAll('[data-categorie]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        categorie = btn.dataset.categorie;
+        renderDeck();
+        renderCategorieen(aanwezig);
+      });
+    });
+  }
+
+  function renderDeck() {
+    const el = document.getElementById('nieuws-deck');
+    const gefilterd = categorie === 'alle' ? alleBerichten : alleBerichten.filter(n => (n.categorie || 'algemeen') === categorie);
+    if (!gefilterd.length) {
+      el.className = '';
+      el.innerHTML = '<div class="nieuws-leeg-categorie">Geen nieuws gevonden in deze categorie.</div>';
+      nieuwsDeck = null;
+      return;
+    }
+    el.className = '';
+    const kaarten = gefilterd.map(bouwKaart);
+    if (nieuwsDeck) {
+      el.innerHTML = '';
+      nieuwsDeck = null;
+    }
+    nieuwsDeck = initCoverflowDeck(el, kaarten, {
+      leegTekst: 'Nog geen nieuwsberichten.',
+      onKaartTik: (index) => openBericht(gefilterd[index]),
+    });
+  }
 
   async function laadNieuws() {
     const el = document.getElementById('nieuws-deck');
     const vandaag = new Date().toISOString().substring(0, 10);
-    const rows = await haalOp('nieuws', {
-      select: 'id,titel,inhoud,gepubliceerd_op,categorie,bron,link,datum_tekst,afbeelding_url,vervaldatum',
-      or: '(vervaldatum.is.null,vervaldatum.gte.' + vandaag + ')',
-      order: 'gepubliceerd_op.desc,volgorde.asc',
-    });
-    const verborgen = geefVerborgen();
-    window.__nieuws = rows.filter(n => !verborgen.includes(nieuwsSleutel(n)));
+    const [rows, verborgenRows] = await Promise.all([
+      haalOp('nieuws', {
+        select: 'id,titel,inhoud,gepubliceerd_op,categorie,link,afbeelding_url,volgorde',
+        or: '(vervaldatum.is.null,vervaldatum.gte.' + vandaag + ')',
+        order: 'gepubliceerd_op.desc,volgorde.asc',
+        limit: '50',
+      }),
+      haalOp('nieuws_verborgen', { select: 'nieuws_id', lid_id: 'eq.' + sessie.user_id }),
+    ]);
+    const verborgenIds = new Set(verborgenRows.map(r => r.nieuws_id));
+    alleBerichten = rows.filter(n => !verborgenIds.has(n.id));
 
-    const kaarten = window.__nieuws.map(n => {
-      const categorie = n.categorie && categorieLabels[n.categorie] ? n.categorie : 'algemeen';
-      const datumWeergave = n.datum_tekst ||
-        new Date(n.gepubliceerd_op).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
-      const foto = n.afbeelding_url
-        ? '<img class="foto" src="' + escapeHtml(n.afbeelding_url) + '" alt="" loading="lazy" />'
-        : '<div class="foto-placeholder">' + categorieIconen[categorie] + '</div>';
-      const bronLink = n.link
-        ? '<a href="' + escapeHtml(n.link) + '" target="_blank" rel="noopener">Meer lezen →</a>'
-        : '';
-      return '<div class="nieuws-kaart" style="border:none;box-shadow:none;position:relative">' + foto +
-        '<div class="inhoud-vlak">' +
-        '<span class="categorie-badge categorie-' + categorie + '">' + categorieLabels[categorie] + '</span>' +
-        '<h3>' + escapeHtml(n.titel) + '</h3>' +
-        '<p class="lichaam">' + escapeHtml(n.inhoud) + '</p>' +
-        '<div class="voetregel"><span>' + (n.bron ? escapeHtml(n.bron) + ' · ' : '') + datumWeergave + '</span>' + bronLink + '</div>' +
-        '</div></div>';
-    });
-
-    const opties = {
-      leegTekst: 'Nog geen nieuwsberichten.',
-      badgeRechts: 'Meer lezen', badgeLinks: 'Niet geïnteresseerd',
-      onSwipeRechts: (index) => {
-        const n = window.__nieuws[index];
-        if (n.link) window.open(n.link, '_blank', 'noopener');
-        else toonVolledigNieuws(n);
-        // "Meer lezen" verwijdert het bericht niet uit de lijst — de kaart
-        // moet dus terugveren i.p.v. weg blijven vliegen. herlaad() met
-        // dezelfde kaarten rendert de huidige kaart opnieuw (zonder de
-        // vlieg-transform), zonder een nieuwe netwerk-call nodig te hebben.
-        if (nieuwsDeck) nieuwsDeck.herlaad(kaarten);
-      },
-      onSwipeLinks: (index) => {
-        const n = window.__nieuws[index];
-        const lijst = geefVerborgen();
-        const sleutel = nieuwsSleutel(n);
-        if (!lijst.includes(sleutel)) lijst.push(sleutel);
-        localStorage.setItem('pb_nieuws_verborgen', JSON.stringify(lijst));
-        laadNieuws();
-      },
-    };
-    if (nieuwsDeck) nieuwsDeck.herlaad(kaarten);
-    else nieuwsDeck = initSwipeDeck(el, kaarten, opties);
+    const aanwezig = CATEGORIE_VOLGORDE.filter(c => alleBerichten.some(n => (n.categorie || 'algemeen') === c));
+    renderCategorieen(aanwezig);
+    renderDeck();
   }
 
   laadNieuws().catch(e => {

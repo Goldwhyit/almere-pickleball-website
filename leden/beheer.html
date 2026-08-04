@@ -551,14 +551,15 @@
 
   // ---------- Club-instellingen ----------
   async function laadInstellingen(el) {
-    const rows = await haalOp('club_instellingen', { select: 'betaalinstructies,seizoen_start,seizoen_eind', id: 'eq.true' });
+    const rows = await haalOp('club_instellingen', { select: 'betaalinstructies,seizoen_start,seizoen_eind,uitnodig_tekst', id: 'eq.true' });
     const ci = rows[0] || {};
     el.innerHTML =
       '<div class="veld-twee">' +
       '<div class="veld-rij"><label>Seizoen start</label><input type="date" id="i-seizoen-start" value="' + (ci.seizoen_start || '') + '" /></div>' +
       '<div class="veld-rij"><label>Seizoen eind</label><input type="date" id="i-seizoen-eind" value="' + (ci.seizoen_eind || '') + '" /></div>' +
       '</div>' +
-      '<div class="veld-rij"><label>Betaalinstructies</label><textarea id="i-betaalinstructies" rows="4">' + (ci.betaalinstructies || '') + '</textarea></div>' +
+      '<div class="veld-rij"><label>Betaalinstructies</label><textarea id="i-betaalinstructies" rows="4">' + escapeHtml(ci.betaalinstructies || '') + '</textarea></div>' +
+      '<div class="veld-rij"><label>Uitnodigingstekst</label><textarea id="i-uitnodig-tekst" rows="4">' + escapeHtml(ci.uitnodig_tekst || '') + '</textarea></div>' +
       '<button class="knop aanmelden" id="i-opslaan-knop" type="button">Opslaan</button>' +
       '<div id="i-melding"></div>';
     document.getElementById('i-opslaan-knop').addEventListener('click', async () => {
@@ -568,6 +569,7 @@
           seizoen_start: document.getElementById('i-seizoen-start').value,
           seizoen_eind: document.getElementById('i-seizoen-eind').value,
           betaalinstructies: document.getElementById('i-betaalinstructies').value.trim() || null,
+          uitnodig_tekst: document.getElementById('i-uitnodig-tekst').value.trim(),
         });
         melding(meldingEl, 'Instellingen opgeslagen.', false);
       } catch (e) { melding(meldingEl, e.message, true); }

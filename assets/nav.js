@@ -29,7 +29,28 @@ const NAV_ITEMS = [
   },
 ];
 
+// Eenmalige SVG-filter voor het "gooey" blob-effect — de klassieke
+// blur-dan-scherp-afkappen-truc (feGaussianBlur + een steile feColorMatrix-
+// alfadrempel) die twee dichtbij elkaar liggende vormen laat "samensmelten".
+// Zelfde recept als _GooeyBlobLayer in liquid_tabs_nav_bar.dart (die met
+// ImageFiltered+ColorFiltered werkt); CSS/SVG-feColorMatrix werkt in het
+// bereik 0-1 i.p.v. Dart se 0-255, vandaar de herschaalde drempelconstante.
+function _zorgVoorGooeyFilter() {
+  if (document.getElementById('pb-gooey-svg')) return;
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.id = 'pb-gooey-svg';
+  svg.setAttribute('width', '0');
+  svg.setAttribute('height', '0');
+  svg.style.position = 'absolute';
+  svg.innerHTML = '<filter id="pb-gooey">' +
+    '<feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>' +
+    '<feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7"/>' +
+    '</filter>';
+  document.body.appendChild(svg);
+}
+
 function initNav(actievePagina) {
+  _zorgVoorGooeyFilter();
   const stijl = document.createElement('style');
   stijl.textContent = `
     body { padding-bottom: 100px; }
@@ -44,20 +65,28 @@ function initNav(actievePagina) {
       box-shadow: 0 8px 24px rgba(4,27,51,0.16), inset 0 1px 0 var(--glas-hooglicht-boven, rgba(255,255,255,0.55)), inset 0 -1px 0 var(--glas-hooglicht-onder, rgba(0,0,0,0.1));
       max-width: 480px; margin: 0 auto;
     }
+    .onderbalk-tabs { position: relative; flex: 1; display: flex; }
+    /* "Vloeibare" blob-laag achter de tabs — vervangt de vroegere statische
+       kleur-pil op .actief. De feColorMatrix-gooey-filter zorgt dat het
+       hoofd- en spoor-blobje samensmelten zolang ze dicht bij elkaar zijn,
+       zelfde effect als de app se liquid_tabs_nav_bar.dart. */
+    .onderbalk-blob-laag { position: absolute; inset: 0; filter: url(#pb-gooey); pointer-events: none; }
+    .blob-hoofd, .blob-trail {
+      position: absolute; top: 2px; bottom: 2px; border-radius: 999px; background: var(--navy, #2457ff);
+      opacity: 0; left: 0; width: 0;
+    }
+    .blob-gloed {
+      position: absolute; top: 0; bottom: 0; border-radius: 999px;
+      box-shadow: 0 0 14px 2px rgba(0,91,191,0.4); opacity: 0; pointer-events: none;
+      transition: left 0.35s cubic-bezier(0.65,0,0.35,1), width 0.35s cubic-bezier(0.65,0,0.35,1);
+    }
     .onderbalk a {
-      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+      position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
       text-decoration: none; color: var(--ink-muted, #5b6b7d); font-size: 10.5px; font-weight: 600;
-      padding: 6px 2px 5px; margin: 0 2px; border-radius: 999px;
-      transition: background-color 0.22s ease, color 0.22s ease, box-shadow 0.22s ease;
+      padding: 6px 2px 5px; margin: 0 2px;
+      transition: color 0.22s ease;
     }
-    /* "Liquid" gevulde gloed-pil op de actieve tab — zelfde behandeling als
-       de actieve tegel in de app se PilNavigatie (lib/widgets/pil_navigatie.dart):
-       een volle koningsblauwe pil met witte tekst/icoon en een zachte gloed,
-       i.p.v. enkel een lichte kleurtint. */
-    .onderbalk a.actief {
-      color: #fff; background: var(--navy, #2457ff);
-      box-shadow: 0 0 14px 0.5px rgba(0,91,191,0.45);
-    }
+    .onderbalk a.actief { color: #fff; }
     .onderbalk a svg { width: 21px; height: 21px; }
     .onderbalk-extra { display: flex; gap: 4px; align-items: center; flex-shrink: 0; margin-left: 2px; padding-left: 6px; border-left: 1px solid var(--line, rgba(4,27,51,0.1)); }
     .onderbalk-extra .thema-knop, .onderbalk-extra .taal-knop {
@@ -78,14 +107,85 @@ function initNav(actievePagina) {
 
   const nav = document.createElement('nav');
   nav.className = 'onderbalk';
-  nav.innerHTML = NAV_ITEMS.map(item =>
-    '<a href="' + item.href + '"' + (item.pagina === actievePagina ? ' class="actief"' : '') + '>' +
-    item.icoon + '<span data-i18n="' + item.taalSleutel + '"></span></a>'
-  ).join('') + '<div class="onderbalk-extra" id="onderbalk-extra"></div>';
+  const actieveIndex = NAV_ITEMS.findIndex(item => item.pagina === actievePagina);
+  nav.innerHTML =
+    '<div class="onderbalk-tabs">' +
+    '<div class="onderbalk-blob-laag"><div class="blob-trail"></div><div class="blob-hoofd"></div></div>' +
+    '<div class="blob-gloed"></div>' +
+    NAV_ITEMS.map(item =>
+      '<a href="' + item.href + '"' + (item.pagina === actievePagina ? ' class="actief"' : '') + '>' +
+      item.icoon + '<span data-i18n="' + item.taalSleutel + '"></span></a>'
+    ).join('') +
+    '</div>' +
+    '<div class="onderbalk-extra" id="onderbalk-extra"></div>';
   const navPlek = document.getElementById('nav-plek');
   (navPlek || document.body).appendChild(nav);
   if (typeof initThemeKnop === 'function') initThemeKnop('onderbalk-extra');
   if (typeof initTaalKnop === 'function') initTaalKnop('onderbalk-extra');
+
+  // Blob meteen op de actieve tab zetten (geen "vanaf"-positie: dit is een
+  // verse paginalading, geen tab-wissel binnen dezelfde SPA-context zoals in
+  // de app). Bij een klik op een ANDERE tab wordt de blob wél kort naar de
+  // nieuwe positie ge-animeerd vóórdat de daadwerkelijke paginanavigatie
+  // plaatsvindt — zo krijgt de gebruiker toch een glimp van de vloeiende
+  // "liquid"-overgang, ook al herlaadt de website (i.t.t. de app) de hele
+  // pagina per tab.
+  const tabsWrap = nav.querySelector('.onderbalk-tabs');
+  const blobHoofd = nav.querySelector('.blob-hoofd');
+  const blobTrail = nav.querySelector('.blob-trail');
+  const blobGloed = nav.querySelector('.blob-gloed');
+
+  function tabGeometrie(index) {
+    const breedte = tabsWrap.clientWidth / NAV_ITEMS.length;
+    const blobBreedte = breedte * 0.72;
+    return { left: (index + 0.5) * breedte - blobBreedte / 2, width: blobBreedte };
+  }
+
+  function zetBlob(index) {
+    if (index < 0) return;
+    const { left, width } = tabGeometrie(index);
+    [blobHoofd, blobGloed].forEach(el => {
+      el.style.transition = 'none';
+      el.style.left = left + 'px';
+      el.style.width = width + 'px';
+      el.style.opacity = '1';
+    });
+    // Forceer een reflow zodat de volgende stijlwijziging (bij een klik)
+    // weer een overgang animeert i.p.v. de 'transition: none' hierboven
+    // te blijven gebruiken.
+    void blobHoofd.offsetWidth;
+    blobHoofd.style.transition = '';
+    blobGloed.style.transition = '';
+  }
+
+  zetBlob(actieveIndex);
+
+  nav.querySelectorAll('.onderbalk-tabs a').forEach((link, index) => {
+    link.addEventListener('click', (e) => {
+      if (index === actieveIndex) return; // al op deze tab, gewoon normaal gedrag
+      e.preventDefault();
+      const { left: vanLeft, width: vanBreedte } = tabGeometrie(actieveIndex < 0 ? index : actieveIndex);
+      const { left: naarLeft, width: naarBreedte } = tabGeometrie(index);
+      blobTrail.style.transition = 'none';
+      blobTrail.style.left = vanLeft + 'px';
+      blobTrail.style.width = vanBreedte + 'px';
+      blobTrail.style.opacity = '1';
+      void blobTrail.offsetWidth;
+      blobHoofd.style.transition = 'left 0.32s cubic-bezier(0.65,0,0.35,1), width 0.32s cubic-bezier(0.65,0,0.35,1)';
+      blobGloed.style.transition = 'left 0.32s cubic-bezier(0.65,0,0.35,1), width 0.32s cubic-bezier(0.65,0,0.35,1)';
+      blobHoofd.style.left = naarLeft + 'px';
+      blobHoofd.style.width = naarBreedte + 'px';
+      blobHoofd.style.opacity = '1';
+      blobGloed.style.left = naarLeft + 'px';
+      blobGloed.style.width = naarBreedte + 'px';
+      blobTrail.style.transition = 'width 0.32s cubic-bezier(0.65,0,0.35,1), left 0.32s cubic-bezier(0.65,0,0.35,1), opacity 0.15s ease 0.17s';
+      blobTrail.style.left = (vanLeft + vanBreedte / 2) + 'px';
+      blobTrail.style.width = '0px';
+      blobTrail.style.opacity = '0';
+      setTimeout(() => { window.location.href = link.href; }, 260);
+    });
+  });
+  window.addEventListener('resize', () => zetBlob(actieveIndex));
 
   const accountPlek = document.getElementById('account-plek');
   if (accountPlek) {

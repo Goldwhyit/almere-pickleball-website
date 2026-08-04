@@ -55,6 +55,64 @@
     display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;
   }
   .i-inline { width: 14px; height: 14px; vertical-align: -2px; margin-right: 3px; flex-shrink: 0; }
+  /* Betaalherinnering — zelfde behandeling als de app se accent-gekleurde
+     banner (home_screen.dart _betaalherinneringBanner). */
+  .betaal-banner {
+    background: rgba(228,29,35,0.08); border: 1px solid rgba(228,29,35,0.25);
+    border-radius: 16px; padding: 16px; margin-bottom: 14px;
+  }
+  .betaal-banner .kop { display: flex; align-items: flex-start; gap: 10px; }
+  .betaal-banner .kop svg { width: 22px; height: 22px; color: var(--accent); flex-shrink: 0; margin-top: 1px; }
+  .betaal-banner .titel { font-weight: 700; color: var(--accent); font-size: 15px; }
+  .betaal-banner .bericht { margin-top: 4px; font-size: 14px; }
+  .betaal-banner .knop-betalen {
+    margin-top: 12px; display: inline-flex; align-items: center; gap: 6px;
+    background: var(--accent); color: #fff; border: none; border-radius: 10px;
+    padding: 10px 16px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  .betaal-instructies-tekst a { color: var(--navy); font-weight: 600; }
+  .ideal-knop {
+    width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--navy); color: #fff; border: none; border-radius: 10px;
+    padding: 12px; font-size: 14.5px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  .ideal-knop:disabled { opacity: 0.6; cursor: default; }
+  /* "Samen spelen?"-verzoek — matcht home_screen.dart _samenSpelenBanner. */
+  .samenspelen-banner {
+    background: rgba(36,87,255,0.08); border: 1px solid rgba(36,87,255,0.2);
+    border-radius: 16px; padding: 16px; margin-bottom: 14px;
+  }
+  .samenspelen-banner .kop { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+  .samenspelen-banner .kop svg { width: 22px; height: 22px; color: var(--navy); flex-shrink: 0; }
+  .samenspelen-banner .knoppen-rij { display: flex; gap: 8px; margin-top: 10px; }
+  .samenspelen-banner button {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 9px; border-radius: 10px; font-size: 13.5px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  .samenspelen-banner .knop-ja { background: var(--navy); color: #fff; border: none; }
+  .samenspelen-banner .knop-nee { background: transparent; color: var(--navy); border: 1.5px solid var(--navy); }
+  /* Statistiekentegels — gedeeld door "Jouw statistieken" en "Club" (zelfde
+     _statTegel-behandeling in de app, hergebruikt voor beide rijen). */
+  .stat-tegel-rij { display: flex; gap: 8px; }
+  .kaart .stat-tegel-rij { margin-top: 10px; }
+  .kaart .kop-met-icoon { display: flex; align-items: center; gap: 6px; }
+  .kaart .kop-met-icoon svg { width: 18px; height: 18px; color: var(--navy); }
+  .kaart .kop-met-icoon span { font-size: 13px; font-weight: 600; color: var(--ink-muted); }
+  .stat-tegel-los { flex: 1; padding: 10px 4px; border-radius: 10px; text-align: center; }
+  .stat-tegel-los .waarde { font-size: 19px; font-weight: 700; }
+  .stat-tegel-los .label { font-size: 10.5px; color: var(--ink-muted); margin-top: 2px; }
+  .uitnodig-kaart {
+    display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+    border: none; cursor: pointer; font-family: inherit;
+  }
+  .uitnodig-icoon {
+    width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; background: rgba(36,87,255,0.1);
+    color: var(--navy); display: flex; align-items: center; justify-content: center;
+  }
+  .uitnodig-icoon svg { width: 22px; height: 22px; }
+  .uitnodig-tekst { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .uitnodig-titel { font-weight: 600; font-size: 14.5px; color: var(--ink); }
+  .uitnodig-sub { font-size: 12.5px; color: var(--ink-muted); }
 </style>
 </head>
 <body>
@@ -67,6 +125,8 @@
   <div id="account-plek"></div>
 </header>
 <main>
+  <div id="betaalherinnering-plek"></div>
+  <div id="samenspelen-plek"></div>
   <div class="kaart">
     <h2>Mijn abonnement</h2>
     <div id="abonnement-inhoud" class="laden">Laden…</div>
@@ -75,10 +135,25 @@
     <h2>Eerstvolgende speelavond</h2>
     <div id="volgende-speelavond-inhoud" class="laden">Laden…</div>
   </div>
+  <div class="kaart" id="statistieken-kaart" style="display:none">
+    <div class="kop-met-icoon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-4"/></svg><span>Jouw statistieken</span></div>
+    <div id="statistieken-inhoud" class="stat-tegel-rij"></div>
+  </div>
   <div class="kaart">
     <h2>Laatste nieuws</h2>
     <div id="nieuws-inhoud" class="laden">Laden…</div>
   </div>
+  <div class="kaart">
+    <div class="kop-met-icoon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M15 15.5c2.2.3 4 2 4 4.5"/></svg><span>Club</span></div>
+    <div id="club-stats-inhoud" class="stat-tegel-rij laden">Laden…</div>
+  </div>
+  <button type="button" class="kaart uitnodig-kaart" id="uitnodig-vriend-knop">
+    <span class="uitnodig-icoon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 3-6.2 6.5-6.2s6.5 2.6 6.5 6.2"/><circle cx="18" cy="8" r="2.8"/><path d="M14.5 15.2c2.4.4 4.2 2.3 4.2 4.8"/></svg></span>
+    <span class="uitnodig-tekst">
+      <span class="uitnodig-titel">Nodig een vriend uit</span>
+      <span class="uitnodig-sub">Samen spelen is leuker.</span>
+    </span>
+  </button>
 </main>
 <div id="nav-plek"></div>
 <script src="/assets/supabase.js"></script>
@@ -129,6 +204,130 @@
     // De naam staat nu al in de header (zie nav.js) — hier alleen nog de
     // verjaardagscontrole nodig.
     toonVerjaardagAlsJarig(rows[0].geboortedatum, rows[0].naam.split(' ')[0]).catch(() => {});
+  }
+
+  /// Openstaande betaalherinnering van de beheerder (nog niet als voldaan
+  /// afgevinkt) — blijft als banner staan tot een beheerder de betaling
+  /// bevestigt. Matcht home_screen.dart's _betaalherinneringBanner.
+  async function laadBetaalherinnering() {
+    const el = document.getElementById('betaalherinnering-plek');
+    const rows = await haalOp('betaal_herinneringen', {
+      select: 'id,bericht,lid_abonnement_id',
+      lid_id: 'eq.' + sessie.user_id, voldaan: 'eq.false',
+      order: 'created_at.desc', limit: '1',
+    });
+    if (!rows.length) { el.innerHTML = ''; return; }
+    const herinnering = rows[0];
+    el.innerHTML = '<div class="betaal-banner">' +
+      '<div class="kop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+      '<div><div class="titel">Betaling nodig</div><div class="bericht">' + escapeHtml(herinnering.bericht) + '</div></div></div>' +
+      '<button type="button" class="knop-betalen" id="betalen-knop"><svg class="i-inline" style="margin-right:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Betalen</button>' +
+      '</div>';
+    document.getElementById('betalen-knop').addEventListener('click', () => toonBetaalinstructies(herinnering.lid_abonnement_id));
+  }
+
+  /// Toont de door de beheerder ingevulde betaalinstructies + (als er een
+  /// lid_abonnement_id is) een directe iDEAL-betaalknop. Matcht de app se
+  /// widgets/betaalinstructies.dart.
+  async function toonBetaalinstructies(lidAbonnementId) {
+    const bestaand = document.getElementById('betaal-popup');
+    if (bestaand) bestaand.remove();
+    const rows = await haalOp('club_instellingen', { select: 'betaalinstructies', id: 'eq.true' });
+    const instructies = (rows[0] && rows[0].betaalinstructies || '').trim();
+    const instructiesHtml = instructies
+      ? '<p class="betaal-instructies-tekst">' + escapeHtml(instructies).replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>') + '</p>'
+      : '<p class="details">Neem contact op met het bestuur voor de betaalgegevens.</p>';
+    const overlay = document.createElement('div');
+    overlay.className = 'popup-overlay';
+    overlay.id = 'betaal-popup';
+    overlay.innerHTML = '<div class="popup-kaart">' +
+      '<div class="popup-kop"><h3>Hoe kun je betalen?</h3><button type="button" class="popup-sluit" aria-label="Sluiten">✕</button></div>' +
+      (lidAbonnementId
+        ? '<button type="button" class="ideal-knop" id="ideal-knop">⚡ Betaal nu via iDEAL</button>' +
+          '<p class="details" style="margin:10px 0">Of betaal liever zelf (contant/overschrijving):</p>'
+        : '') +
+      instructiesHtml +
+      '<p class="details" style="margin-top:14px">Heb je al betaald? De beheerder verwerkt dit zodra het binnen is.</p>' +
+      '</div>';
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+    overlay.querySelector('.popup-sluit').addEventListener('click', () => overlay.remove());
+    document.body.appendChild(overlay);
+    const idealKnop = document.getElementById('ideal-knop');
+    if (idealKnop) {
+      idealKnop.addEventListener('click', async () => {
+        idealKnop.disabled = true;
+        idealKnop.textContent = 'Bezig…';
+        try {
+          const res = await functieAanroepen('create-mollie-payment', { type: 'abonnement', lid_abonnement_id: lidAbonnementId });
+          if (res.checkoutUrl) window.location.href = res.checkoutUrl;
+        } catch (e) {
+          alert(e.message || 'Kan de betaalpagina niet openen.');
+          idealKnop.disabled = false;
+          idealKnop.textContent = '⚡ Betaal nu via iDEAL';
+        }
+      });
+    }
+  }
+
+  /// Openstaande "Samen spelen?"-verzoeken van vandaag — matcht
+  /// home_screen.dart's _laadSamenSpelenVerzoeken/_samenSpelenBanner.
+  async function laadSamenSpelen() {
+    const el = document.getElementById('samenspelen-plek');
+    const beginVandaag = new Date(); beginVandaag.setHours(0, 0, 0, 0);
+    const verzoeken = await haalOp('speel_verzoeken', {
+      select: 'id,van_lid_id,leden!speel_verzoeken_van_lid_id_fkey(naam)',
+      naar_lid_id: 'eq.' + sessie.user_id, status: 'eq.open',
+      created_at: 'gte.' + beginVandaag.toISOString(),
+      order: 'created_at.desc',
+    });
+    el.innerHTML = verzoeken.map(v => '<div class="samenspelen-banner" data-verzoek="' + v.id + '">' +
+      '<div class="kop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v18" stroke-linecap="round"/><path d="M5 4h11l-2.5 3.5L16 11H5" stroke-linejoin="round"/></svg>' +
+      '<span>' + escapeHtml((v.leden && v.leden.naam) || '?') + ' vraagt: samen spelen?</span></div>' +
+      '<div class="knoppen-rij">' +
+      '<button type="button" class="knop-ja" data-antwoord="ja">✓ Ja</button>' +
+      '<button type="button" class="knop-nee" data-antwoord="nee">✕ Nee</button>' +
+      '</div></div>').join('');
+    el.querySelectorAll('[data-antwoord]').forEach(btn => btn.addEventListener('click', async () => {
+      const banner = btn.closest('[data-verzoek]');
+      await werkBij('speel_verzoeken', { id: 'eq.' + banner.dataset.verzoek }, { status: btn.dataset.antwoord });
+      banner.remove();
+    }));
+  }
+
+  /// "Jouw statistieken" (alle tijden) — alleen tonen als er al gespeeld is,
+  /// matcht home_screen.dart's `if (d.stats.alleTijden.gespeeld > 0)`.
+  async function laadStatistieken() {
+    const kaart = document.getElementById('statistieken-kaart');
+    const el = document.getElementById('statistieken-inhoud');
+    const rows = await haalOp('lid_avond_statistieken', { select: 'gespeeld,gewonnen', lid_id: 'eq.' + sessie.user_id });
+    const s = rows[0] || { gespeeld: 0, gewonnen: 0 };
+    if (!s.gespeeld) { kaart.style.display = 'none'; return; }
+    const winstPct = Math.round((s.gewonnen / s.gespeeld) * 100);
+    kaart.style.display = '';
+    el.innerHTML =
+      '<div class="stat-tegel-los" style="background:rgba(36,87,255,0.06)"><div class="waarde" style="color:var(--navy)">' + s.gespeeld + '</div><div class="label">Gespeeld</div></div>' +
+      '<div class="stat-tegel-los" style="background:rgba(228,29,35,0.06)"><div class="waarde" style="color:var(--accent)">' + winstPct + '%</div><div class="label">Winst</div></div>';
+  }
+
+  /// Club-brede cijfers — matcht home_screen.dart's _laadClubStats/_clubStatsRij.
+  async function laadClubStats() {
+    const el = document.getElementById('club-stats-inhoud');
+    const [leden, speeldagen] = await Promise.all([
+      haalOp('leden', { select: 'lid_sinds', actief: 'eq.true' }),
+      haalOp('speeldagen', { select: 'aantal_banen', actief: 'eq.true' }),
+    ]);
+    const nu = new Date();
+    const nieuweDezeMaand = leden.filter(l => {
+      if (!l.lid_sinds) return false;
+      const d = new Date(l.lid_sinds);
+      return d.getFullYear() === nu.getFullYear() && d.getMonth() === nu.getMonth();
+    }).length;
+    const actieveBanen = speeldagen.reduce((som, sd) => som + (sd.aantal_banen || 0), 0);
+    el.className = 'stat-tegel-rij';
+    el.innerHTML =
+      '<div class="stat-tegel-los" style="background:rgba(36,87,255,0.06)"><div class="waarde" style="color:var(--navy)">' + leden.length + '</div><div class="label">Totaal Leden</div></div>' +
+      '<div class="stat-tegel-los" style="background:rgba(228,29,35,0.06)"><div class="waarde" style="color:var(--accent)">+' + nieuweDezeMaand + '</div><div class="label">Nieuw deze maand</div></div>' +
+      '<div class="stat-tegel-los" style="background:rgba(91,107,125,0.08)"><div class="waarde" style="color:var(--ink)">' + actieveBanen + '</div><div class="label">Actieve Banen</div></div>';
   }
 
   async function laadAbonnement() {
@@ -229,8 +428,27 @@
     el.innerHTML = html;
   }
 
-  Promise.all([laadProfiel(), laadAbonnement(), laadVolgendeSpeelavond(), laadNieuws()])
-    .catch(e => console.error(e));
+  Promise.all([
+    laadProfiel(), laadBetaalherinnering(), laadSamenSpelen(), laadAbonnement(),
+    laadVolgendeSpeelavond(), laadStatistieken(), laadNieuws(), laadClubStats(),
+  ]).catch(e => console.error(e));
+
+  /// "Nodig een vriend uit" — zelfde Web Share API + klembord-fallback als
+  /// de tegel op leden.html, matcht home_screen.dart's _nodigVriendUit().
+  document.getElementById('uitnodig-vriend-knop').addEventListener('click', async () => {
+    let tekst = 'Kom pickleballen bij Almere Pickleball!';
+    try {
+      const rows = await haalOp('club_instellingen', { select: 'uitnodig_tekst', id: 'eq.true' });
+      if (rows[0] && rows[0].uitnodig_tekst) tekst = rows[0].uitnodig_tekst;
+    } catch (e) { /* val terug op de standaardtekst hierboven */ }
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Almere Pickleball', text: tekst }); }
+      catch (e) { /* gebruiker annuleerde het deelvenster — geen actie nodig */ }
+      return;
+    }
+    try { await navigator.clipboard.writeText(tekst); alert('Tekst gekopieerd naar klembord.'); }
+    catch (e) { alert('Kon de tekst niet kopiëren.'); }
+  });
 </script>
 </body>
 </html>

@@ -207,3 +207,61 @@ main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
   background: rgba(36,87,255,0.12); color: var(--navy); text-decoration: none;
 }
 @media (prefers-color-scheme: dark) { .pil-knop-vorm { color: #8ab6ec; } }
+
+/* Gedeelde 3D-coverflow kaartenrij — zie assets/coverflow-deck.js. Repliceert
+   lib/widgets/news_coverflow_slider/ (kleuren/geometrie 1-op-1 overgenomen:
+   #141D38/#FCDB32 en #3447AA/#FBEAEB als afwisselende kaartthema's,
+   #C2185B/#E0F2FE als vaste badge-kleuren, radius 16px). */
+.coverflow-rij { display: flex; align-items: center; gap: 4px; }
+.coverflow-viewport {
+  flex: 1; position: relative; height: 260px; overflow: hidden;
+  perspective: 1000px; outline: none;
+}
+.coverflow-chevron {
+  width: 48px; height: 48px; flex-shrink: 0; border: none; background: transparent;
+  color: var(--ink-muted); font-size: 26px; cursor: pointer; border-radius: 50%;
+}
+.coverflow-chevron:disabled { opacity: 0.25; cursor: default; }
+.coverflow-chevron:not(:disabled):hover { background: rgba(91,107,125,0.1); }
+.coverflow-kaart {
+  position: absolute; top: 0; left: 50%; height: 100%; border-radius: 16px;
+  overflow: hidden; cursor: pointer; user-select: none;
+  transform-style: preserve-3d; backface-visibility: hidden;
+  box-shadow: 0 10px 26px -6px rgba(0,0,0,0.35);
+}
+.coverflow-kaart:nth-of-type(odd) { background: #141D38; }
+.coverflow-kaart:nth-of-type(even) { background: #3447AA; }
+.coverflow-kaart .cf-foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.coverflow-kaart .cf-foto-leeg {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+}
+.coverflow-kaart:nth-of-type(odd) .cf-foto-leeg { color: #FCDB32; background: rgba(20,29,56,0.7); }
+.coverflow-kaart:nth-of-type(even) .cf-foto-leeg { color: #FBEAEB; background: rgba(52,71,170,0.7); }
+.coverflow-kaart .cf-foto-leeg svg { width: 28px; height: 28px; }
+.coverflow-kaart .cf-onderlaag {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 16px 14px;
+}
+.coverflow-kaart:nth-of-type(odd) .cf-onderlaag { background: linear-gradient(to bottom, rgba(20,29,56,0), rgba(20,29,56,0.94)); }
+.coverflow-kaart:nth-of-type(even) .cf-onderlaag { background: linear-gradient(to bottom, rgba(52,71,170,0), rgba(52,71,170,0.94)); }
+.coverflow-kaart .cf-badge {
+  display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 10px; font-weight: 700;
+  background: #C2185B; color: #E0F2FE; margin-bottom: 6px;
+}
+.coverflow-kaart .cf-titel {
+  font-size: 15px; font-weight: 700; line-height: 1.3; display: -webkit-box;
+  -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.coverflow-kaart:nth-of-type(odd) .cf-titel { color: #FCDB32; }
+.coverflow-kaart:nth-of-type(even) .cf-titel { color: #FBEAEB; }
+.coverflow-dots { display: flex; justify-content: center; gap: 5px; margin-top: 12px; }
+.coverflow-dot {
+  width: 7px; height: 7px; border-radius: 999px; border: none; padding: 0; cursor: pointer;
+  background: var(--ink-muted); opacity: 0.35; transition: width 0.22s ease, opacity 0.22s ease;
+}
+.coverflow-dot.actief { width: 22px; opacity: 1; background: #C2185B; }
+.coverflow-leeg {
+  height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; color: var(--ink-muted); background: rgba(91,107,125,0.06); border-radius: 16px;
+}
+.coverflow-leeg svg { width: 32px; height: 32px; }
+.coverflow-leeg span { font-size: 13.5px; text-align: center; padding: 0 20px; }
