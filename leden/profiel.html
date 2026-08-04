@@ -34,6 +34,11 @@
   .veld-rij textarea { resize: vertical; min-height: 60px; }
   .veld-rij input:disabled { opacity: 0.6; }
   .veld-twee { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .toestemming-rij {
+    display: flex; align-items: flex-start; gap: 9px; font-size: 12.5px; font-weight: 400;
+    color: var(--ink); margin: 10px 0; cursor: pointer;
+  }
+  .toestemming-rij input[type=checkbox] { width: 17px; height: 17px; margin-top: 1px; flex-shrink: 0; accent-color: var(--navy); }
   .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 6px; }
   .stat-tegel {
     background: var(--paper); border: 1px solid var(--line); border-radius: 10px;
@@ -218,7 +223,7 @@
   async function laadProfiel() {
     const rows = await haalOp('leden', {
       select: 'naam,email,telefoon,geboortedatum,geslacht,niveau,adres,ervaring,medische_info,' +
-        'noodcontact_naam,noodcontact_telefoon,lid_sinds,rating,matches_played',
+        'noodcontact_naam,noodcontact_telefoon,lid_sinds,rating,matches_played,foto_video_toestemming',
       id: 'eq.' + sessie.user_id,
     });
     if (!rows.length) return;
@@ -278,6 +283,10 @@
       '<div class="veld-rij"><label>Noodcontact telefoon</label><input type="tel" id="veld-noodcontact-telefoon" value="' + escapeHtml(lid.noodcontact_telefoon || '') + '" /></div>' +
       '</div>' +
       '<div class="veld-rij"><label>Medische info (bijv. blessures/allergieën)</label><textarea id="veld-medische-info">' + escapeHtml(lid.medische_info || '') + '</textarea></div>' +
+      '<label class="toestemming-rij" id="medische-toestemming-veld" style="display: none;"><input type="checkbox" id="veld-medische-toestemming" />' +
+      '<span>Ik geef uitdrukkelijke toestemming voor het verwerken van deze medische informatie.</span></label>' +
+      '<label class="toestemming-rij"><input type="checkbox" id="veld-foto-video"' + (lid.foto_video_toestemming ? ' checked' : '') + ' />' +
+      '<span>Ik geef toestemming dat foto\'s/video\'s waarop ik te zien ben tijdens clubactiviteiten gebruikt mogen worden (bijv. op de website of social media).</span></label>' +
       (lid.lid_sinds ? '<p class="details">Lid sinds ' + datumFormat.format(new Date(lid.lid_sinds)) + '</p>' : '') +
       '<div class="pil-knoppen-rij">' +
       '<button type="button" class="pil-knop" id="gegevens-opslaan-knop">Opslaan</button>' +
@@ -286,6 +295,15 @@
       '<div id="gegevens-melding"></div>';
     document.getElementById('gegevens-opslaan-knop').addEventListener('click', slaGegevensOp);
     document.getElementById('gegevens-annuleer-knop').addEventListener('click', toonGegevensWeergave);
+    const medischeVeld = document.getElementById('veld-medische-info');
+    const toestemmingRij = document.getElementById('medische-toestemming-veld');
+    const bijwerkenToestemmingRij = () => {
+      toestemmingRij.style.display =
+        medischeVeld.value.trim() && medischeVeld.value.trim() !== (lid.medische_info || '').trim()
+          ? 'flex' : 'none';
+    };
+    medischeVeld.addEventListener('input', bijwerkenToestemmingRij);
+    bijwerkenToestemmingRij();
   }
 
   function leegOfWaarde(id) {
@@ -297,6 +315,12 @@
     const meldingEl = document.getElementById('gegevens-melding');
     const naam = document.getElementById('veld-naam').value.trim();
     if (!naam) { meldingEl.innerHTML = '<div class="melding fout">Naam is verplicht.</div>'; return; }
+    const medischeInfoNieuw = document.getElementById('veld-medische-info').value.trim();
+    const medischeInfoGewijzigd = medischeInfoNieuw && medischeInfoNieuw !== (mijnLid.medische_info || '').trim();
+    if (medischeInfoGewijzigd && !document.getElementById('veld-medische-toestemming').checked) {
+      meldingEl.innerHTML = '<div class="melding fout">Bevestig eerst de toestemming voor je medische informatie.</div>';
+      return;
+    }
     const btn = document.getElementById('gegevens-opslaan-knop');
     btn.disabled = true;
     btn.textContent = 'Bezig…';
@@ -311,7 +335,17 @@
         ervaring: leegOfWaarde('veld-ervaring'),
         noodcontact_naam: leegOfWaarde('veld-noodcontact-naam'),
         noodcontact_telefoon: leegOfWaarde('veld-noodcontact-telefoon'),
-        medische_info: leegOfWaarde('veld-medische-info'),
+        medische_info: medischeInfoNieuw || null,
+        // Leeggemaakt: toestemming heeft geen betekenis meer zonder de data.
+        // Gewijzigd naar een nieuwe, niet-lege waarde: net bevestigd via de
+        // checkbox hierboven. Ongewijzigd: veld weglaten (hieronder al niet
+        // meegestuurd) zodat een eerder vastgelegd tijdstip blijft staan.
+        ...(!medischeInfoNieuw
+          ? { medische_info_toestemming_op: null }
+          : medischeInfoGewijzigd
+            ? { medische_info_toestemming_op: new Date().toISOString() }
+            : {}),
+        foto_video_toestemming: document.getElementById('veld-foto-video').checked,
       });
       await laadProfiel();
       toonGegevensWeergave();

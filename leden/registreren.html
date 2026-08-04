@@ -66,6 +66,13 @@
   .rij-twee > div:first-child { flex: 3; }
   .rij-twee > div:last-child { flex: 2; }
   .hint { font-size: 12px; color: var(--ink-muted); margin-top: 5px; }
+  .toestemming-rij {
+    display: flex; align-items: flex-start; gap: 9px; font-size: 12.5px; font-weight: 400;
+    color: var(--ink); margin-top: 14px; cursor: pointer;
+  }
+  .toestemming-rij input[type=checkbox] { width: 17px; height: 17px; margin-top: 1px; flex-shrink: 0; accent-color: var(--navy); }
+  .toestemming-rij a { color: var(--navy); }
+  :root[data-theme="dark"] .toestemming-rij a { color: #8ab6ec; }
 
   .drie-knoppen { display: flex; gap: 8px; margin-top: 6px; }
   .keuzeknop {
@@ -187,6 +194,13 @@
       <div class="samenvatting-kaart" id="samenvatting-kaart"></div>
       <label>Kies een wachtwoord<input type="password" id="wachtwoord-invoer" autocomplete="new-password" /></label>
       <p class="hint">Minimaal 8 tekens.</p>
+
+      <label class="toestemming-rij"><input type="checkbox" id="privacybeleid-invoer" />
+        <span>Ik heb het <a href="/privacy/" target="_blank" rel="noopener">privacybeleid</a> gelezen en ga hiermee akkoord.</span></label>
+      <label class="toestemming-rij" id="medische-toestemming-veld" style="display: none;"><input type="checkbox" id="medische-toestemming-invoer" />
+        <span>Ik geef uitdrukkelijke toestemming voor het verwerken van de hierboven ingevulde medische informatie.</span></label>
+      <label class="toestemming-rij"><input type="checkbox" id="foto-video-invoer" />
+        <span>Ik geef toestemming dat foto's/video's waarop ik te zien ben tijdens clubactiviteiten gebruikt mogen worden (bijv. op de website of social media). Optioneel, op elk moment aan te passen via je profiel.</span></label>
     </div>
 
     <div class="knoppen-rij">
@@ -395,7 +409,7 @@
     document.getElementById('terug-knop').style.display = stap > 0 ? 'block' : 'none';
     document.getElementById('volgende-knop').style.display = stap < 2 ? 'block' : 'none';
     document.getElementById('verstuur-knop').style.display = stap === 2 ? 'block' : 'none';
-    if (stap === 2) renderSamenvatting();
+    if (stap === 2) { renderSamenvatting(); bijwerkenMedischeToestemmingVeld(); }
     bijwerkenKnoppen();
     document.getElementById('fout-melding').textContent = '';
   }
@@ -445,6 +459,12 @@
     return { betaald: true, checkoutUrl: data.checkoutUrl };
   }
 
+  function bijwerkenMedischeToestemmingVeld() {
+    document.getElementById('medische-toestemming-veld').style.display =
+      document.getElementById('medische-info-invoer').value.trim() ? 'flex' : 'none';
+  }
+  document.getElementById('medische-info-invoer').addEventListener('input', bijwerkenMedischeToestemmingVeld);
+
   document.getElementById('reg-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     if (bezig || !gekozenAbonnement) return;
@@ -453,6 +473,15 @@
     foutEl.textContent = '';
     if (wachtwoord.length < 8) {
       foutEl.textContent = 'Je wachtwoord moet minstens 8 tekens hebben.';
+      return;
+    }
+    if (!document.getElementById('privacybeleid-invoer').checked) {
+      foutEl.textContent = 'Accepteer eerst het privacybeleid.';
+      return;
+    }
+    const medischeInfoWaarde = document.getElementById('medische-info-invoer').value.trim();
+    if (medischeInfoWaarde && !document.getElementById('medische-toestemming-invoer').checked) {
+      foutEl.textContent = 'Bevestig eerst de toestemming voor je medische informatie.';
       return;
     }
     bezig = true;
@@ -470,11 +499,14 @@
         taal: 'nl',
         adres: document.getElementById('adres-invoer').value.trim(),
         ervaring: document.getElementById('ervaring-invoer').value.trim(),
-        medische_info: document.getElementById('medische-info-invoer').value.trim(),
+        medische_info: medischeInfoWaarde,
         noodcontact_naam: document.getElementById('noodcontact-naam-invoer').value.trim(),
         noodcontact_telefoon: document.getElementById('noodcontact-telefoon-invoer').value.trim(),
         niveau,
         ouder_email: isJeugd ? ouderEmail : '',
+        privacybeleid_akkoord: 'true',
+        medische_info_toestemming: document.getElementById('medische-toestemming-invoer').checked ? 'true' : 'false',
+        foto_video_toestemming: document.getElementById('foto-video-invoer').checked ? 'true' : 'false',
       });
       const resultaat = await slaAbonnementOp();
       if (isJeugd) {
