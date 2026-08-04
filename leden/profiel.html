@@ -115,7 +115,7 @@
 <header>
   <img src="/assets/img/logo.png" alt="" width="40" height="39" style="border-radius: 8px;" />
   <div style="flex: 1; min-width: 0;">
-    <div class="merk">Almere Pickleball</div>
+    <div class="merk"></div>
     <h1 id="welkom">Profiel</h1>
   </div>
   <div id="account-plek"></div>
@@ -228,7 +228,8 @@
     });
     if (!rows.length) return;
     mijnLid = rows[0];
-    document.getElementById('welkom').textContent = 'Welkom, ' + mijnLid.naam;
+    // De naam staat nu al in de header (zie nav.js) — de titel blijft hier
+    // gewoon "Profiel".
     mijnLeeftijd = berekenLeeftijd(mijnLid.geboortedatum);
     toonGegevensWeergave();
   }

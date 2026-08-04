@@ -49,7 +49,7 @@ body { margin: 0; font-family: 'Manrope', -apple-system, sans-serif; background:
    onder dat het oppervlak als glas laat "vangen". De header behoudt de
    navy merkkleur maar dan als getint glas i.p.v. een vlakke kleur. */
 header {
-  background: linear-gradient(135deg, rgba(36,87,255,0.82), rgba(0,61,130,0.82));
+  background: linear-gradient(135deg, rgba(0,61,130,0.88), rgba(36,87,255,0.78));
   -webkit-backdrop-filter: blur(24px) saturate(160%);
   backdrop-filter: blur(24px) saturate(160%);
   color: #fff;
@@ -60,7 +60,14 @@ header {
   border-radius: 32px;
   border: 1px solid rgba(255,255,255,0.24);
 }
-header .merk { font-family: 'Unbounded', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #cfe0f0; }
+/* Toont de naam van het ingelogde lid (nav.js vult dit bij het laden van
+   elke pagina) i.p.v. de vroegere statische "Almere Pickleball"-tekst.
+   Ellipsis + nowrap zodat een lange naam nooit tegen #account-plek
+   (flex-shrink: 0, zie nav.js) aan botst. */
+header .merk {
+  font-family: 'Manrope', sans-serif; font-size: 13.5px; font-weight: 700;
+  color: #eaf1fb; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 header h1 {
   font-family: 'Unbounded', sans-serif; font-size: clamp(15px, 4.8vw, 20px); margin: 4px 0 0; flex: 1;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;

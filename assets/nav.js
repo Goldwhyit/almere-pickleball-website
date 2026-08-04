@@ -96,14 +96,24 @@ function initNav(actievePagina) {
     if (typeof pasTaalToe === 'function') pasTaalToe();
 
     if (actievePagina !== 'beheer') {
-      haalOp('leden', { select: 'is_admin', id: 'eq.' + huidigeSessie().user_id }).then(rows => {
-        if (rows[0] && rows[0].is_admin) {
+      haalOp('leden', { select: 'naam,is_admin', id: 'eq.' + huidigeSessie().user_id }).then(rows => {
+        if (!rows[0]) return;
+        const merkEl = document.querySelector('header .merk');
+        if (merkEl) merkEl.textContent = rows[0].naam;
+        if (rows[0].is_admin) {
           const link = document.createElement('a');
           link.href = '/leden/beheer.html';
           link.setAttribute('data-i18n', 'navBeheer');
           accountPlek.querySelector('.account-knoppen').prepend(link);
           if (typeof pasTaalToe === 'function') pasTaalToe();
         }
+      }).catch(() => {});
+    } else {
+      // Op beheer.html is de admin-check niet nodig (de hele pagina is al
+      // admin-only), maar de header-naam moet hier ook getoond worden.
+      haalOp('leden', { select: 'naam', id: 'eq.' + huidigeSessie().user_id }).then(rows => {
+        const merkEl = document.querySelector('header .merk');
+        if (merkEl && rows[0]) merkEl.textContent = rows[0].naam;
       }).catch(() => {});
     }
   }

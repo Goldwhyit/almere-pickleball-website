@@ -61,7 +61,7 @@
 <header>
   <img src="/assets/img/logo.png" alt="" width="40" height="39" style="border-radius: 8px;" />
   <div style="flex: 1; min-width: 0;">
-    <div class="merk">Almere Pickleball</div>
+    <div class="merk"></div>
     <h1 id="welkom">Welkom</h1>
   </div>
   <div id="account-plek"></div>
@@ -126,7 +126,8 @@
   async function laadProfiel() {
     const rows = await haalOp('leden', { select: 'naam,geboortedatum', id: 'eq.' + sessie.user_id });
     if (!rows.length) return;
-    document.getElementById('welkom').textContent = 'Welkom, ' + rows[0].naam;
+    // De naam staat nu al in de header (zie nav.js) — hier alleen nog de
+    // verjaardagscontrole nodig.
     toonVerjaardagAlsJarig(rows[0].geboortedatum, rows[0].naam.split(' ')[0]).catch(() => {});
   }
 
