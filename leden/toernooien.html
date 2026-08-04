@@ -57,7 +57,13 @@
   }
   @media (prefers-color-scheme: dark) { .deelnemers-knop { color: #8ab6ec; } }
 
-  /* Landelijk: foto 50/50 over de kaart als er een flyer is */
+  /* Landelijk: foto 50/50 over de kaart als er een flyer is.
+     .naam/.details hadden hier geen basisstijl (die bestond alleen scoped
+     onder .toernooi-regel voor Almere) — de titel en icoon-regels renderden
+     daardoor ongestyled, vandaar dat dit niet aansloot bij de kaart-look
+     van de app (zie lib/widgets/national_tournament_card_swap/ — bold
+     titel, kleine grijze icoon-regels, een kosten-"chip" i.p.v. platte
+     tekst). Hieronder dezelfde typografie/kleuren als daar. */
   .landelijk-kaart {
     display: flex; border-top: 1px solid var(--line); padding: 12px 0; gap: 14px; align-items: stretch;
   }
@@ -69,6 +75,16 @@
   .landelijk-kaart .foto-helft img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .landelijk-kaart .tekst-helft { flex: 1; min-width: 0; }
   .landelijk-kaart.zonder-foto .tekst-helft { flex: 1 1 100%; }
+  .landelijk-kaart .naam { font-weight: 700; font-size: 15px; line-height: 1.3; }
+  .landelijk-kaart .details {
+    display: flex; align-items: center; color: var(--ink-muted); font-size: 12.5px; margin-top: 4px;
+  }
+  .landelijk-kaart .actie { margin-top: 10px; }
+  .kosten-chip {
+    display: inline-block; margin-top: 8px; padding: 3px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 700; background: rgba(36,87,255,0.1); color: var(--navy);
+  }
+  @media (prefers-color-scheme: dark) { .kosten-chip { color: #8ab6ec; } }
 
   .popup-overlay {
     position: fixed; inset: 0; background: rgba(4,27,51,0.45); z-index: 100;
@@ -365,8 +381,8 @@
         '<div class="details"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.58 7-12A7 7 0 0 0 5 9c0 4.42 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>' + escapeHtml(t.plaats) + (t.adres ? ' · ' + escapeHtml(t.adres) : '') + '</div>',
       ];
       if (t.toernooi_type) detailRegels.push('<div class="details">' + escapeHtml(t.toernooi_type) + '</div>');
-      if (t.kosten) detailRegels.push('<div class="details">Kosten: ' + escapeHtml(t.kosten) + '</div>');
       if (t.sluiting_inschrijving) detailRegels.push('<div class="details">Sluiting inschrijving: ' + escapeHtml(t.sluiting_inschrijving) + '</div>');
+      const kostenChip = t.kosten ? '<span class="kosten-chip">' + escapeHtml(t.kosten) + '</span>' : '';
       let actie = '';
       if (email || link) {
         actie = '<div class="actie">' +
@@ -377,7 +393,7 @@
       const tekstHelft = '<div class="tekst-helft">' +
         '<div class="naam-rij"><span class="naam">' + escapeHtml(t.naam) + '</span>' +
         '<span class="landelijk-badge">Landelijk</span></div>' +
-        detailRegels.join('') + actie + '</div>';
+        detailRegels.join('') + kostenChip + actie + '</div>';
       if (t.flyer_url) {
         return '<div class="landelijk-kaart met-foto" style="border-top:none">' +
           '<div class="foto-helft"><img src="' + escapeHtml(t.flyer_url) + '" alt="" /></div>' +
