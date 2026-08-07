@@ -51,19 +51,72 @@
     background: var(--card); border: 1px solid var(--line); border-radius: 16px;
     padding: 22px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   }
-  .toelichting { font-size: 13.5px; color: var(--ink-muted); line-height: 1.5; margin: 0 0 18px; }
-  .ticket { border: 1.5px dashed var(--line); border-radius: 12px; padding: 20px; text-align: center; }
-  .ticket .baan { font-size: 12.5px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-  .ticket .datum { font-size: 19px; font-weight: 700; margin-top: 4px; }
-  .ticket .tijd { font-size: 16px; font-weight: 600; color: var(--navy); margin-top: 2px; }
-  @media (prefers-color-scheme: dark) { .ticket .tijd { color: #8ab6ec; } }
-  .ticket img { margin: 16px 0; border-radius: 8px; }
-  .ticket .ref { font-size: 12px; color: var(--ink-muted); }
-  .details { width: 100%; margin-top: 18px; font-size: 13.5px; color: var(--ink-muted); border-collapse: collapse; }
-  .details td { padding: 4px 0; }
-  .details td:last-child { text-align: right; font-weight: 700; color: var(--ink); }
+  .toelichting { font-size: 13.5px; color: var(--ink-muted); line-height: 1.5; margin: 0 0 14px; }
+
+  /* Bioscoopticket-stijl bevestiging: koptekst met een schematische
+     baan-illustratie (geen echte foto — die hebben we niet, en een
+     externe stockfoto hotlinken is niet betrouwbaar/toegestaan), een
+     "afgescheurde" perforatielijn, en een 2-koloms gegevensraster.
+     Blijft in de bestaande site-kleuren (--navy/--gold/--card/--line)
+     i.p.v. de limegroen/Apple-HIG-stijl uit het referentie-ontwerp. */
+  .ticket-kaart {
+    position: relative; border-radius: 22px; margin-bottom: 14px;
+    box-shadow: 0 10px 30px rgba(4,27,51,0.14);
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+  }
+  .ticket-kaart:hover { box-shadow: 0 16px 40px rgba(4,27,51,0.2); transform: translateY(-2px); }
+  .ticket-kaart.is-voltooid { opacity: 0.72; filter: grayscale(0.45); }
+  .ticket-header {
+    position: relative; height: 148px; border-radius: 22px 22px 0 0; overflow: hidden;
+    background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+  }
+  .ticket-header .baanlijnen { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.38; }
+  .ticket-header .titelblok { position: absolute; left: 20px; right: 20px; bottom: 14px; color: #fff; }
+  .ticket-header .titelblok .sub {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.75);
+  }
+  .ticket-header .titelblok .baan { font-family: 'Unbounded', sans-serif; font-size: 19px; font-weight: 700; margin-top: 2px; }
+  .ticket-badge {
+    position: absolute; top: 14px; left: 20px; padding: 4px 12px; border-radius: 999px;
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #fff;
+  }
+  .ticket-badge.klaar { background: rgba(20,140,90,0.92); }
+  .ticket-badge.voltooid { background: rgba(30,38,50,0.75); }
+  .ticket-badge.bevestigd { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.35); }
+  .ticket-perforatie { position: relative; height: 0; }
+  .ticket-perforatie .notch {
+    position: absolute; top: -11px; width: 22px; height: 22px; border-radius: 50%; background: var(--paper); z-index: 2;
+  }
+  .ticket-perforatie .notch.links { left: -11px; }
+  .ticket-perforatie .notch.rechts { right: -11px; }
+  .ticket-perforatie .lijn { position: absolute; left: 22px; right: 22px; top: -1px; border-top: 1.5px dashed var(--line); }
+  .ticket-body { background: var(--card); border-radius: 0 0 22px 22px; padding: 18px 22px 6px; }
+  .ticket-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+  .ticket-veld { display: flex; align-items: flex-start; gap: 9px; padding: 10px 0; border-top: 1px solid var(--line); min-width: 0; }
+  .ticket-grid .ticket-veld:nth-child(-n+2) { border-top: none; }
+  .ticket-veld .icoon {
+    width: 26px; height: 26px; flex-shrink: 0; margin-top: 1px; border-radius: 8px;
+    background: rgba(36,87,255,0.1); color: var(--navy); display: flex; align-items: center; justify-content: center;
+  }
+  @media (prefers-color-scheme: dark) { .ticket-veld .icoon { color: #8ab6ec; } }
+  .ticket-veld .icoon svg { width: 13px; height: 13px; }
+  .ticket-veld .tekst { min-width: 0; }
+  .ticket-veld .label { font-size: 10.5px; color: var(--ink-muted); display: block; }
+  .ticket-veld .waarde {
+    font-size: 13.5px; font-weight: 700; color: var(--ink); display: block;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ticket-qr-sectie { text-align: center; padding: 18px 22px 22px; border-top: 1px solid var(--line); margin-top: 8px; }
+  .ticket-referentie-label { font-size: 10.5px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .ticket-referentie { font-family: 'Unbounded', sans-serif; font-size: 15px; font-weight: 700; margin-top: 2px; }
+  .ticket-qr-sectie img {
+    margin: 14px 0 8px; border-radius: 10px; opacity: 0; transform: scale(0.94);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .ticket-qr-sectie img.zichtbaar { opacity: 1; transform: scale(1); }
+  .ticket-qr-hint { font-size: 12.5px; color: var(--ink-muted); }
   .screenshot-tip {
-    margin-top: 16px; padding: 10px 12px; border-radius: 8px; font-size: 13px;
+    margin-top: 14px; padding: 10px 12px; border-radius: 8px; font-size: 13px;
     background: rgba(255,210,63,0.14); color: var(--gold-deep);
   }
   @media (prefers-color-scheme: dark) { .screenshot-tip { color: var(--gold); } }
@@ -71,8 +124,11 @@
   .deel-knop {
     flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
     padding: 11px; border-radius: 10px; text-decoration: none; font-size: 13.5px; font-weight: 700;
-    border: 1.5px solid var(--line); color: var(--ink);
+    border: 1.5px solid var(--line); color: var(--ink); transition: background 0.15s ease;
   }
+  .deel-knop:hover { background: rgba(36,87,255,0.06); }
+  .deel-knop.primair { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .deel-knop.primair:hover { background: var(--navy-deep); }
   .mail-notitie { font-size: 12.5px; color: var(--ink-muted); margin-top: 14px; text-align: center; }
   .laden { text-align: center; color: var(--ink-muted); padding: 40px 0; }
   .fout { color: var(--danger); text-align: center; padding: 20px 0; }
@@ -92,7 +148,7 @@
   <div id="thema-plek"></div>
 </header>
 <main>
-  <div id="app" class="kaart"><div class="laden">Even je boeking ophalen…</div></div>
+  <div id="app"><div class="kaart"><div class="laden">Even je boeking ophalen…</div></div></div>
   <a class="terug" href="/">← Terug naar de website</a>
   <p class="mini-footer"><a href="/veelgestelde-vragen/">Veelgestelde vragen</a> · <a href="/privacy/">Privacybeleid</a></p>
 </main>
@@ -112,39 +168,108 @@
       ' ' + tijdFormat.format(start) + '–' + tijdFormat.format(eind) + ' uur. Referentie ' + referentie + '.';
   }
 
+  // Schematische bovenaanzicht-lijntekening van een pickleballbaan (kader,
+  // net, kitchen-lijnen, middenlijnen) — i.p.v. een echte foto, die er nog
+  // niet is; zo blijft de header wel herkenbaar zonder een onbetrouwbare
+  // externe hotlink te gebruiken.
+  const BAANLIJNEN_SVG =
+    '<svg class="baanlijnen" viewBox="0 0 400 160" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' +
+    '<rect x="20" y="15" width="360" height="130" fill="none" stroke="#fff" stroke-width="2"/>' +
+    '<line x1="20" y1="80" x2="380" y2="80" stroke="#fff" stroke-width="3"/>' +
+    '<line x1="20" y1="52" x2="380" y2="52" stroke="#fff" stroke-width="1.5"/>' +
+    '<line x1="20" y1="108" x2="380" y2="108" stroke="#fff" stroke-width="1.5"/>' +
+    '<line x1="200" y1="15" x2="200" y2="52" stroke="#fff" stroke-width="1.5"/>' +
+    '<line x1="200" y1="108" x2="200" y2="145" stroke="#fff" stroke-width="1.5"/>' +
+    '</svg>';
+
+  function ticketVeld(icoonSvg, label, waarde) {
+    return '<div class="ticket-veld"><span class="icoon">' + icoonSvg + '</span>' +
+      '<span class="tekst"><span class="label">' + label + '</span><span class="waarde">' + escapeHtml(waarde) + '</span></span></div>';
+  }
+
   function toonTicket(t) {
     const start = new Date(t.start_tijd), eind = new Date(t.eind_tijd);
-    const referentie = id.slice(0, 8).toUpperCase();
+    const nu = new Date();
+    const duurMin = Math.round((eind - start) / 60000);
+    const referentie = 'PB-' + start.getFullYear() + '-' + id.replace(/-/g, '').slice(0, 8).toUpperCase();
     const qrData = encodeURIComponent('Pickleball Almere · ' + t.baan_naam + ' · ' + t.start_tijd + ' · ' + referentie);
     const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=8&data=' + qrData;
     const tekst = ticketTekst(t, referentie);
+
+    // Status-badge: "Klaar om te spelen" als de boeking binnen 2 uur begint
+    // (en nog niet voorbij is), "Voltooid" (en de hele kaart gedimd) als de
+    // eindtijd al gepasseerd is, anders gewoon "Bevestigd".
+    const voltooid = nu > eind;
+    const binnenkort = !voltooid && (start - nu) <= 2 * 60 * 60 * 1000;
+    const badge = voltooid
+      ? '<span class="ticket-badge voltooid">Voltooid</span>'
+      : binnenkort
+        ? '<span class="ticket-badge klaar">Klaar om te spelen</span>'
+        : '<span class="ticket-badge bevestigd">Bevestigd</span>';
+
     app.innerHTML =
       '<p class="toelichting">Bedankt voor je boeking, ' + escapeHtml(t.naam) + '! Bewaar dit ticket, of maak een schermafbeelding als bewijs.</p>' +
-      '<div class="ticket">' +
-      '<div class="baan">' + escapeHtml(t.baan_naam) + '</div>' +
-      '<div class="datum">' + dagFormat.format(start) + '</div>' +
-      '<div class="tijd">' + tijdFormat.format(start) + '–' + tijdFormat.format(eind) + ' uur</div>' +
-      '<img src="' + qrUrl + '" width="160" height="160" alt="QR-code van je ticket" />' +
-      '<div class="ref">Referentie ' + referentie + '</div>' +
+      '<div class="ticket-kaart' + (voltooid ? ' is-voltooid' : '') + '">' +
+      '<div class="ticket-header">' + BAANLIJNEN_SVG + badge +
+      '<div class="titelblok"><div class="sub">Baanverhuur</div><div class="baan">' + escapeHtml(t.baan_naam) + '</div></div>' +
       '</div>' +
-      '<table class="details">' +
-      '<tr><td>Prijs</td><td>' + euro.format(t.prijs) + '</td></tr>' +
-      '<tr><td>Locatie</td><td>Sporthal Almere Haven</td></tr>' +
-      '</table>' +
+      '<div class="ticket-perforatie"><span class="notch links"></span><span class="notch rechts"></span><span class="lijn"></span></div>' +
+      '<div class="ticket-body">' +
+      '<div class="ticket-grid">' +
+      ticketVeld('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>', 'Datum', dagFormat.format(start)) +
+      ticketVeld('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>', 'Tijd', tijdFormat.format(start) + '–' + tijdFormat.format(eind) + ' uur') +
+      ticketVeld('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>', 'Locatie', 'Sporthal Almere Haven') +
+      ticketVeld('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg>', 'Duur', duurMin + ' min') +
+      ticketVeld('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><circle cx="12" cy="9.5" r="1.6" fill="currentColor" stroke="none"/></svg>', 'Baan', t.baan_naam) +
+      ticketVeld('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 8a3 3 0 1 1 6 0v1a3 3 0 1 1-6 0Z"/></svg>', 'Status', voltooid ? 'Voltooid' : (binnenkort ? 'Klaar om te spelen' : 'Bevestigd')) +
+      ticketVeld('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 8.5c0-1 1-1.5 2-1.5h1.5a2 2 0 0 1 0 4H10a2 2 0 0 0 0 4H13c1 0 2-.5 2-1.5M12 5.5v13"/></svg>', 'Prijs', euro.format(t.prijs)) +
+      ticketVeld('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>', 'Naam', t.naam) +
+      '</div>' +
+      '</div>' +
+      '<div class="ticket-qr-sectie">' +
+      '<div class="ticket-referentie-label">Reserveringsnummer</div>' +
+      '<div class="ticket-referentie">' + referentie + '</div>' +
+      '<img id="ticket-qr" src="' + qrUrl + '" width="160" height="160" alt="QR-code van je ticket" />' +
+      '<div class="ticket-qr-hint">Toon deze QR-code bij aankomst.</div>' +
+      '</div>' +
+      '</div>' +
       '<div class="screenshot-tip"><svg class="i-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h1.5l1-1.5h7l1 1.5H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><circle cx="12" cy="12.5" r="3.2"/></svg>Tip: maak nu een schermafbeelding (screenshot) van dit ticket.</div>' +
-      '<div class="deel-knoppen">' +
+      '<div class="deel-knoppen" id="deel-knoppen">' +
+      '<button type="button" class="deel-knop primair" id="deel-reservering-knop">Deel reservering</button>' +
+      '</div>' +
+      '<div class="deel-knoppen" id="deel-fallback-knoppen" style="display:none">' +
       '<a class="deel-knop" href="sms:?body=' + encodeURIComponent(tekst) + '">Via sms</a>' +
       '<a class="deel-knop" href="https://wa.me/?text=' + encodeURIComponent(tekst) + '" target="_blank" rel="noopener">Via WhatsApp</a>' +
       '</div>' +
       '<div class="mail-notitie">Je ontvangt ook een bevestiging per e-mail op ' + escapeHtml(t.email) + '.</div>';
+
+    // Zachte fade-in van de QR-code zodra de pop-up/pagina open is, i.p.v.
+    // meteen zichtbaar.
+    requestAnimationFrame(() => {
+      const qrImg = document.getElementById('ticket-qr');
+      if (qrImg) qrImg.classList.add('zichtbaar');
+    });
+
+    // "Delen" gebruikt de Web Share API waar beschikbaar (native deelvenster
+    // op telefoon/tablet); op desktop-browsers zonder ondersteuning tonen we
+    // de bestaande sms/WhatsApp-knoppen als terugval.
+    document.getElementById('deel-reservering-knop').addEventListener('click', async () => {
+      if (navigator.share) {
+        try { await navigator.share({ title: 'Mijn baanreservering', text: tekst }); }
+        catch (e) { /* gebruiker annuleerde het deelvenster — negeren */ }
+      } else {
+        document.getElementById('deel-knoppen').style.display = 'none';
+        document.getElementById('deel-fallback-knoppen').style.display = '';
+      }
+    });
   }
 
   function toonWachten() {
-    app.innerHTML = '<div class="laden">Je betaling wordt nog verwerkt — dit duurt meestal maar een paar seconden…</div>';
+    app.innerHTML = '<div class="kaart"><div class="laden">Je betaling wordt nog verwerkt — dit duurt meestal maar een paar seconden…</div></div>';
   }
 
   function toonFout(tekst) {
-    app.innerHTML = '<div class="fout">' + tekst + '</div>';
+    app.innerHTML = '<div class="kaart"><div class="fout">' + tekst + '</div></div>';
   }
 
   async function haalTicketOp(pogingen) {
