@@ -69,12 +69,12 @@
     background: #0a0c12;
     box-shadow: 0 8px 20px -6px rgba(0,0,0,0.5);
   }
+  /* Alleen bovenin een donker-naar-transparant overloop (voor naam/niveau-
+     leesbaarheid) i.p.v. een waas/glas-tint over de hele kaart — de
+     onderbalk heeft al zijn eigen ondoorzichtige achtergrond. */
   .lid-kaart-inside {
     position: absolute; inset: 0;
-    background: linear-gradient(150deg,
-      color-mix(in srgb, var(--kaart-surface) 55%, transparent) 0%,
-      rgba(10,12,18,0.88) 46%,
-      color-mix(in srgb, var(--kaart-surface) 45%, transparent) 100%);
+    background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, transparent 34%);
   }
   .lid-kaart-head { position: absolute; left: 0; right: 0; top: 18px; padding: 0 16px; pointer-events: none; }
   .lid-kaart .naam {
@@ -88,7 +88,7 @@
   .lid-kaart-bar {
     position: absolute; left: 10px; right: 10px; bottom: 10px; display: flex; align-items: center; gap: 8px;
     padding: 8px 9px; border-radius: 16px; background: rgba(14,17,24,0.72); border: 1px solid rgba(226,236,248,0.12);
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); text-align: left;
+    text-align: left;
   }
   .lid-kaart-chip {
     width: 30px; height: 30px; flex: 0 0 auto; display: flex; align-items: center; justify-content: center;
@@ -101,13 +101,7 @@
     font-style: normal; font-size: 10px; color: rgba(226,236,248,0.55); display: block;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .lid-kaart-cta {
-    flex: 0 0 auto; padding: 6.5px 12px; border: 1px solid rgba(226,236,248,0.2); border-radius: 10px;
-    background: rgba(226,236,248,0.08); color: #eef3fa; font-family: inherit; font-size: 11px; font-weight: 600; cursor: pointer;
-    transition: background 0.18s ease, transform 0.12s ease;
-  }
-  .lid-kaart-cta:hover { background: rgba(226,236,248,0.16); }
-  .lid-kaart-cta:active { transform: scale(0.95); }
+  .lid-kaart { cursor: pointer; }
 
   .popup-kaart .naam { font-size: 18px; font-weight: 700; }
   .popup-kaart .niveau-badge {
@@ -122,7 +116,10 @@
   .popup-kaart .stat-tegel .label { font-size: 10.5px; color: var(--ink-muted); }
 
   /* Lid-profielpopup: foto neemt de helft (2/4) van de kaart in, details de
-     andere helft — i.p.v. de gestapelde, gecentreerde lay-out hierboven. */
+     andere helft — i.p.v. de gestapelde, gecentreerde lay-out hierboven.
+     De detailhelft deelt nu dezelfde mens/womens-kleuridentiteit als de
+     foto (i.p.v. een losstaande witte/navy kaart) zodat de hele pop-up als
+     één geheel oogt — matcht _ProfielPager in leden_screen.dart (app). */
   .popup-kaart--lid { max-width: 440px; padding: 0; text-align: left; overflow: hidden; }
   .popup-kaart--lid .popup-sluit-rij { position: absolute; top: 10px; right: 10px; z-index: 2; }
   .popup-kaart--lid .popup-sluit { background: rgba(4,10,20,0.45); color: #fff; }
@@ -136,16 +133,24 @@
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     font-size: 44px; font-weight: 700; color: var(--kaart-highlight, #FCDB32);
   }
-  .popup-lid-details { flex: 1 1 50%; min-width: 0; padding: 20px 18px; display: flex; flex-direction: column; }
-  .popup-lid-details .naam { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .popup-lid-stats { margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding-top: 14px; }
-  .popup-lid-stat-regel {
-    display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
-    border-top: 1px solid var(--line); padding-top: 6px;
+  .popup-lid-details {
+    flex: 1 1 50%; min-width: 0; padding: 20px 18px; display: flex; flex-direction: column;
+    background: var(--kaart-surface, #141D38); color: #f2f6fc;
   }
-  .popup-lid-stat-regel .label { font-size: 11px; color: var(--ink-muted); }
-  .popup-lid-stat-regel .waarde { font-size: 14.5px; font-weight: 700; color: var(--navy); }
-  @media (prefers-color-scheme: dark) { .popup-lid-stat-regel .waarde { color: #8ab6ec; } }
+  .popup-lid-details .naam { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #f2f6fc; }
+  .popup-lid-details .niveau-badge {
+    background: rgba(255,255,255,0.14); color: var(--kaart-highlight, #FCDB32);
+  }
+  .popup-lid-stats { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 14px; }
+  .popup-lid-stat-regel { display: flex; align-items: center; gap: 10px; }
+  .popup-lid-stat-regel .icoon {
+    width: 26px; height: 26px; flex-shrink: 0; border-radius: 8px;
+    background: color-mix(in srgb, var(--kaart-highlight, #FCDB32) 22%, transparent);
+    color: var(--kaart-highlight, #FCDB32); display: flex; align-items: center; justify-content: center;
+  }
+  .popup-lid-stat-regel .icoon svg { width: 14px; height: 14px; }
+  .popup-lid-stat-regel .label { font-size: 10.5px; color: rgba(242,246,252,0.6); display: block; }
+  .popup-lid-stat-regel .waarde { font-size: 14.5px; font-weight: 700; color: #f2f6fc; display: block; }
   @media (max-width: 380px) {
     .popup-lid-layout { min-height: 220px; }
     .popup-lid-details { padding: 16px 14px; }
@@ -299,6 +304,11 @@
     });
   }
 
+  function lidStatRegel(icoonSvg, label, waarde) {
+    return '<div class="popup-lid-stat-regel"><span class="icoon">' + icoonSvg + '</span>' +
+      '<div><span class="label">' + label + '</span><span class="waarde">' + escapeHtml(waarde) + '</span></div></div>';
+  }
+
   function toonWedstrijdDetails(lid, index) {
     const s = statsMap[lid.id] || { gespeeld: 0, gewonnen: 0 };
     const winrate = s.gespeeld > 0 ? Math.round((s.gewonnen / s.gespeeld) * 100) : null;
@@ -321,9 +331,12 @@
       '<div class="naam">' + escapeHtml(lid.naam) + '</div>' +
       '<span class="niveau-badge">' + escapeHtml(niveauLabels[lid.niveau] || lid.niveau || '') + '</span>' +
       '<div class="popup-lid-stats">' +
-      '<div class="popup-lid-stat-regel"><span class="label">Rating</span><span class="waarde">' + (lid.rating != null ? Number(lid.rating).toFixed(2) : '–') + '</span></div>' +
-      '<div class="popup-lid-stat-regel"><span class="label">Speelavonden</span><span class="waarde">' + s.gespeeld + '</span></div>' +
-      '<div class="popup-lid-stat-regel"><span class="label">Win-%</span><span class="waarde">' + (winrate === null ? '–' : winrate + '%') + '</span></div>' +
+      lidStatRegel('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M8.5 12.5L7 22l5-3 5 3-1.5-9.5"/></svg>',
+        'Rating', lid.rating != null ? Number(lid.rating).toFixed(2) : '–') +
+      lidStatRegel('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+        'Speelavonden', String(s.gespeeld)) +
+      lidStatRegel('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>',
+        'Win-%', winrate === null ? '–' : winrate + '%') +
       '</div>' +
       '</div>' +
       '</div></div>';
@@ -354,14 +367,17 @@
       return;
     }
 
-    // Leden-weergave: tinder-stijl swipe-kaarten met foto, klik voor wedstrijddetails.
+    // Leden-weergave: tinder-stijl swipe-kaarten met foto, overal op de
+    // kaart klikken/tikken toont de details-popup (matcht de app, waar de
+    // hele ledenkaart al tikbaar is) — geen apart "Details"-knopje meer
+    // nodig.
     const genegeerd = geefLedenGenegeerd();
     swipeLijst = lijst.filter(l => !genegeerd.includes(l.id));
     const kaarten = swipeLijst.map((l, i) => {
       const ratingTxt = l.rating != null ? Number(l.rating).toFixed(2) : '–';
       const k = kleurenVoorLid(l, i);
       const kaartStijl = '--kaart-surface:' + k.surface + '; --kaart-highlight:' + k.highlight + ';';
-      return '<div class="lid-kaart" tabindex="0" style="' + kaartStijl + '">' +
+      return '<div class="lid-kaart" tabindex="0" role="button" aria-label="Bekijk profiel van ' + escapeHtml(l.naam) + '" data-lid-index="' + i + '" style="' + kaartStijl + '">' +
         '<div class="lid-kaart-surface">' +
         (l.avatar_url
           ? '<img class="lid-kaart-foto" src="' + escapeHtml(l.avatar_url) + '" alt="" />'
@@ -374,7 +390,6 @@
         '<div class="lid-kaart-bar">' +
         '<span class="lid-kaart-chip">' + escapeHtml(initialen(l.naam)) + '</span>' +
         '<span class="lid-kaart-meta"><b>Rating ' + ratingTxt + '</b><i>' + escapeHtml(subtitel(l)) + '</i></span>' +
-        '<button type="button" class="lid-kaart-cta" data-details-index="' + i + '">Details</button>' +
         '</div>' +
         '</div></div>';
     });
@@ -385,14 +400,16 @@
       el.innerHTML = '';
       ledenDeck = initSwipeDeck(el, kaarten, {
         leegTekst: 'Geen leden gevonden.',
-        // Deze callbacks worden maar één keer gebonden (bij deze eerste
-        // render) — ze lezen daarom bewust de module-scope swipeLijst
-        // i.p.v. de bovenstaande const, zodat latere render()-aanroepen
-        // (zoeken/filteren/swipen) ze altijd van verse data voorzien.
+        // Deze callback wordt maar één keer gebonden (bij deze eerste
+        // render) — leest daarom bewust de module-scope swipeLijst i.p.v.
+        // de bovenstaande const, zodat latere render()-aanroepen (zoeken/
+        // filteren/swipen) 'm altijd van verse data voorzien. Een échte
+        // sleep (swipe) verplaatst de kaart altijd merkbaar voordat
+        // muisup/touchend loskomt — de browser onderdrukt een 'click'-event
+        // daarna vanzelf, dus geen aparte tap-versus-sleep-detectie nodig.
         onRender: (kaartEl) => {
-          const btn = kaartEl.querySelector('[data-details-index]');
-          if (btn) btn.addEventListener('click', () => {
-            const idx = Number(btn.dataset.detailsIndex);
+          kaartEl.querySelector('.lid-kaart').addEventListener('click', () => {
+            const idx = Number(kaartEl.querySelector('.lid-kaart').dataset.lidIndex);
             toonWedstrijdDetails(swipeLijst[idx], idx);
           });
         },
