@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<script>(function(){try{var t=localStorage.getItem('pb_thema');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Check-in — Almere Pickleball</title>
+<meta name="robots" content="noindex" />
+<link rel="canonical" href="https://www.almerepickleball.nl/baan-huren/check-in.html" />
+<link rel="icon" type="image/png" href="/assets/img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --navy: #2457ff; --navy-deep: #003d82; --gold: #ffd23f; --gold-deep: #b8860a;
+    --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1);
+    --goed: #148c5a; --fout: #b3261e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  }
+  :root[data-theme="dark"] { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  :root[data-theme="light"] { --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1); }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Manrope', -apple-system, sans-serif; background: var(--paper); color: var(--ink);
+    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 18px;
+  }
+  main { width: 100%; max-width: 380px; }
+  .logo-rij { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; }
+  .logo-rij img { border-radius: 8px; }
+  .logo-rij span { font-family: 'Unbounded', sans-serif; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); }
+  .resultaat-kaart {
+    background: var(--card); border-radius: 24px; padding: 32px 24px; text-align: center;
+    box-shadow: 0 10px 30px rgba(4,27,51,0.14); border: 2px solid var(--line);
+  }
+  .resultaat-kaart.geldig { border-color: rgba(20,140,90,0.35); }
+  .resultaat-kaart.fout { border-color: rgba(179,38,30,0.35); }
+  .resultaat-icoon {
+    width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 18px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .resultaat-icoon.geldig { background: rgba(20,140,90,0.14); color: var(--goed); }
+  .resultaat-icoon.fout { background: rgba(179,38,30,0.12); color: var(--fout); }
+  .resultaat-icoon.laden { background: rgba(36,87,255,0.1); color: var(--navy); }
+  .resultaat-icoon svg { width: 36px; height: 36px; }
+  .resultaat-titel { font-family: 'Unbounded', sans-serif; font-size: 19px; font-weight: 700; margin: 0 0 6px; }
+  .resultaat-titel.geldig { color: var(--goed); }
+  .resultaat-titel.fout { color: var(--fout); }
+  .resultaat-sub { font-size: 13.5px; color: var(--ink-muted); margin: 0 0 20px; line-height: 1.5; }
+  .boeking-details { text-align: left; border-top: 1px solid var(--line); padding-top: 16px; margin-top: 4px; }
+  .boeking-regel { display: flex; justify-content: space-between; gap: 10px; padding: 5px 0; font-size: 13.5px; }
+  .boeking-regel .label { color: var(--ink-muted); }
+  .boeking-regel .waarde { font-weight: 700; text-align: right; }
+  .laden-tekst { color: var(--ink-muted); font-size: 13.5px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="logo-rij">
+    <img src="/assets/img/logo.png" alt="" width="28" height="27" />
+    <span>Almere Pickleball</span>
+  </div>
+  <div id="resultaat" class="resultaat-kaart">
+    <div class="resultaat-icoon laden">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+    </div>
+    <p class="laden-tekst">Ticket controleren…</p>
+  </div>
+</main>
+<script src="/assets/supabase.js"></script>
+<script>
+  const el = document.getElementById('resultaat');
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+
+  const dagFormat = new Intl.DateTimeFormat('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+  const tijdFormat = new Intl.DateTimeFormat('nl-NL', { hour: '2-digit', minute: '2-digit' });
+
+  function toonResultaat(soort, icoonSvg, titel, sub, details) {
+    el.className = 'resultaat-kaart ' + soort;
+    el.innerHTML =
+      '<div class="resultaat-icoon ' + soort + '">' + icoonSvg + '</div>' +
+      '<h1 class="resultaat-titel ' + soort + '">' + titel + '</h1>' +
+      '<p class="resultaat-sub">' + sub + '</p>' +
+      (details || '');
+  }
+
+  const ICOON_GELDIG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>';
+  const ICOON_FOUT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+
+  function boekingDetailsHtml(r) {
+    if (!r.baan_naam) return '';
+    const start = new Date(r.start_tijd), eind = new Date(r.eind_tijd);
+    return '<div class="boeking-details">' +
+      '<div class="boeking-regel"><span class="label">Baan</span><span class="waarde">' + escapeHtml(r.baan_naam) + '</span></div>' +
+      '<div class="boeking-regel"><span class="label">Datum</span><span class="waarde">' + dagFormat.format(start) + '</span></div>' +
+      '<div class="boeking-regel"><span class="label">Tijd</span><span class="waarde">' + tijdFormat.format(start) + '–' + tijdFormat.format(eind) + '</span></div>' +
+      (r.huurder_naam ? '<div class="boeking-regel"><span class="label">Huurder</span><span class="waarde">' + escapeHtml(r.huurder_naam) + '</span></div>' : '') +
+      '</div>';
+  }
+
+  async function controleer() {
+    if (!id) {
+      toonResultaat('fout', ICOON_FOUT, 'Geen ticket', 'Er ontbreekt een ticket-referentie in deze link.');
+      return;
+    }
+    try {
+      const rows = await rpc('check_in_verhuur', { p_id: id });
+      const r = Array.isArray(rows) ? rows[0] : rows;
+      if (!r || r.resultaat === 'niet_gevonden') {
+        toonResultaat('fout', ICOON_FOUT, 'Niet gevonden', 'Deze boeking bestaat niet (meer).');
+        return;
+      }
+      if (r.resultaat === 'ongeldig') {
+        toonResultaat('fout', ICOON_FOUT, 'Ongeldig ticket', 'Deze boeking is geannuleerd of niet bevestigd.', boekingDetailsHtml(r));
+        return;
+      }
+      if (r.resultaat === 'al_gebruikt') {
+        const tijd = r.ingecheckt_op ? tijdFormat.format(new Date(r.ingecheckt_op)) : '?';
+        toonResultaat('fout', ICOON_FOUT, 'Al gebruikt', 'Dit ticket is al ingecheckt om ' + tijd + ' uur.', boekingDetailsHtml(r));
+        return;
+      }
+      // resultaat === 'geldig'
+      toonResultaat('geldig', ICOON_GELDIG, 'Geldig ticket', 'Ingecheckt — welkom!', boekingDetailsHtml(r));
+    } catch (e) {
+      toonResultaat('fout', ICOON_FOUT, 'Kon niet controleren', e.message);
+    }
+  }
+
+  controleer();
+</script>
+</body>
+</html>

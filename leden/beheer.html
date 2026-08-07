@@ -656,7 +656,7 @@
   // ---------- Baanverhuur ----------
   async function laadBaanverhuur(el) {
     const rows = await haalOp('baan_verhuur', {
-      select: 'id,naam,email,telefoon,start_tijd,eind_tijd,prijs,status,mollie_payment_id,banen(naam)',
+      select: 'id,naam,email,telefoon,start_tijd,eind_tijd,prijs,status,mollie_payment_id,ingecheckt_op,banen(naam)',
       order: 'start_tijd.desc', limit: '50',
     });
     if (!rows.length) { el.innerHTML = '<p class="details">Nog geen boekingen.</p>'; return; }
@@ -667,7 +667,11 @@
         '<div class="sub">' + start.toLocaleDateString('nl-NL') + ' ' + start.toTimeString().slice(0, 5) + '–' + eind.toTimeString().slice(0, 5) +
         ' · €' + Number(r.prijs).toFixed(2) + '</div>' +
         '<div class="sub">' + escapeHtml(r.email) + ' · ' + escapeHtml(r.telefoon) + '</div>' +
-        '<div class="sub">Mollie: ' + (r.mollie_payment_id || 'nog geen betaling gestart') + '</div></div>' +
+        '<div class="sub">Mollie: ' + (r.mollie_payment_id || 'nog geen betaling gestart') + '</div>' +
+        (r.ingecheckt_op
+          ? '<div class="sub" style="color:#148c5a;font-weight:700">✓ Ingecheckt om ' + new Date(r.ingecheckt_op).toTimeString().slice(0, 5) + ' uur</div>'
+          : '') +
+        '</div>' +
         '<div class="acties"><span class="badge-status ' + r.status + '">' + r.status + '</span>' +
         (r.status === 'bevestigd'
           ? '<button class="mini-knop neutraal" data-ticket-inzien="' + i + '">Ticket inzien</button>' +
