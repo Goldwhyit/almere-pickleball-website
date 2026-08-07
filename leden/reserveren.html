@@ -130,7 +130,7 @@
 
   async function laadAbonnement() {
     const rows = await haalOp('lid_abonnementen', {
-      select: 'id,vaste_dag,abonnementen(vorm,sessies_per_week)', lid_id: 'eq.' + sessie.user_id, status: 'eq.actief', limit: '1',
+      select: 'id,abonnementen(vorm,sessies_per_week)', lid_id: 'eq.' + sessie.user_id, status: 'eq.actief', limit: '1',
     });
     mijnAbonnement = rows.length ? rows[0] : null;
   }
@@ -150,29 +150,17 @@
     return overlay;
   }
 
-  /// Bestaande en nieuwe 1x-per-week-leden moeten een vaste dag kiezen
-  /// vóórdat ze de speelavonden kunnen zien (verplicht, geen "later"-optie).
-  async function dwingVasteDagAf(speeldagen) {
-    if (!isEenxPerWeek(mijnAbonnement) || mijnAbonnement.vaste_dag) return;
-    const weekdagen = [...new Set(speeldagen.map(sd => sd.weekdag))].sort();
-    const overlay = toonPopup(
-      '<h3>Kies je vaste speeldag</h3>' +
-      '<p class="details">Je abonnement is voor 1x per week. Kies of je op dinsdag of donderdag speelt — ' +
-      'spelen op de andere dag kan altijd nog, tegen het losse sessietarief, of door over te stappen naar 2x per week.</p>' +
-      '<div class="dag-keuze">' +
-      weekdagen.map(w => '<button type="button" data-dag="' + w + '">' + dagnamen[w - 1] + '</button>').join('') +
-      '</div><div id="vaste-dag-melding"></div>'
-    );
-    overlay.querySelectorAll('[data-dag]').forEach(btn => btn.addEventListener('click', async () => {
-      try {
-        await rpc('kies_vaste_dag', { p_dag: Number(btn.dataset.dag) });
-        mijnAbonnement.vaste_dag = Number(btn.dataset.dag);
-        overlay.remove();
-        await laadSpeeldagen();
-      } catch (e) {
-        document.getElementById('vaste-dag-melding').innerHTML = '<div class="melding fout">' + e.message + '</div>';
-      }
-    }));
+  // Wisselen van vaste dag binnen de week (§58): een 1x-per-week jaar/
+  // maandlid kiest zelf per week welke dag ze spelen (geen permanente
+  // lock meer) — de eerste trainingsdag die in een kalenderweek gekozen
+  // wordt valt onder het abonnement, een extra dag in dezelfde week wordt
+  // doorberekend als eenmalig betaald moment. De server bepaalt uiteindelijk
+  // of het echt gratis is (zie verwerk_reservering_strip()).
+  function weekSleutel(datum) {
+    const d = new Date(datum.getFullYear(), datum.getMonth(), datum.getDate());
+    const daynum = d.getDay() === 0 ? 7 : d.getDay();
+    d.setDate(d.getDate() - (daynum - 1));
+    return d.toISOString().substring(0, 10);
   }
 
   async function toonUpgradePopup() {
@@ -230,7 +218,6 @@
     const speeldagen = await haalOp('speeldagen', { select: 'id,weekdag,start_tijd,eind_tijd,locatie,adres,aantal_banen,max_spelers', actief: 'eq.true', order: 'weekdag.asc' });
     if (!speeldagen.length) { el.textContent = 'Geen speelavonden gevonden.'; return; }
     toonLocaties(speeldagen);
-    await dwingVasteDagAf(speeldagen);
     const sessies = volgendeSessies(speeldagen, 5).slice(0, 8);
     window.__sessies = sessies;
     if (!sessies.length) { el.textContent = 'Geen aankomende speelavonden binnen het seizoen.'; return; }
@@ -243,7 +230,14 @@
       haalOp('speeldag_uitzonderingen', { select: 'speeldag_id,datum,reden', datum: 'gte.' + vandaag }),
     ]);
 
-    const isOffDag = isEenxPerWeek(mijnAbonnement);
+    const isEenxPerWeekLid = isEenxPerWeek(mijnAbonnement);
+    const mijnReserveringenPerWeek = {};
+    if (isEenxPerWeekLid) {
+      reserveringen.filter(r => r.lid_id === sessie.user_id).forEach(r => {
+        const w = weekSleutel(new Date(r.start_tijd));
+        mijnReserveringenPerWeek[w] = (mijnReserveringenPerWeek[w] || 0) + 1;
+      });
+    }
 
     const kaarten = sessies.map((s, i) => {
       // Vergelijk als Date, niet als string: PostgREST geeft "+00:00" terug,
@@ -256,7 +250,7 @@
       const iso = s.start.toISOString().substring(0, 10);
       const blokkade = blokkades.find(b => b.speeldag_id === s.speeldagId && b.datum === iso);
       const weekdag = s.start.getDay() === 0 ? 7 : s.start.getDay();
-      const isOpNietVasteDag = isOffDag && mijnAbonnement.vaste_dag && weekdag !== mijnAbonnement.vaste_dag;
+      const isExtraDagDezeWeek = isEenxPerWeekLid && (mijnReserveringenPerWeek[weekSleutel(s.start)] || 0) > 0;
 
       let knop;
       if (blokkade) {
@@ -265,7 +259,7 @@
         knop = '<button class="knop afmelden" data-actie="afmelden" data-index="' + i + '" data-id="' + mijnReservering.id + '">Afmelden</button>';
       } else if (vol) {
         knop = '<button class="knop vol" disabled>Vol</button>';
-      } else if (isOpNietVasteDag) {
+      } else if (isExtraDagDezeWeek) {
         knop = '<div class="off-dag-actie">' +
           '<button class="knop aanmelden" data-actie="aanmelden-bijbetalen" data-index="' + i + '">Aanmelden (+ eenmalig €8,50)</button>' +
           '<a href="#" data-upgrade="1">of overstappen naar 2x/week</a></div>';
