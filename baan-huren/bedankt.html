@@ -67,22 +67,26 @@
   .ticket-kaart:hover { box-shadow: 0 16px 40px rgba(4,27,51,0.2); transform: translateY(-2px); }
   .ticket-kaart.is-voltooid { opacity: 0.72; filter: grayscale(0.45); }
   .ticket-header {
-    position: relative; height: 148px; border-radius: 22px 22px 0 0; overflow: hidden;
+    position: relative; height: 190px; border-radius: 22px 22px 0 0; overflow: hidden;
     background: linear-gradient(135deg, var(--navy), var(--navy-deep));
   }
   .ticket-header .baanlijnen { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.38; }
-  .ticket-header .titelblok { position: absolute; left: 20px; right: 20px; bottom: 14px; color: #fff; }
-  .ticket-header .titelblok .sub {
-    font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.75);
-  }
-  .ticket-header .titelblok .baan { font-family: 'Unbounded', sans-serif; font-size: 19px; font-weight: 700; margin-top: 2px; }
   .ticket-badge {
-    position: absolute; top: 14px; left: 20px; padding: 4px 12px; border-radius: 999px;
+    position: absolute; top: 14px; left: 14px; padding: 4px 12px; border-radius: 999px;
     font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #fff;
   }
   .ticket-badge.klaar { background: rgba(20,140,90,0.92); }
   .ticket-badge.voltooid { background: rgba(30,38,50,0.75); }
   .ticket-badge.bevestigd { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.35); }
+  /* Titel staat, net als bij een bioscoopticket, ONDER de afbeelding op de
+     witte kaart — niet er overheen — gecentreerd en prominent. */
+  .ticket-titelblok { background: var(--card); text-align: center; padding: 18px 22px 4px; }
+  .ticket-titelblok .sub {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-muted);
+  }
+  .ticket-titelblok .baan {
+    font-family: 'Unbounded', sans-serif; font-size: 19px; font-weight: 700; color: var(--ink); margin-top: 3px;
+  }
   .ticket-perforatie { position: relative; height: 0; }
   .ticket-perforatie .notch {
     position: absolute; top: -11px; width: 22px; height: 22px; border-radius: 50%; background: var(--paper); z-index: 2;
@@ -90,31 +94,26 @@
   .ticket-perforatie .notch.links { left: -11px; }
   .ticket-perforatie .notch.rechts { right: -11px; }
   .ticket-perforatie .lijn { position: absolute; left: 22px; right: 22px; top: -1px; border-top: 1.5px dashed var(--line); }
-  .ticket-body { background: var(--card); border-radius: 0 0 22px 22px; padding: 18px 22px 6px; }
-  .ticket-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
-  .ticket-veld { display: flex; align-items: flex-start; gap: 9px; padding: 10px 0; border-top: 1px solid var(--line); min-width: 0; }
-  .ticket-grid .ticket-veld:nth-child(-n+2) { border-top: none; }
-  .ticket-veld .icoon {
-    width: 26px; height: 26px; flex-shrink: 0; margin-top: 1px; border-radius: 8px;
-    background: rgba(36,87,255,0.1); color: var(--navy); display: flex; align-items: center; justify-content: center;
+  .ticket-body { background: var(--card); border-radius: 0 0 22px 22px; padding: 20px 24px 4px; }
+  /* Rustig 2-koloms raster zonder icoontjes/lijntjes per rij — enkel
+     ruime witruimte tussen de veldparen, net als het referentie-ticket. */
+  .ticket-grid { display: grid; grid-template-columns: 1fr 1fr; row-gap: 22px; column-gap: 14px; }
+  .ticket-veld { min-width: 0; }
+  .ticket-veld .label {
+    font-size: 11px; color: var(--ink-muted); display: block; text-transform: uppercase; letter-spacing: 0.04em;
   }
-  @media (prefers-color-scheme: dark) { .ticket-veld .icoon { color: #8ab6ec; } }
-  .ticket-veld .icoon svg { width: 13px; height: 13px; }
-  .ticket-veld .tekst { min-width: 0; }
-  .ticket-veld .label { font-size: 10.5px; color: var(--ink-muted); display: block; }
   .ticket-veld .waarde {
-    font-size: 13.5px; font-weight: 700; color: var(--ink); display: block;
+    font-size: 15px; font-weight: 700; color: var(--ink); display: block; margin-top: 3px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .ticket-qr-sectie { text-align: center; padding: 18px 22px 22px; border-top: 1px solid var(--line); margin-top: 8px; }
-  .ticket-referentie-label { font-size: 10.5px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.06em; }
-  .ticket-referentie { font-family: 'Unbounded', sans-serif; font-size: 15px; font-weight: 700; margin-top: 2px; }
+  .ticket-qr-sectie { text-align: center; padding: 22px 22px 24px; }
+  .ticket-referentie { font-size: 12.5px; letter-spacing: 0.04em; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
   .ticket-qr-sectie img {
-    margin: 14px 0 8px; border-radius: 10px; opacity: 0; transform: scale(0.94);
+    margin: 14px 0 0; border-radius: 10px; opacity: 0; transform: scale(0.94);
     transition: opacity 0.5s ease, transform 0.5s ease;
   }
   .ticket-qr-sectie img.zichtbaar { opacity: 1; transform: scale(1); }
-  .ticket-qr-hint { font-size: 12.5px; color: var(--ink-muted); }
+  .ticket-qr-hint { font-size: 12.5px; color: var(--ink-muted); margin-top: 10px; }
   .screenshot-tip {
     margin-top: 14px; padding: 10px 12px; border-radius: 8px; font-size: 13px;
     background: rgba(255,210,63,0.14); color: var(--gold-deep);
@@ -182,9 +181,8 @@
     '<line x1="200" y1="108" x2="200" y2="145" stroke="#fff" stroke-width="1.5"/>' +
     '</svg>';
 
-  function ticketVeld(icoonSvg, label, waarde) {
-    return '<div class="ticket-veld"><span class="icoon">' + icoonSvg + '</span>' +
-      '<span class="tekst"><span class="label">' + label + '</span><span class="waarde">' + escapeHtml(waarde) + '</span></span></div>';
+  function ticketVeld(label, waarde) {
+    return '<div class="ticket-veld"><span class="label">' + label + '</span><span class="waarde">' + escapeHtml(waarde) + '</span></div>';
   }
 
   function toonTicket(t) {
@@ -210,26 +208,24 @@
     app.innerHTML =
       '<p class="toelichting">Bedankt voor je boeking, ' + escapeHtml(t.naam) + '! Bewaar dit ticket, of maak een schermafbeelding als bewijs.</p>' +
       '<div class="ticket-kaart' + (voltooid ? ' is-voltooid' : '') + '">' +
-      '<div class="ticket-header">' + BAANLIJNEN_SVG + badge +
-      '<div class="titelblok"><div class="sub">Baanverhuur</div><div class="baan">' + escapeHtml(t.baan_naam) + '</div></div>' +
-      '</div>' +
+      '<div class="ticket-header">' + BAANLIJNEN_SVG + badge + '</div>' +
+      '<div class="ticket-titelblok"><div class="sub">Baanverhuur</div><div class="baan">' + escapeHtml(t.baan_naam) + '</div></div>' +
       '<div class="ticket-perforatie"><span class="notch links"></span><span class="notch rechts"></span><span class="lijn"></span></div>' +
       '<div class="ticket-body">' +
       '<div class="ticket-grid">' +
-      ticketVeld('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>', 'Datum', dagFormat.format(start)) +
-      ticketVeld('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>', 'Tijd', tijdFormat.format(start) + '–' + tijdFormat.format(eind) + ' uur') +
-      ticketVeld('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>', 'Locatie', 'Sporthal Almere Haven') +
-      ticketVeld('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg>', 'Duur', duurMin + ' min') +
-      ticketVeld('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><circle cx="12" cy="9.5" r="1.6" fill="currentColor" stroke="none"/></svg>', 'Baan', t.baan_naam) +
-      ticketVeld('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 8a3 3 0 1 1 6 0v1a3 3 0 1 1-6 0Z"/></svg>', 'Status', voltooid ? 'Voltooid' : (binnenkort ? 'Klaar om te spelen' : 'Bevestigd')) +
-      ticketVeld('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 8.5c0-1 1-1.5 2-1.5h1.5a2 2 0 0 1 0 4H10a2 2 0 0 0 0 4H13c1 0 2-.5 2-1.5M12 5.5v13"/></svg>', 'Prijs', euro.format(t.prijs)) +
-      ticketVeld('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>', 'Naam', t.naam) +
+      ticketVeld('Datum', dagFormat.format(start)) +
+      ticketVeld('Tijd', tijdFormat.format(start) + '–' + tijdFormat.format(eind) + ' uur') +
+      ticketVeld('Locatie', 'Sporthal Almere Haven') +
+      ticketVeld('Duur', duurMin + ' min') +
+      ticketVeld('Baan', t.baan_naam) +
+      ticketVeld('Status', voltooid ? 'Voltooid' : (binnenkort ? 'Klaar om te spelen' : 'Bevestigd')) +
+      ticketVeld('Prijs', euro.format(t.prijs)) +
+      ticketVeld('Naam', t.naam) +
       '</div>' +
       '</div>' +
       '<div class="ticket-qr-sectie">' +
-      '<div class="ticket-referentie-label">Reserveringsnummer</div>' +
-      '<div class="ticket-referentie">' + referentie + '</div>' +
       '<img id="ticket-qr" src="' + qrUrl + '" width="160" height="160" alt="QR-code van je ticket" />' +
+      '<div class="ticket-referentie">' + referentie + '</div>' +
       '<div class="ticket-qr-hint">Toon deze QR-code bij aankomst.</div>' +
       '</div>' +
       '</div>' +
