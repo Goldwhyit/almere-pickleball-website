@@ -119,6 +119,9 @@
   } else if (geblokkeerdReden === 'ouderlijketoestemming') {
     document.getElementById('fout-melding').textContent =
       'We wachten nog op de bevestiging van je ouder/voogd via e-mail voordat je kunt inloggen.';
+  } else if (geblokkeerdReden === 'accountgoedkeuring') {
+    document.getElementById('fout-melding').textContent =
+      'Je account wordt nog beoordeeld door de club. Zodra een beheerder je goedkeurt, kun je inloggen en je proeflessen inplannen.';
   }
 
   // Speelt de intro-video af na een geslaagde login, en gaat pas daarna

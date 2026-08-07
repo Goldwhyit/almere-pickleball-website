@@ -174,10 +174,12 @@
     upgrades: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16V8M8.5 11.5L12 8l3.5 3.5" stroke-linejoin="round"/></svg>',
     wedstrijden: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v18" stroke-linecap="round"/><path d="M5 4h11l-2.5 3.5L16 11H5" stroke-linejoin="round"/></svg>',
     leden: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.3 2.9-5.8 5.5-5.8s5.5 2.5 5.5 5.8"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 12.3c2.2.3 3.8 2.1 3.8 4.4" /></svg>',
+    nieuweaccounts: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg>',
   };
 
   const SECTIES = [
     { key: 'leden', label: 'Leden beheren' },
+    { key: 'nieuweaccounts', label: 'Nieuwe accounts' },
     { key: 'proefleden', label: 'Proefleden' },
     { key: 'nieuws', label: 'Nieuws' },
     { key: 'toernooien', label: 'Toernooien' },
@@ -201,12 +203,13 @@
   }
 
   async function bouwPagina() {
-    const [proeflBadge, wedstrBadge] = await Promise.all([
+    const [proeflBadge, wedstrBadge, nieuweAccountsBadge] = await Promise.all([
       haalOp('lid_abonnementen', { select: 'id,goedgekeurd,abonnementen!inner(vorm)', status: 'eq.actief', 'abonnementen.vorm': 'eq.proef' })
         .then(rows => rows.filter(r => !r.goedgekeurd).length).catch(() => 0),
       haalOp('gemelde_wedstrijden', { select: 'id', status: 'eq.in_behandeling' }).then(rows => rows.length).catch(() => 0),
+      haalOp('leden', { select: 'id', account_goedgekeurd: 'eq.false' }).then(rows => rows.length).catch(() => 0),
     ]);
-    const badges = { proefleden: proeflBadge, wedstrijden: wedstrBadge };
+    const badges = { proefleden: proeflBadge, wedstrijden: wedstrBadge, nieuweaccounts: nieuweAccountsBadge };
 
     hoofd.innerHTML =
       '<div class="beheer-intro"><h2>Beheer</h2><p>Kies een onderdeel om te bekijken of aan te passen.</p></div>' +
@@ -236,18 +239,18 @@
 
   function openSectie(key) {
     const titels = {
-      proefleden: 'Proefleden goedkeuren', nieuws: 'Nieuws plaatsen', toernooien: 'Toernooien',
+      proefleden: 'Proefleden', nieuws: 'Nieuws plaatsen', toernooien: 'Toernooien',
       speeldagen: 'Speeldagen & feestdagen blokkeren', prijzen: 'Abonnementsprijzen',
       instellingen: 'Club-instellingen', baanverhuur: 'Baanverhuur', betalingen: 'Betalingen',
       upgrades: 'Abo-upgrades naar 2x per week', wedstrijden: 'Gemelde wedstrijden',
-      leden: 'Leden beheren',
+      leden: 'Leden beheren', nieuweaccounts: 'Nieuwe accounts goedkeuren',
     };
     const lichaam = toonPopup(titels[key]);
     ({
       proefleden: laadProefleden, nieuws: bouwNieuwsForm, toernooien: bouwToernooienBeheer,
       speeldagen: laadSpeeldagenBeheer, prijzen: laadPrijzen, instellingen: laadInstellingen,
       baanverhuur: laadBaanverhuur, betalingen: laadBetalingen, upgrades: laadUpgrades, wedstrijden: laadWedstrijden,
-      leden: laadLedenBeheer,
+      leden: laadLedenBeheer, nieuweaccounts: laadNieuweAccounts,
     })[key](lichaam);
   }
 
@@ -264,6 +267,23 @@
       '<div class="acties"><button class="mini-knop goed" data-lid="' + r.lid_id + '">Goedkeuren</button></div></div>').join('');
     el.querySelectorAll('[data-lid]').forEach(btn => btn.addEventListener('click', async () => {
       try { await rpc('keur_proef_goed', { p_lid: btn.dataset.lid }); await laadProefleden(el); }
+      catch (e) { alert(e.message); }
+    }));
+  }
+
+  // ---------- Nieuwe accounts (proeflid, nog niet goedgekeurd) -----------
+  // Los van laadProefleden hierboven (dat gaat over "proefperiode afgerond,
+  // mag een betaald abonnement kiezen") — dit gaat over "net geregistreerd,
+  // mag nog helemaal niks totdat een beheerder het account goedkeurt" (zie
+  // 57_account_goedkeuring.sql).
+  async function laadNieuweAccounts(el) {
+    const rows = await haalOp('leden', { select: 'id,naam,email,lid_sinds', account_goedgekeurd: 'eq.false', order: 'lid_sinds.asc' });
+    if (!rows.length) { el.innerHTML = '<p class="details">Geen nieuwe accounts die wachten op goedkeuring.</p>'; return; }
+    el.innerHTML = rows.map(l => '<div class="rij"><div class="info"><div class="naam">' + escapeHtml(l.naam) + '</div>' +
+      '<div class="sub">' + escapeHtml(l.email) + (l.lid_sinds ? ' · ' + new Date(l.lid_sinds).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) : '') + '</div></div>' +
+      '<div class="acties"><button class="mini-knop goed" data-lid="' + l.id + '">Goedkeuren</button></div></div>').join('');
+    el.querySelectorAll('[data-lid]').forEach(btn => btn.addEventListener('click', async () => {
+      try { await rpc('keur_lid_goed', { p_lid: btn.dataset.lid }); await laadNieuweAccounts(el); }
       catch (e) { alert(e.message); }
     }));
   }

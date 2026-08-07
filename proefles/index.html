@@ -227,7 +227,12 @@
           strippen_resterend: proefAbo.strippen,
           geldig_tot: geldigTot.toISOString().substring(0, 10),
         });
-        toonGelukt('Welkom bij Almere Pickleball! Je gratis proefles is vastgelegd — we nemen snel contact met je op voor een datum. Je kunt ook meteen inloggen in het ledenportaal.');
+        // Nieuw proeflid: pas volledige toegang (incl. inloggen) na
+        // goedkeuring door een beheerder (zie 57_account_goedkeuring.sql) —
+        // de trigger op lid_abonnementen heeft account_goedgekeurd hierboven
+        // al op false gezet.
+        verwijderSessie();
+        toonGelukt('Welkom bij Almere Pickleball! Je gratis proefles is vastgelegd — we nemen snel contact met je op voor een datum. Je account wordt nog beoordeeld door de club; zodra een beheerder je goedkeurt, kun je inloggen.');
       } else {
         const betaalData = await functieAanroepen('create-mollie-payment', {
           type: 'abonnement', abonnement_id: ervarenAbo.id, betaalwijze: 'per_sessie',

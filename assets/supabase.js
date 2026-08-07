@@ -81,13 +81,15 @@ function startActiefControle() {
   }, 60000);
 }
 
-/// Checkt leden.actief + ouderlijke-toestemmingsstatus via een los token
-/// (nog niet in localStorage bewaard) — voor gebruik vlak vóór
-/// bewaarSessie() in inloggen(). Retourneert null (mag inloggen),
-/// 'gedeactiveerd' of 'ouderlijketoestemming'.
+/// Checkt leden.actief + ouderlijke-toestemmingsstatus + account-goedkeuring
+/// via een los token (nog niet in localStorage bewaard) — voor gebruik
+/// vlak vóór bewaarSessie() in inloggen(). Retourneert null (mag inloggen),
+/// 'gedeactiveerd', 'ouderlijketoestemming' of 'accountgoedkeuring' (nieuw
+/// proeflid, nog niet goedgekeurd door een beheerder — zie
+/// 57_account_goedkeuring.sql).
 async function inlogBlokkade(accessToken, uid) {
   const resp = await fetch(
-    REST_BASE + '/leden?select=actief,ouder_toestemming_vereist,ouder_toestemming_gegeven_op&id=eq.' + uid,
+    REST_BASE + '/leden?select=actief,ouder_toestemming_vereist,ouder_toestemming_gegeven_op,account_goedgekeurd&id=eq.' + uid,
     { headers: { apikey: ANON_KEY, Authorization: 'Bearer ' + accessToken } },
   );
   if (!resp.ok) return null;
@@ -96,6 +98,7 @@ async function inlogBlokkade(accessToken, uid) {
   const lid = rijen[0];
   if (lid.actief === false) return 'gedeactiveerd';
   if (lid.ouder_toestemming_vereist && !lid.ouder_toestemming_gegeven_op) return 'ouderlijketoestemming';
+  if (lid.account_goedgekeurd === false) return 'accountgoedkeuring';
   return null;
 }
 
@@ -115,6 +118,9 @@ async function inloggen(email, wachtwoord) {
   }
   if (reden === 'ouderlijketoestemming') {
     throw new Error('We wachten nog op de bevestiging van je ouder/voogd via e-mail voordat je kunt inloggen.');
+  }
+  if (reden === 'accountgoedkeuring') {
+    throw new Error('Je account wordt nog beoordeeld door de club. Zodra een beheerder je goedkeurt, kun je inloggen en je proeflessen inplannen.');
   }
   bewaarSessie({
     access_token: data.access_token,
