@@ -117,6 +117,11 @@
   .vergelijk-kaart .sub { font-size: 11.5px; color: var(--ink-muted); }
   .vergelijk-kaart .prijs { font-weight: 700; font-size: 16px; color: var(--navy); margin-top: 6px; }
   @media (prefers-color-scheme: dark) { .vergelijk-kaart .prijs { color: #8ab6ec; } }
+  .vergelijk-kaart .verschil { font-size: 11px; font-weight: 700; margin-top: 2px; }
+  .vergelijk-kaart .verschil.goedkoper { color: var(--navy); }
+  @media (prefers-color-scheme: dark) { .vergelijk-kaart .verschil.goedkoper { color: #8ab6ec; } }
+  .vergelijk-kaart .verschil.duurder { color: var(--accent); }
+  .vergelijk-kaart .verschil.gelijk { color: var(--ink-muted); font-weight: 600; }
   .i-inline { width: 14px; height: 14px; vertical-align: -2px; margin-right: 3px; flex-shrink: 0; }
 </style>
 </head>
@@ -559,7 +564,8 @@
 
     const vormLabels = { jaar: 'Jaarlijks', maand: 'Maandelijks', strippenkaart: 'Strippenkaart', sessie: 'Per sessie', proef: 'Proeflidmaatschap' };
     const actief = await haalOp('lid_abonnementen', {
-      select: 'id,status,strippen_resterend,geldig_tot,start_datum,opgezegd_op,eind_datum,vaste_dag,abonnementen(naam,vorm,prijs,sessies_per_week)',
+      select: 'id,status,strippen_resterend,geldig_tot,start_datum,opgezegd_op,eind_datum,vaste_dag,betaalwijze,' +
+        'abonnementen(naam,vorm,prijs,sessies_per_week,jaarkorting_pct,strippen)',
       lid_id: 'eq.' + sessie.user_id, status: 'eq.actief', limit: '1',
     });
     if (actief.length) {
@@ -631,25 +637,57 @@
     return delen.join(' · ');
   }
 
+  /// Herleidt de kosten van een abonnement naar een maandbedrag zodat elke
+  /// vorm eerlijk te vergelijken is — matcht _maandBedrag in
+  /// profiel_screen.dart (app): jaar (evt. korting bij ineens betalen)
+  /// gedeeld door 12, maand blijft gelijk, strippenkaart/sessie herleid
+  /// alsof je 4x per maand speelt.
+  function maandBedrag(a, directBetalen) {
+    const prijs = Number(a.prijs);
+    if (a.vorm === 'jaar') return directBetalen ? prijs * (100 - (a.jaarkorting_pct || 0)) / 100 / 12 : prijs / 12;
+    if (a.vorm === 'maand') return prijs;
+    if (a.vorm === 'strippenkaart') return prijs / (a.strippen || 1) * 4;
+    if (a.vorm === 'sessie') return prijs * 4;
+    return prijs;
+  }
+
   async function toonVergelijking() {
     const categorie = (mijnLeeftijd !== null && mijnLeeftijd <= 17) ? 'jeugd' : 'volwassen';
-    // Proeflidmaatschap hoort hier niet thuis — dat is alleen relevant op het
-    // moment van een proefles zelf, niet in een vergelijking voor bestaande
-    // leden. `sessies_per_week.asc` garandeert dat 1x altijd vóór 2x komt
-    // (anders bepaalt de invoegvolgorde in de DB de volgorde, wat niet
-    // betrouwbaar is). Matcht _toonPakketVergelijking in profiel_screen.dart
-    // (app): daar wordt `vorm != 'proef'` ook uitgesloten.
-    const opties = await haalOp('abonnementen', {
+    // Proeflidmaatschap (vorm=proef) en de losse "Proefles"-sessie horen
+    // hier niet thuis — dat is alleen relevant op het moment van een
+    // proefles zelf, niet in een vergelijking voor bestaande leden.
+    // `sessies_per_week.asc` garandeert dat 1x altijd vóór 2x komt (anders
+    // bepaalt de invoegvolgorde in de DB de volgorde, wat niet betrouwbaar
+    // is). Matcht _toonPakketVergelijking in profiel_screen.dart (app).
+    const opties = (await haalOp('abonnementen', {
       select: '*', actief: 'eq.true', categorie: 'in.(' + categorie + ',alle)', vorm: 'neq.proef',
       order: 'vorm.asc,sessies_per_week.asc',
-    });
+    })).filter(a => !a.naam.toLowerCase().includes('proefles'));
+
+    const huidigeA = mijnAbonnement && mijnAbonnement.abonnementen;
+    const huidigMaand = huidigeA
+      ? maandBedrag(huidigeA, mijnAbonnement.betaalwijze === 'jaarlijks_vooruit')
+      : null;
+
     const kaarten = opties.map(a => {
-      const huidig = mijnAbonnement && mijnAbonnement.abonnementen && mijnAbonnement.abonnementen.naam === a.naam;
+      const huidig = huidigeA && huidigeA.naam === a.naam;
+      let verschilHtml = '';
+      if (!huidig && huidigMaand !== null) {
+        const verschil = huidigMaand - maandBedrag(a, false);
+        if (verschil > 0.005) {
+          verschilHtml = '<div class="verschil goedkoper">Bespaart €' + verschil.toFixed(2) + '/maand</div>';
+        } else if (verschil < -0.005) {
+          verschilHtml = '<div class="verschil duurder">€' + Math.abs(verschil).toFixed(2) + '/maand extra</div>';
+        } else {
+          verschilHtml = '<div class="verschil gelijk">Zelfde prijs per maand</div>';
+        }
+      }
       return '<div class="vergelijk-kaart' + (huidig ? ' huidig' : '') + '">' +
         (huidig ? '<span class="badge-huidig">Huidig</span>' : '') +
         '<div class="naam">' + escapeHtml(a.naam) + '</div>' +
         (subLabel(a) ? '<div class="sub">' + escapeHtml(subLabel(a)) + '</div>' : '') +
-        '<div class="prijs">' + prijsLabel(a) + '</div></div>';
+        '<div class="prijs">' + prijsLabel(a) + '</div>' +
+        verschilHtml + '</div>';
     }).join('');
     toonPopup('Vergelijk abonnementen',
       '<p class="vergelijk-uitleg">Zie wat een ander pakket je per maand scheelt. Strippenkaart en losse sessies zijn omgerekend alsof je 4x per maand speelt.</p>' +
