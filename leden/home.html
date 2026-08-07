@@ -24,28 +24,36 @@
   .flip-kaart.omgedraaid { transform: rotateY(180deg); }
   .flip-voorkant, .flip-achterkant {
     position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;
-    overflow-y: auto; margin: 0;
+    margin: 0;
   }
-  .flip-achterkant { transform: rotateY(180deg); }
+  .flip-achterkant { transform: rotateY(180deg); overflow-y: auto; }
   @media (prefers-reduced-motion: reduce) { .flip-kaart { transition: none; } }
   .flip-draai-knop {
     position: absolute; top: 10px; right: 10px; z-index: 2; width: 30px; height: 30px; border-radius: 50%;
     background: rgba(0,0,0,0.14); border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer;
   }
   .flip-draai-knop svg { width: 16px; height: 16px; }
-  .welkom-rij { display: flex; align-items: center; gap: 14px; }
-  .welkom-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
-  .welkom-avatar-initialen {
-    width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-    background: rgba(36,87,255,0.12); color: var(--navy); font-weight: 700; font-size: 20px;
+  /* Voorkant: profielfoto vult de hele kaart (i.p.v. een kleine avatar-
+     cirkel), met een donkere gradient onderin voor leesbaarheid — matcht
+     _heroVoorkant in home_screen.dart (app). */
+  .flip-voorkant.kaart { padding: 0; overflow: hidden; }
+  .welkom-foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .welkom-foto-initialen {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: var(--navy); color: #fff; font-size: 54px; font-weight: 700;
   }
-  .welkom-naam { font-family: 'Unbounded', sans-serif; font-size: 23px; font-weight: 700; color: var(--navy); line-height: 1.15; margin-top: 2px; }
-  .welkom-sub { color: var(--ink-muted); font-size: 14px; margin-top: 10px; }
-  .welkom-knoppen { display: flex; gap: 10px; margin-top: 18px; }
+  .welkom-gradient {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 45%, rgba(0,0,0,0.82) 100%);
+  }
+  .welkom-onderlaag { position: absolute; left: 20px; right: 20px; bottom: 18px; color: #fff; }
+  .welkom-onderlaag .welkom-intro { color: rgba(255,255,255,0.85); font-size: 14px; }
+  .welkom-naam { font-family: 'Unbounded', sans-serif; font-size: 23px; font-weight: 700; color: #fff; line-height: 1.15; margin-top: 2px; }
+  .welkom-sub { color: rgba(255,255,255,0.75); font-size: 14px; margin-top: 4px; }
+  .welkom-knoppen { display: flex; gap: 10px; margin-top: 14px; }
   .welkom-knoppen a.knop { padding: 10px 18px; font-size: 13.5px; text-decoration: none; display: inline-block; }
   .welkom-knoppen a.knop.primair { background: var(--navy); color: #fff; }
-  .welkom-knoppen a.knop.secundair { background: transparent; border: 1.5px solid var(--navy); color: var(--navy); }
-  @media (prefers-color-scheme: dark) { .welkom-knoppen a.knop.secundair { border-color: #8ab6ec; color: #8ab6ec; } }
+  .welkom-knoppen a.knop.secundair { background: transparent; border: 1.5px solid #fff; color: #fff; }
   .gegevens-regel-flip { display: flex; gap: 10px; margin-bottom: 8px; font-size: 13.5px; }
   .gegevens-regel-flip .label { font-weight: 700; color: var(--ink-muted); min-width: 112px; flex-shrink: 0; }
   .mini-stat-rij { display: flex; gap: 10px; margin-top: 12px; }
@@ -265,19 +273,19 @@
   /// achterkant matcht _heroAchterkant (dezelfde velden als "Mijn gegevens"
   /// op profiel.html).
   function renderWelkomKaart(lid) {
-    const voornaam = lid.naam.split(' ')[0];
     document.getElementById('welkom-voorkant').innerHTML =
-      '<div class="welkom-rij">' +
       (lid.avatar_url
-        ? '<img class="welkom-avatar" src="' + escapeHtml(lid.avatar_url) + '" alt="" />'
-        : '<span class="welkom-avatar-initialen">' + escapeHtml(initialen(lid.naam)) + '</span>') +
-      '<div><div>Welkom terug,</div><div class="welkom-naam">' + escapeHtml(lid.naam) + '</div></div>' +
-      '</div>' +
+        ? '<img class="welkom-foto" src="' + escapeHtml(lid.avatar_url) + '" alt="" />'
+        : '<div class="welkom-foto-initialen">' + escapeHtml(initialen(lid.naam)) + '</div>') +
+      '<div class="welkom-gradient"></div>' +
+      '<div class="welkom-onderlaag">' +
+      '<div class="welkom-intro">Welkom terug,</div>' +
+      '<div class="welkom-naam">' + escapeHtml(lid.naam) + '</div>' +
       '<div class="welkom-sub">Fijn dat je er weer bent.</div>' +
       '<div class="welkom-knoppen">' +
       '<a class="knop primair" href="/leden/reserveren.html">Reserveren</a>' +
       '<a class="knop secundair" href="/leden/profiel.html">Profiel</a>' +
-      '</div>';
+      '</div></div>';
 
     const regel = (label, waarde) => '<div class="gegevens-regel-flip"><span class="label">' + label + '</span><span>' + escapeHtml(waarde) + '</span></div>';
     document.getElementById('welkom-achterkant').innerHTML =
