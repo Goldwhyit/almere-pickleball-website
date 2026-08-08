@@ -122,6 +122,7 @@ function initNav(actievePagina) {
   (navPlek || document.body).appendChild(nav);
   if (typeof initThemeKnop === 'function') initThemeKnop('onderbalk-extra');
   if (typeof initTaalKnop === 'function') initTaalKnop('onderbalk-extra');
+  if (typeof initHelpKnop === 'function') initHelpKnop('onderbalk-extra');
 
   // Blob meteen op de actieve tab zetten (geen "vanaf"-positie: dit is een
   // verse paginalading, geen tab-wissel binnen dezelfde SPA-context zoals in
