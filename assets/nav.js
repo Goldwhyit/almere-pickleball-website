@@ -113,7 +113,7 @@ function initNav(actievePagina) {
     '<div class="onderbalk-blob-laag"><div class="blob-trail"></div><div class="blob-hoofd"></div></div>' +
     '<div class="blob-gloed"></div>' +
     NAV_ITEMS.map(item =>
-      '<a href="' + item.href + '"' + (item.pagina === actievePagina ? ' class="actief"' : '') + '>' +
+      '<a href="' + item.href + '" data-pagina="' + item.pagina + '"' + (item.pagina === actievePagina ? ' class="actief"' : '') + '>' +
       item.icoon + '<span data-i18n="' + item.taalSleutel + '"></span></a>'
     ).join('') +
     '</div>' +

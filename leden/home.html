@@ -229,6 +229,7 @@
 <script src="/assets/theme.js"></script>
 <script src="/assets/i18n.js"></script>
 <script src="/assets/nav.js"></script>
+<script src="/assets/feature-tour.js"></script>
 <script src="/assets/verjaardag/insluiten.js"></script>
 <script>
   const sessie = vereisSessie();
@@ -494,7 +495,7 @@
     if (actief.length) {
       const naam = actief[0].abonnementen ? actief[0].abonnementen.naam : '';
       el.innerHTML = '<div class="status-regel"><span class="status-badge">' + escapeHtml(naam) + '</span></div>' + statsHtml +
-        '<p style="margin-top:10px"><a href="/leden/profiel.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Beheren →</a></p>';
+        '<p style="margin-top:10px"><a href="/leden/profiel.html" id="abonnement-link" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Beheren →</a></p>';
       return;
     }
     const wachtend = await haalOp('lid_abonnementen', {
@@ -502,11 +503,11 @@
     });
     if (wachtend.length) {
       el.innerHTML = '<span class="status-badge leeg">In afwachting van betaling</span>' + statsHtml +
-        '<p style="margin-top:10px"><a href="/leden/profiel.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Afronden →</a></p>';
+        '<p style="margin-top:10px"><a href="/leden/profiel.html" id="abonnement-link" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Afronden →</a></p>';
       return;
     }
     el.innerHTML = '<span class="status-badge leeg">Geen actief abonnement</span>' + statsHtml +
-      '<p style="margin-top:10px"><a href="/leden/profiel.html" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Abonnement starten →</a></p>';
+      '<p style="margin-top:10px"><a href="/leden/profiel.html" id="abonnement-link" style="color:var(--navy);font-size:13px;font-weight:700;text-decoration:none">Abonnement starten →</a></p>';
   }
 
   async function laadVolgendeSpeelavond() {
@@ -576,7 +577,7 @@
   Promise.all([
     laadProfiel(), laadBetaalherinnering(), laadSamenSpelen(), laadAbonnement(),
     laadVolgendeSpeelavond(), laadStatistieken(), laadNieuws(), laadClubStats(),
-  ]).catch(e => console.error(e));
+  ]).then(() => initFeatureTour()).catch(e => console.error(e));
 
   /// "Nodig een vriend uit" — zelfde Web Share API + klembord-fallback als
   /// de tegel op leden.html, matcht home_screen.dart's _nodigVriendUit().
