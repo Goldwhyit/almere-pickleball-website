@@ -463,7 +463,7 @@
           lid_id: 'eq.' + lid.id, order: 'created_at.desc', limit: '20',
         }),
         haalOp('toernooi_teams', {
-          select: 'toernooi_id,toernooien(naam,datum)',
+          select: 'toernooi_id,toernooien!toernooi_teams_toernooi_id_fkey(naam,datum)',
           or: '(speler1_id.eq.' + lid.id + ',speler2_id.eq.' + lid.id + ')',
         }),
       ]);
