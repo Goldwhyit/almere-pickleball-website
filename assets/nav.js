@@ -122,7 +122,6 @@ function initNav(actievePagina) {
   (navPlek || document.body).appendChild(nav);
   if (typeof initThemeKnop === 'function') initThemeKnop('onderbalk-extra');
   if (typeof initTaalKnop === 'function') initTaalKnop('onderbalk-extra');
-  if (typeof initHelpKnop === 'function') initHelpKnop('onderbalk-extra');
 
   // Blob meteen op de actieve tab zetten (geen "vanaf"-positie: dit is een
   // verse paginalading, geen tab-wissel binnen dezelfde SPA-context zoals in
@@ -191,9 +190,15 @@ function initNav(actievePagina) {
   const accountPlek = document.getElementById('account-plek');
   if (accountPlek) {
     accountPlek.innerHTML = '<div class="account-knoppen" id="account-knoppen-rij">' +
+      '<span id="account-hulp-plek" style="display:contents"></span>' +
       (actievePagina === 'profiel' ? '' : '<a href="/leden/profiel.html" data-i18n="navProfiel"></a>') +
       '<button id="nav-uitlog-knop" data-i18n="uitloggen"></button></div>';
     document.getElementById('nav-uitlog-knop').addEventListener('click', uitloggen);
+    // Home + de overlays (profiel/beheer, niet in de footer) tonen bewust
+    // de volledige handleiding — matcht _sectieVoorHuidigScherm() in
+    // home_shell.dart (app).
+    const HULP_SECTIE_PER_PAGINA = { reserveren: 'reserveren', toernooien: 'toernooien', nieuws: 'nieuws', leden: 'leden' };
+    if (typeof initHelpKnop === 'function') initHelpKnop('account-hulp-plek', HULP_SECTIE_PER_PAGINA[actievePagina]);
     if (typeof pasTaalToe === 'function') pasTaalToe();
 
     if (actievePagina !== 'beheer') {

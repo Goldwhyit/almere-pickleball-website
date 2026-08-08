@@ -11,7 +11,10 @@ const HULP_ICOON =
   '<circle cx="12" cy="12" r="9.25"/><path d="M9.1 9.3a2.9 2.9 0 0 1 5.6 1c0 1.9-2.7 2.1-2.7 4.1"/>' +
   '<line x1="12" y1="17.3" x2="12" y2="17.4"/></svg>';
 
-function initHelpKnop(containerId) {
+// sectie (optioneel) beperkt de handleiding tot één onderdeel — matcht de
+// pagina waar de knop vandaan komt (zie HULP_SECTIE_PER_PAGINA in nav.js),
+// zelfde idee als de tabblad-filter van HelpScreen in de app.
+function initHelpKnop(containerId, sectie) {
   const container = document.getElementById(containerId);
   if (!container) return;
   const btn = document.createElement('button');
@@ -19,6 +22,8 @@ function initHelpKnop(containerId) {
   btn.className = 'thema-knop';
   btn.setAttribute('aria-label', 'Hulp / handleiding');
   btn.innerHTML = HULP_ICOON;
-  btn.addEventListener('click', () => { window.location.href = '/hulp.html'; });
+  btn.addEventListener('click', () => {
+    window.location.href = sectie ? '/hulp.html?sectie=' + encodeURIComponent(sectie) : '/hulp.html';
+  });
   container.appendChild(btn);
 }
