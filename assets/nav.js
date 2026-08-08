@@ -194,10 +194,12 @@ function initNav(actievePagina) {
       (actievePagina === 'profiel' ? '' : '<a href="/leden/profiel.html" data-i18n="navProfiel"></a>') +
       '<button id="nav-uitlog-knop" data-i18n="uitloggen"></button></div>';
     document.getElementById('nav-uitlog-knop').addEventListener('click', uitloggen);
-    // Home + de overlays (profiel/beheer, niet in de footer) tonen bewust
-    // de volledige handleiding — matcht _sectieVoorHuidigScherm() in
-    // home_shell.dart (app).
-    const HULP_SECTIE_PER_PAGINA = { reserveren: 'reserveren', toernooien: 'toernooien', nieuws: 'nieuws', leden: 'leden' };
+    // 1-op-1: elke pagina toont alleen zijn eigen handleiding-sectie —
+    // matcht _sectieVoorHuidigScherm() in home_shell.dart (app).
+    const HULP_SECTIE_PER_PAGINA = {
+      home: 'home', reserveren: 'reserveren', toernooien: 'toernooien',
+      nieuws: 'nieuws', leden: 'leden', profiel: 'profiel', beheer: 'beheer',
+    };
     if (typeof initHelpKnop === 'function') initHelpKnop('account-hulp-plek', HULP_SECTIE_PER_PAGINA[actievePagina]);
     if (typeof pasTaalToe === 'function') pasTaalToe();
 

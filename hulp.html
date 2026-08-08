@@ -98,6 +98,18 @@
 <main>
   <p class="intro">Kom je er niet uit? Vraag het gerust aan een bestuurslid.</p>
 
+  <details data-sectie="home">
+    <summary>
+      <span class="summary-icoon"><svg viewBox="0 0 24 24"><polygon points="12,3 21,10 19,10 19,20 5,20 5,10 3,10" fill="currentColor"/></svg></span>
+      <span class="summary-titel">Startscherm (Home)</span>
+    </summary>
+    <ol class="stappen">
+      <li class="stap"><span class="stap-nummer">1</span><span>Op "Home" zie je in één oogopslag je welkomstkaart — klik erop om 'm om te draaien en je gegevens te zien.</span></li>
+      <li class="stap"><span class="stap-nummer">2</span><span>Daaronder vind je je abonnement, de eerstvolgende speelavond en het laatste nieuws.</span></li>
+      <li class="stap"><span class="stap-nummer">3</span><span>Gebruik de snelknoppen "Reserveren" en "Profiel" voor directe toegang.</span></li>
+    </ol>
+  </details>
+
   <details open data-vereist-uitgelogd>
     <summary>
       <span class="summary-icoon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg></span>
@@ -170,7 +182,7 @@
     </ol>
   </details>
 
-  <details>
+  <details data-sectie="profiel">
     <summary>
       <span class="summary-icoon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
       <span class="summary-titel">Je profiel beheren</span>
@@ -192,7 +204,7 @@
     </ol>
   </details>
 
-  <details data-vereist-beheerder>
+  <details data-sectie="beheer" data-vereist-beheerder>
     <summary>
       <span class="summary-icoon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.13.36.35.68.63.94.28.26.63.44 1 .51.13.02.25.03.38.03h.09a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
       <span class="summary-titel">Voor beheerders</span>
@@ -230,7 +242,11 @@
   (function pasSectieFilterToe() {
     const sectie = new URLSearchParams(window.location.search).get('sectie');
     if (!sectie) return;
-    document.querySelectorAll('details[data-sectie]').forEach((el) => {
+    // Alle <details> doorlopen (niet alleen die met data-sectie) — anders
+    // blijft bv. "Speelavond" (bewust geen eigen sectie) altijd zichtbaar
+    // naast de opgevraagde sectie i.p.v. dat de handleiding echt 1-op-1
+    // filtert.
+    document.querySelectorAll('details').forEach((el) => {
       if (el.dataset.sectie === sectie) { el.open = true; el.scrollIntoView({ block: 'center' }); }
       else el.remove();
     });
