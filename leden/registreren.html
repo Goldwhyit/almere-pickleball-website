@@ -217,8 +217,8 @@
 </div>
 <script src="/assets/supabase.js"></script>
 <script>
-  const VORM_VOLGORDE = ['jaar', 'maand', 'strippenkaart', 'sessie', 'proef'];
-  const VORM_LABELS = { jaar: 'Jaar', maand: 'Maand', strippenkaart: 'Strippenkaart', sessie: 'Per sessie', proef: 'Proef' };
+  const VORM_VOLGORDE = ['jaar', 'maand', 'strippenkaart', 'sessie'];
+  const VORM_LABELS = { jaar: 'Jaar', maand: 'Maand', strippenkaart: 'Strippenkaart', sessie: 'Per sessie' };
   const euro = (n) => '€' + Number(n).toFixed(2).replace('.', ',');
 
   let stap = 0;
@@ -230,8 +230,13 @@
   let betaalwijze = null;
   let bezig = false;
 
+  // Proefles (gratis proeflidmaatschap én de betaalde ervaren-speler-
+  // sessie) hoort uitsluitend via de aparte /proefles-aanvraagpagina te
+  // lopen, niet via het gewone ledenportaal-registratiewizard (§60).
   async function laadAbonnementen() {
-    abonnementen = await haalOp('abonnementen', { select: '*', actief: 'eq.true', order: 'categorie.asc,id.asc' });
+    abonnementen = await haalOp('abonnementen', {
+      select: '*', actief: 'eq.true', toon_bij_inschrijving: 'eq.true', order: 'categorie.asc,id.asc',
+    });
   }
 
   function leeftijd() {
