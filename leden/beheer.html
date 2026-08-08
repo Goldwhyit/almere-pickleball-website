@@ -459,7 +459,7 @@
           lid_id: 'eq.' + lid.id, order: 'created_at.desc',
         }),
         haalOp('betalingen', {
-          select: 'id,bedrag,status,methode,type,omschrijving,created_at',
+          select: 'id,bedrag,status,methode,type,omschrijving,created_at,terugbetaald_bedrag',
           lid_id: 'eq.' + lid.id, order: 'created_at.desc', limit: '20',
         }),
         haalOp('toernooi_teams', {
@@ -482,11 +482,18 @@
         (plan.prijs != null ? '<div class="acties"><strong>' + euro.format(plan.prijs) + '</strong></div>' : '') + '</div>';
     }).join('') : '<p class="details">Geen gegevens.</p>';
 
-    const betalingenHtml = betalingen.length ? betalingen.map(b =>
-      '<div class="rij"><div class="info"><div class="naam">' + escapeHtml(b.omschrijving || b.type || '') + '</div>' +
-      '<div class="sub">' + escapeHtml(b.status) + (b.created_at ? ' · ' + datumFmt(b.created_at) : '') + '</div></div>' +
-      '<div class="acties"><strong>' + euro.format(b.bedrag) + '</strong></div></div>'
-    ).join('') : '<p class="details">Geen gegevens.</p>';
+    const betalingStatusLabels = { terugbetaald: 'Terugbetaald', deels_terugbetaald: 'Deels terugbetaald' };
+    const betalingenHtml = betalingen.length ? betalingen.map(b => {
+      const subRegels = [
+        betalingStatusLabels[b.status] || b.status,
+        b.terugbetaald_bedrag != null ? euro.format(b.terugbetaald_bedrag) + ' terugbetaald' : null,
+        b.created_at ? datumFmt(b.created_at) : null,
+      ].filter(Boolean).join(' · ');
+      const teruggeboekt = b.status === 'terugbetaald' || b.status === 'deels_terugbetaald';
+      return '<div class="rij"><div class="info"><div class="naam">' + escapeHtml(b.omschrijving || b.type || '') + '</div>' +
+        '<div class="sub"' + (teruggeboekt ? ' style="color:var(--accent)"' : '') + '>' + escapeHtml(subRegels) + '</div></div>' +
+        '<div class="acties"><strong>' + euro.format(b.bedrag) + '</strong></div></div>';
+    }).join('') : '<p class="details">Geen gegevens.</p>';
 
     const toernooienHtml = teams.length ? teams.map(tm => {
       const tn = tm.toernooien || {};
