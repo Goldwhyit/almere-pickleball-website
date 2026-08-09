@@ -40,6 +40,7 @@ function initCoverflowDeck(container, kaarten, opties) {
   let startX = 0;
   let startPagina = 0;
   let totaleBeweging = 0;
+  let sleepFrameId = null; // RAF-batching: max 1 positioneer()-schrijfactie per frame tijdens het slepen
 
   function actieveIndex() {
     return Math.max(0, Math.min(kaarten.length - 1, Math.round(pagina)));
@@ -138,11 +139,20 @@ function initCoverflowDeck(container, kaarten, opties) {
     totaleBeweging = Math.max(totaleBeweging, Math.abs(deltaPx));
     pagina = startPagina - deltaPx / kaartBreedte();
     pagina = Math.max(-0.5, Math.min(kaarten.length - 0.5, pagina));
-    positioneer();
+    // RAF-batchen: als pointermove vaker dan één keer per frame vuurt
+    // (bv. hogere polling-rate trackpads/muizen), toch maar één
+    // positioneer()-schrijfactie per frame i.p.v. meerdere style-recalcs.
+    if (sleepFrameId == null) {
+      sleepFrameId = requestAnimationFrame(() => {
+        sleepFrameId = null;
+        positioneer();
+      });
+    }
   }
   function onEnd() {
     if (!slepend) return;
     slepend = false;
+    if (sleepFrameId != null) { cancelAnimationFrame(sleepFrameId); sleepFrameId = null; }
     if (totaleBeweging < 6) {
       // Een tik (geen sleep) — af laten handelen door de eigen click-
       // listener op de kaart (zie bindKaartEvents), niets snappen hier.
@@ -197,7 +207,18 @@ function initCoverflowDeck(container, kaarten, opties) {
     positioneer();
   }
 
-  window.addEventListener('resize', () => positioneer());
+  // RAF-wrappen i.p.v. rechtstreeks aanroepen: bij een lopende venster-
+  // resize (bv. tijdens het slepen van een vensterrand) kan 'resize'
+  // meermaals per frame vuren — dit coalesceert dat tot hooguit één
+  // positioneer()-aanroep per frame.
+  let resizeFrameId = null;
+  window.addEventListener('resize', () => {
+    if (resizeFrameId != null) return;
+    resizeFrameId = requestAnimationFrame(() => {
+      resizeFrameId = null;
+      positioneer();
+    });
+  });
 
   pagina = 0;
   render();

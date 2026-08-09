@@ -22,6 +22,7 @@ function initSwipeDeck(container, kaarten, opties) {
   opties = opties || {};
   let index = 0;
   let slepend = false, startX = 0, huidigX = 0;
+  let sleepFrameId = null; // RAF-batching: max 1 schrijfactie per frame tijdens het slepen
 
   container.classList.add('swipe-deck');
   container.innerHTML =
@@ -71,19 +72,26 @@ function initSwipeDeck(container, kaarten, opties) {
   }
   function onMove(e) {
     if (!slepend) return;
-    const kaart = stapel.querySelector('.swipe-kaart');
-    if (!kaart) return;
     huidigX = puntX(e) - startX;
-    kaart.style.transform = 'translateX(' + huidigX + 'px) rotate(' + (huidigX / 20) + 'deg)';
-    const sterkte = Math.min(1, Math.abs(huidigX) / 80);
-    const badgeLinks = kaart.querySelector('.swipe-badge-links');
-    const badgeRechts = kaart.querySelector('.swipe-badge-rechts');
-    if (badgeLinks) badgeLinks.style.opacity = huidigX < 0 ? sterkte : 0;
-    if (badgeRechts) badgeRechts.style.opacity = huidigX > 0 ? sterkte : 0;
+    // RAF-batchen: hooguit één transform/opacity-schrijfactie per frame,
+    // ook als pointermove vaker vuurt.
+    if (sleepFrameId != null) return;
+    sleepFrameId = requestAnimationFrame(() => {
+      sleepFrameId = null;
+      const kaart = stapel.querySelector('.swipe-kaart');
+      if (!kaart) return;
+      kaart.style.transform = 'translateX(' + huidigX + 'px) rotate(' + (huidigX / 20) + 'deg)';
+      const sterkte = Math.min(1, Math.abs(huidigX) / 80);
+      const badgeLinks = kaart.querySelector('.swipe-badge-links');
+      const badgeRechts = kaart.querySelector('.swipe-badge-rechts');
+      if (badgeLinks) badgeLinks.style.opacity = huidigX < 0 ? sterkte : 0;
+      if (badgeRechts) badgeRechts.style.opacity = huidigX > 0 ? sterkte : 0;
+    });
   }
   function onEnd() {
     if (!slepend) return;
     slepend = false;
+    if (sleepFrameId != null) { cancelAnimationFrame(sleepFrameId); sleepFrameId = null; }
     const kaart = stapel.querySelector('.swipe-kaart');
     if (!kaart) return;
     kaart.style.transition = 'transform 0.22s ease';

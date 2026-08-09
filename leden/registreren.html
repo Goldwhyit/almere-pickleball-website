@@ -12,15 +12,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --navy: #2457ff; --navy-deep: #003d82; --gold: #ffd23f; --gold-deep: #b8860a;
+    --navy: #2457ff; --navy-deep: #003d82; --gold: #f9e534; --gold-deep: #b8860a;
     --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1);
-    --danger: #b3261e;
+    --danger: #e41d23;
   }
   @media (prefers-color-scheme: dark) {
-    :root { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+    :root { --gold: #dbc90a; --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
   }
-  :root[data-theme="dark"] { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
-  :root[data-theme="light"] { --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1); }
+  :root[data-theme="dark"] { --gold: #dbc90a; --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  :root[data-theme="light"] { --gold: #f9e534; --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1); }
   #thema-plek { position: fixed; top: 16px; right: 16px; z-index: 50; display: flex; gap: 8px; align-items: center; }
   .thema-knop, .taal-knop {
     background: var(--card); border: 1.5px solid var(--line); border-radius: 999px; height: 38px;
@@ -107,7 +107,7 @@
     border: 1.5px solid var(--line); background: transparent; color: var(--ink); font-family: inherit;
     cursor: pointer; text-align: left; width: 100%;
   }
-  .plan-optie.actief { border-color: var(--gold-deep); background: rgba(255,210,63,0.14); }
+  .plan-optie.actief { border-color: var(--gold-deep); background: rgba(249,229,52,0.14); }
   .plan-optie .stip { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--line); flex-shrink: 0; margin-top: 2px; }
   .plan-optie.actief .stip { border-color: var(--gold-deep); background: var(--gold); }
   .plan-optie .titel { font-weight: 700; font-size: 13.5px; }

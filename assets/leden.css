@@ -174,6 +174,7 @@ main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
   background: var(--card); border: 1px solid var(--line); border-radius: 18px;
   padding: 18px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); cursor: grab; user-select: none;
   transition: transform 0.22s ease; touch-action: pan-y; position: relative;
+  will-change: transform;
 }
 .swipe-kaart:active { cursor: grabbing; }
 .swipe-badge {
@@ -215,7 +216,7 @@ main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
 .coverflow-rij { display: flex; align-items: center; gap: 4px; }
 .coverflow-viewport {
   flex: 1; position: relative; height: 260px; overflow: hidden;
-  perspective: 1000px; outline: none;
+  perspective: 1000px; outline: none; touch-action: pan-y;
 }
 .coverflow-chevron {
   width: 48px; height: 48px; flex-shrink: 0; border: none; background: transparent;
@@ -226,7 +227,7 @@ main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
 .coverflow-kaart {
   position: absolute; top: 0; left: 50%; height: 100%; border-radius: 16px;
   overflow: hidden; cursor: pointer; user-select: none;
-  transform-style: preserve-3d; backface-visibility: hidden;
+  transform-style: preserve-3d; backface-visibility: hidden; will-change: transform;
   box-shadow: 0 10px 26px -6px rgba(0,0,0,0.35);
 }
 .coverflow-kaart:nth-of-type(odd) { background: #141D38; }

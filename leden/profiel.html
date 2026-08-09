@@ -710,7 +710,8 @@
         const prijs = Number(a.prijs) > 0 ? '€' + Number(a.prijs).toFixed(2) : 'Gratis';
         return '<label style="display:flex;align-items:center;gap:8px;font-size:13.5px;padding:8px;border:1.5px solid var(--line);border-radius:10px;cursor:pointer">' +
           '<input type="radio" name="abo-keuze" value="' + i + '" ' + (i === 0 ? 'checked' : '') + ' />' +
-          '<span style="flex:1">' + escapeHtml(a.naam) + '</span><strong>' + prijs + '</strong></label>';
+          '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escapeHtml(a.naam) + '</span>' +
+          '<strong style="flex-shrink:0">' + prijs + '</strong></label>';
       }).join('') +
       '</div><button class="knop aanmelden" id="start-abo-knop" style="margin-top:14px">Abonnement starten</button>' +
       '<div id="abonnement-melding"></div>';

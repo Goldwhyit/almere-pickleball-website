@@ -185,7 +185,18 @@ function initNav(actievePagina) {
       setTimeout(() => { window.location.href = link.href; }, 260);
     });
   });
-  window.addEventListener('resize', () => zetBlob(actieveIndex));
+  // RAF-wrappen i.p.v. rechtstreeks: bij een lopende venster-resize kan
+  // 'resize' meermaals per frame vuren — dit coalesceert dat tot hooguit
+  // één zetBlob()-aanroep (die zelf al een offsetWidth-reflow forceert)
+  // per frame.
+  let resizeFrameId = null;
+  window.addEventListener('resize', () => {
+    if (resizeFrameId != null) return;
+    resizeFrameId = requestAnimationFrame(() => {
+      resizeFrameId = null;
+      zetBlob(actieveIndex);
+    });
+  });
 
   const accountPlek = document.getElementById('account-plek');
   if (accountPlek) {

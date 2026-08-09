@@ -29,8 +29,9 @@
     background: linear-gradient(135deg, var(--navy), var(--navy-deep)); color: #fff;
     display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px;
   }
-  .lid-naam { font-weight: 700; font-size: 14.5px; }
-  .lid-sub { color: var(--ink-muted); font-size: 12.5px; margin-top: 1px; }
+  .lid-info { flex: 1; min-width: 0; }
+  .lid-naam { font-weight: 700; font-size: 14.5px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lid-sub { color: var(--ink-muted); font-size: 12.5px; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .lid-rating { font-weight: 700; font-size: 15px; color: var(--navy); min-width: 40px; text-align: right; }
   @media (prefers-color-scheme: dark) { .lid-rating { color: #8ab6ec; } }
   .rang-nummer { width: 22px; text-align: center; font-weight: 700; color: var(--ink-muted); font-size: 13px; }
@@ -360,7 +361,7 @@
         return '<div class="lid-regel">' +
           '<span class="rang-nummer">' + (i + 1) + '</span>' +
           (l.avatar_url ? '<img class="avatar" src="' + escapeHtml(l.avatar_url) + '" alt="" />' : '<span class="avatar">' + escapeHtml(initialen(l.naam)) + '</span>') +
-          '<span style="flex:1"><span class="lid-naam">' + escapeHtml(l.naam) + '</span>' +
+          '<span class="lid-info"><span class="lid-naam">' + escapeHtml(l.naam) + '</span>' +
           '<div class="lid-sub">' + escapeHtml(subtitel(l)) + '</div></span>' +
           '<span class="lid-rating">' + rating + '</span></div>';
       }).join('');

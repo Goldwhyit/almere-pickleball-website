@@ -43,7 +43,7 @@
     background: linear-gradient(135deg, var(--navy), var(--navy-deep)); color: #fff;
     display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;
   }
-  .rank-regel .naam { flex: 1; font-weight: 600; font-size: 14px; }
+  .rank-regel .naam { flex: 1; min-width: 0; font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .rank-regel .rating { font-weight: 700; font-size: 14px; color: var(--gold-deep); }
   @media (prefers-color-scheme: dark) { .rank-regel .rating { color: var(--gold); } }
   .training-kop { display: flex; align-items: center; gap: 8px; }
@@ -83,6 +83,7 @@
   .kosten-chip {
     display: inline-block; margin-top: 8px; padding: 3px 10px; border-radius: 999px;
     font-size: 12px; font-weight: 700; background: rgba(36,87,255,0.1); color: var(--navy);
+    max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
   @media (prefers-color-scheme: dark) { .kosten-chip { color: #8ab6ec; } }
 

@@ -19,15 +19,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --navy: #2457ff; --navy-deep: #003d82; --gold: #ffd23f; --gold-deep: #b8860a;
+    --navy: #2457ff; --navy-deep: #003d82; --accent: #e41d23; --gold: #f9e534; --gold-deep: #b8860a;
     --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1);
     --danger: var(--accent);
   }
   @media (prefers-color-scheme: dark) {
-    :root { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+    :root { --gold: #dbc90a; --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
   }
-  :root[data-theme="dark"] { --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
-  :root[data-theme="light"] { --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1); }
+  :root[data-theme="dark"] { --gold: #dbc90a; --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  :root[data-theme="light"] { --gold: #f9e534; --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1); }
   #thema-plek {
     position: fixed; top: 16px; right: 16px; z-index: 50; display: flex; gap: 8px; align-items: center;
   }
@@ -52,6 +52,7 @@
   .merk { font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 12px; letter-spacing: 0.12em;
     text-transform: uppercase; color: var(--navy); text-align: center; }
   @media (prefers-color-scheme: dark) { .merk { color: #8ab6ec; } }
+  :root[data-theme="dark"] .merk { color: #8ab6ec; }
   h1 { font-family: 'Unbounded', sans-serif; font-size: 22px; margin: 8px 0 4px; text-align: center; }
   p.uitleg { text-align: center; color: var(--ink-muted); font-size: 14px; margin: 0 0 24px; }
   label { display: block; font-size: 13px; font-weight: 600; color: var(--ink-muted); margin-top: 14px; }
