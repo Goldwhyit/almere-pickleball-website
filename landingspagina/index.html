@@ -88,6 +88,14 @@
   @media (prefers-color-scheme: dark) { .icoon-vinkje { color: var(--gold); } }
   .usp-lijst { list-style: none; padding: 0; margin: 0 auto; max-width: 460px; display: flex; flex-direction: column; gap: 14px; }
   .usp-lijst li { display: flex; align-items: center; gap: 12px; font-size: 15.5px; }
+  .schema-lijst { display: flex; flex-direction: column; gap: 16px; max-width: 680px; margin: 0 auto; }
+  .schema-rij { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; }
+  .schema-dag { font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: 1.2rem; min-width: 120px; }
+  .schema-details { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; flex: 1; }
+  .schema-tijd { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .schema-locatie { color: var(--ink-muted); font-size: 14px; }
+  .niveau-badge { display: inline-block; padding: 4px 12px; border-radius: var(--radius-pil); background: rgba(36,87,255,0.1); color: var(--navy); font-size: 12px; font-weight: 800; }
+  @media (prefers-color-scheme: dark) { .niveau-badge { background: rgba(138,182,236,0.14); color: #8ab6ec; } }
 
   /* ---------- Kaarten (algemeen) ---------- */
   .kaart { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-kaart); padding: 26px; box-shadow: var(--schaduw-kaart); }
@@ -511,204 +519,33 @@
     </div>
   </section>
 
-  <!-- ============ Programma's ============ -->
-  <section id="programmas" class="sectie-grijs">
+  <!-- ============ Waar en wanneer ============ -->
+  <section id="waar-wanneer" class="sectie-licht">
     <div class="sectie-kop reveal">
-      <span class="eyebrow">Wat je bij ons doet</span>
-      <h2>Onze <span class="accent">programma's</span></h2>
-      <p>Van eerste kennismaking tot competitief spelen — er is altijd een plek voor je.</p>
+      <span class="eyebrow">Waar en wanneer</span>
+      <h2>Kom een keer <span class="accent">meespelen</span></h2>
+      <p>Twee vaste speelavonden in Almere — kies wat jou het beste past.</p>
     </div>
-
-    <div class="kaart hover-kaart programma-kaart reveal">
-      <div>
-        <div class="programma-kop"><h3>Proefles</h3><span class="programma-pijl" aria-hidden="true">↗</span></div>
-        <p class="beschrijving">Nieuw lid? Kom drie keer gratis kennismaken voordat je iets kiest.</p>
-        <ul class="feature-lijst">
-          <li><span class="icoon-vinkje">✓</span> 3 gratis proeflessen, 3 maanden geldig</li>
-          <li><span class="icoon-vinkje">✓</span> Geen verplichtingen</li>
-          <li><span class="icoon-vinkje">✓</span> Al eerder gespeeld? Losse proefles voor €4,25</li>
-        </ul>
-      </div>
-      <div class="programma-illustratie i1" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="10" cy="9" rx="6" ry="7"/><line x1="10" y1="16" x2="10" y2="21"/><circle cx="19" cy="17" r="2.3"/></svg></div>
-    </div>
-
-    <div class="kaart hover-kaart programma-kaart reveal">
-      <div>
-        <div class="programma-kop"><h3>Reguliere speelavonden</h3><span class="programma-pijl" aria-hidden="true">↗</span></div>
-        <p class="beschrijving">Dinsdag en donderdag samen zweten, lachen en scoren op vaste tijden.</p>
-        <ul class="feature-lijst">
-          <li><span class="icoon-vinkje">✓</span> Dinsdag 19:30–21:30, Sporthal Almere Haven</li>
-          <li><span class="icoon-vinkje">✓</span> Donderdag 18:30–20:30, Gymlokaal Kraaiennest</li>
-          <li><span class="icoon-vinkje">✓</span> Aanmelden per avond via de app</li>
-        </ul>
-      </div>
-      <div class="programma-illustratie i2" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></div>
-    </div>
-
-    <div class="kaart hover-kaart programma-kaart reveal">
-      <div>
-        <div class="programma-kop"><h3>Toernooien</h3><span class="programma-pijl" aria-hidden="true">↗</span></div>
-        <p class="beschrijving">Speel voor de eer in clubtoernooien of schrijf je in voor landelijke evenementen.</p>
-        <ul class="feature-lijst">
-          <li><span class="icoon-vinkje">✓</span> Mix, vrouwen, mannen en open klasses</li>
-          <li><span class="icoon-vinkje">✓</span> Niveaus: beginner, gevorderd, competitie, open</li>
-          <li><span class="icoon-vinkje">✓</span> Poules met live standen, plus landelijke toernooien</li>
-        </ul>
-      </div>
-      <div class="programma-illustratie i3" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="9" r="6"/><path d="M9 14L7 21l5-3 5 3-2-7" stroke-linejoin="round"/></svg></div>
-    </div>
-
-    <div class="kaart hover-kaart programma-kaart reveal">
-      <div>
-        <div class="programma-kop"><h3>Jeugd</h3><span class="programma-pijl" aria-hidden="true">↗</span></div>
-        <p class="beschrijving">Voor onze jongste spelers (t/m 17 jaar) houden we het simpel, veilig en vooral heel leuk.</p>
-        <ul class="feature-lijst">
-          <li><span class="icoon-vinkje">✓</span> Bewegen, buiten zijn, vriendschappen sluiten</li>
-          <li><span class="icoon-vinkje">✓</span> Begeleiders zorgen voor een fijne sfeer</li>
-          <li><span class="icoon-vinkje">✓</span> Jeugdtarief: vanaf €10 per maand</li>
-        </ul>
-      </div>
-      <div class="programma-illustratie i4" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="7" r="3.4"/><path d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg></div>
-    </div>
-  </section>
-
-  <!-- ============ Nieuws (Blog) ============ -->
-  <section id="nieuws" class="sectie-licht">
-    <div class="sectie-kop reveal">
-      <span class="eyebrow">Vers van de baan</span>
-      <h2>Nieuws</h2>
-      <p>Blijf op de hoogte met korte, pittige verhalen.</p>
-    </div>
-    <div class="grid-3 reveal">
-      <div class="kaart hover-kaart nieuws-kaart">
-        <span class="label">Beginnen</span>
-        <h3>Tips voor beginners</h3>
-        <p>De belangrijkste dingen om te weten voor je je eerste bal slaat.</p>
-      </div>
-      <div class="kaart hover-kaart nieuws-kaart">
-        <span class="label">Jeugd</span>
-        <h3>Pickleball op school</h3>
-        <p>Hoe pickleball langzaam de gymles verovert — en waarom dat goed nieuws is.</p>
-      </div>
-      <div class="kaart hover-kaart nieuws-kaart">
-        <span class="label">Trend</span>
-        <h3>Waarom steeds meer tennissers overstappen</h3>
-        <p>Kleiner veld, kortere rally's, net zoveel adrenaline.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ Prijzen ============ -->
-  <section id="prijzen" class="sectie-grijs">
-    <div class="sectie-kop reveal">
-      <span class="eyebrow">Word lid</span>
-      <h2>Kies je <span class="accent">lidmaatschap</span></h2>
-      <p>Van vrijblijvend proberen tot onbeperkt spelen — er is een vorm die bij jou past.</p>
-    </div>
-
-    <div class="prijzen-toggle-rij reveal">
-      <span class="actief-label" id="label-volwassen">Volwassen</span>
-      <button type="button" class="toggle-switch" id="prijzen-toggle" aria-pressed="false" aria-label="Wissel tussen volwassen- en jeugdtarieven"></button>
-      <span id="label-jeugd">Jeugd <span class="bespaar-badge">t/m 17 jaar</span></span>
-    </div>
-
-    <div class="prijs-grid prijzen-wrap reveal" id="prijzen-wrap">
-      <div class="kaart prijs-kaart">
-        <div class="naam">Proefles</div>
-        <div class="prijs">Gratis</div>
-        <p class="omschrijving">3 proeflessen, 3 maanden geldig — voor iedereen, ongeacht leeftijd.</p>
-        <ul class="feature-lijst">
-          <li><span class="icoon-vinkje">✓</span> Aanmelden voor elke speelavond</li>
-          <li><span class="icoon-vinkje">✓</span> Begeleiding voor beginners</li>
-          <li><span class="icoon-vinkje">✓</span> Daarna vrijblijvend kiezen</li>
-        </ul>
-        <button type="button" class="knop knop-primair" data-scroll="contact">Meld je aan</button>
-      </div>
-
-      <div class="kaart prijs-kaart uitgelicht">
-        <span class="badge-gekozen">Meest gekozen</span>
-        <div class="naam">Maandlidmaatschap</div>
-        <div class="prijs">
-          <span class="prijs-volwassen">€15,75<small>/maand</small></span>
-          <span class="prijs-jeugd">€10<small>/maand</small></span>
+    <div class="schema-lijst reveal">
+      <div class="kaart hover-kaart schema-rij">
+        <div class="schema-dag">Dinsdag</div>
+        <div class="schema-details">
+          <span class="niveau-badge">Alle niveaus</span>
+          <span class="schema-tijd">19:30 – 21:30 uur</span>
+          <span class="schema-locatie">Sporthal Almere Haven, Parkwerf 138, Almere</span>
         </div>
-        <p class="omschrijving">
-          <span class="prijs-volwassen">1× per week. 2× per week: €31,50/maand.</span>
-          <span class="prijs-jeugd">1× per week. 2× per week: €20/maand.</span>
-        </p>
-        <ul class="feature-lijst">
-          <li><span class="icoon-vinkje">✓</span> Vaste dag naar keuze: dinsdag of donderdag</li>
-          <li><span class="icoon-vinkje">✓</span> Deelname aan clubtoernooien</li>
-          <li><span class="icoon-vinkje">✓</span> Opzeggen t/m einde van de maand</li>
-        </ul>
-        <button type="button" class="knop knop-primair" data-scroll="contact">Meld je aan</button>
       </div>
-
-      <div class="kaart prijs-kaart">
-        <div class="naam">Jaarlidmaatschap</div>
-        <div class="prijs">
-          <span class="prijs-volwassen">€187<small>/jaar</small></span>
-          <span class="prijs-jeugd">€100<small>/jaar</small></span>
+      <div class="kaart hover-kaart schema-rij">
+        <div class="schema-dag">Donderdag</div>
+        <div class="schema-details">
+          <span class="niveau-badge">Alle niveaus</span>
+          <span class="schema-tijd">18:30 – 20:30 uur</span>
+          <span class="schema-locatie">Gymlokaal Kraaiennest, Noorderplassen, Almere</span>
         </div>
-        <p class="omschrijving">
-          <span class="prijs-volwassen">1× per week. 2× per week: €374/jaar.</span>
-          <span class="prijs-jeugd">1× per week. 2× per week: €200/jaar.</span>
-        </p>
-        <ul class="feature-lijst">
-          <li><span class="icoon-vinkje">✓</span> Voordeliger per maand dan maandelijks betalen</li>
-          <li><span class="icoon-vinkje">✓</span> Voorrang bij toernooi-inschrijving</li>
-          <li><span class="icoon-vinkje">✓</span> Opzeggen t/m einde van het contractjaar</li>
-        </ul>
-        <button type="button" class="knop knop-primair" data-scroll="contact">Meld je aan</button>
       </div>
     </div>
-    <p class="prijzen-voetnoot reveal">
-      Liever flexibel? Een strippenkaart (10 strippen, 6 maanden geldig) kost €67,50 (volwassen) / €50 (jeugd).
-      Losse speelavond zonder abonnement: €8,50 (volwassen) / €5,50 (jeugd).
-    </p>
-  </section>
-
-  <!-- ============ Hoe het werkt ============ -->
-  <section class="sectie-licht">
-    <div class="sectie-kop reveal">
-      <span class="eyebrow">Zo ga je van start</span>
-      <h2>Hoe het <span class="accent">werkt</span></h2>
-      <p>In vier stappen van nieuwsgierig naar verslingerd aan pickleball.</p>
-    </div>
-    <div class="stappen-grid reveal">
-      <div class="stap-kaart s1">
-        <span class="stap-decor" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><ellipse cx="10" cy="9" rx="6" ry="7"/><line x1="10" y1="16" x2="10" y2="21"/><circle cx="19" cy="17" r="2.3"/></svg></span>
-        <div><div class="stap-nr">STAP 01</div><h3>Meld je aan voor een proefles</h3><p>Kies een speelavond die je uitkomt en geef je op via de app of website.</p></div>
-        <span class="stap-pijl" aria-hidden="true">↗</span>
-      </div>
-      <div class="stap-kaart s2">
-        <span class="stap-decor" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M15 15.5c2.2.3 4 2 4 4.5"/></svg></span>
-        <div><div class="stap-nr">STAP 02</div><h3>Kom spelen en ontdek het spel</h3><p>Onze begeleiders leren je de basis: service, dinken en de kitchen.</p></div>
-        <span class="stap-pijl" aria-hidden="true">↗</span>
-      </div>
-      <div class="stap-kaart s3">
-        <span class="stap-decor" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="5" y="4" width="14" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="13" y2="18"/></svg></span>
-        <div><div class="stap-nr">STAP 03</div><h3>Kies je lidmaatschap</h3><p>Verliefd geworden? Kies de vorm die bij jouw speelritme past.</p></div>
-        <span class="stap-pijl" aria-hidden="true">↗</span>
-      </div>
-      <div class="stap-kaart s4">
-        <span class="stap-decor" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="9" r="6"/><path d="M9 14L7 21l5-3 5 3-2-7" stroke-linejoin="round"/></svg></span>
-        <div><div class="stap-nr">STAP 04</div><h3>Word onderdeel van de club</h3><p>Speel toernooien, klim in speelsterkte en maak nieuwe vrienden.</p></div>
-        <span class="stap-pijl" aria-hidden="true">↗</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ Drie pijlers ============ -->
-  <section class="sectie-grijs">
-    <div class="sectie-kop reveal">
-      <span class="eyebrow">Waar wij voor staan</span>
-      <h2>Onze drie <span class="accent">pijlers</span></h2>
-    </div>
-    <div class="pijlers-tekst reveal">
-      <p><strong>Plezier</strong> staat voorop — pickleball moet vooral leuk zijn, met een lach op de baan en net genoeg spanning om je scherp te houden, of je nu voor het eerst een paddle vasthoudt of al jaren meedraait.</p>
-      <p><strong>Gemeenschap</strong> is waar we het voor doen — op de baan ontstaan de leukste connecties, van hechte vriendschappen tot een club waar iedereen elkaar bij naam kent en groet.</p>
-      <p><strong>Groei</strong> zit in elk potje verstopt — elke rally leert je iets, elk seizoen word je sterker, en bij ons krijg je de ruimte om in je eigen tempo beter te worden.</p>
+    <div class="reveal" style="text-align:center;margin-top:32px;">
+      <a class="knop knop-primair" href="/proefles/">Meld je aan voor een proefles</a>
     </div>
   </section>
 
