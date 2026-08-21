@@ -25,10 +25,12 @@ wijziging.
 ## Wat vervalt
 
 Team-carrousel (placeholder-namen), transformatie voor/na-carrousel,
-prijzen-sectie, "Hoe het werkt"-stappen, drie-pijlers-tekst, FAQ-sectie
-(bestaat al apart op `/veelgestelde-vragen/`), testimonials, contactformulier,
-nieuwsbrief-sectie. De bijbehorende CSS-regels voor deze secties worden
-verwijderd uit de `<style>`.
+programma's-sectie, nieuws/blog-ministrip, prijzen-sectie, "Hoe het
+werkt"-stappen, drie-pijlers-tekst, FAQ-sectie (bestaat al apart op
+`/veelgestelde-vragen/`), testimonials, contactformulier, nieuwsbrief-sectie.
+De bijbehorende CSS-regels voor deze secties worden verwijderd uit de
+`<style>`, met uitzondering van CSS/JS die letterlijk hergebruikt wordt voor
+een nieuwe sectie (zie hieronder).
 
 ## Nieuwe sectie-opbouw
 
@@ -83,6 +85,28 @@ verwijderd uit de `<style>`.
 8. **Footer**
    - Hergebruik bestaande footer-structuur/component (contactinfo, social,
      copyright) zoals al aanwezig in de pagina
+
+## Hergebruikte CSS/JS-componenten (niet opnieuw bouwen)
+
+- `.faq-item` / `.faq-vraag` / `.faq-chevron` / `.faq-antwoord` + het
+  bijbehorende accordion-script: letterlijk hergebruikt voor de 3
+  uitklapblokken in "Over ons" (andere content, zelfde classes/gedrag).
+- `.stats-balk` / `.stat-item` / `.stat-getal` (met telkende
+  IntersectionObserver-animatie) + de bestaande 3 statistieken: ongewijzigd
+  hergebruikt, alleen de sectie verplaatst naar zijn nieuwe plek in de
+  volgorde.
+- `.embed-gate` + `zetEmbedGate()`: ongewijzigd hergebruikt voor de
+  hero-video (nieuw: `data-embed-sleutel="pb_toestemming_video"` gate wijst
+  naar `assets/video/intro.mp4` i.p.v. een YouTube-embed, dus geen
+  toestemmingsgate nodig voor een lokaal videobestand — direct tonen).
+- `.reveal` / `IntersectionObserver`-scroll-reveal: blijft ongewijzigd van
+  toepassing op alle secties.
+- `.kaart` / `.hover-kaart` / `.icoon-vinkje` / `.knop` / `.knop-primair`:
+  ongewijzigd hergebruikt voor de nieuwe secties (wat-is-pickleball,
+  speelschema, sponsors).
+- Menu-paneel-JS (`openMenu`/`sluitMenu`/`data-scroll`) blijft ongewijzigd;
+  alleen de `<nav>`-links in het paneel en de footer-linklijst worden
+  aangepast aan de nieuwe secties.
 
 ## Navigatie
 
