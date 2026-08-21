@@ -86,6 +86,8 @@
   .knop-cirkel-cta .cirkel { width: 46px; height: 46px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .icoon-vinkje { width: 22px; height: 22px; border-radius: 50%; background: rgba(255,210,63,0.2); color: var(--gold-deep); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   @media (prefers-color-scheme: dark) { .icoon-vinkje { color: var(--gold); } }
+  .usp-lijst { list-style: none; padding: 0; margin: 0 auto; max-width: 460px; display: flex; flex-direction: column; gap: 14px; }
+  .usp-lijst li { display: flex; align-items: center; gap: 12px; font-size: 15.5px; }
 
   /* ---------- Kaarten (algemeen) ---------- */
   .kaart { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-kaart); padding: 26px; box-shadow: var(--schaduw-kaart); }
@@ -305,43 +307,36 @@
     </div>
   </section>
 
-  <!-- ============ Over ons ============ -->
-  <section id="over-ons" class="sectie-licht">
+  <!-- ============ Intro ============ -->
+  <section id="intro" class="sectie-licht">
     <div class="sectie-kop reveal">
-      <span class="eyebrow">Wie wij zijn</span>
-      <h2>Over <span class="accent">ons</span></h2>
+      <span class="eyebrow">Sportief en gezellig</span>
+      <h2>Twee avonden, <span class="accent">iedereen welkom</span></h2>
       <p>
-        Pickleball is tennis, badminton en tafeltennis die een avondje stappen zijn
-        gaan doen en verliefd op elkaar zijn geworden. Bij Almere Pickleball spelen
-        we met power, met humor en met net dat beetje swagger dat een potje net
-        wat pittiger maakt.
+        Elke dinsdag en donderdag staan onze banen open voor wie zin heeft in
+        een potje pickleball — van eerste bal tot gevorderde rally's. Geen
+        ervaring nodig, wel goede zin.
       </p>
     </div>
+  </section>
 
-    <div class="video-intro reveal">
-      <div class="embed-gate" id="video-gate" data-embed-sleutel="pb_toestemming_video"></div>
+  <!-- ============ Wat is pickleball? ============ -->
+  <section id="wat-is-pickleball" class="sectie-grijs">
+    <div class="sectie-kop reveal">
+      <span class="eyebrow">De sport</span>
+      <h2>Wat is <span class="accent">pickleball</span>?</h2>
+      <p>
+        Pickleball is tennis, badminton en tafeltennis die een avondje stappen
+        zijn gaan doen en verliefd op elkaar zijn geworden. Je speelt op een
+        klein veld, met een lichte paddle en een plastic bal met gaatjes — en
+        binnen vijf minuten snap je waarom iedereen verslingerd raakt.
+      </p>
     </div>
-
-    <div class="team-sectie reveal">
-      <div class="team-bg-tekst">HET TEAM</div>
-      <div class="team-carousel-wrap">
-        <!-- TODO: echte namen/foto's van bestuur en begeleiders invullen -->
-        <div class="team-carousel" id="team-carousel">
-          <div class="team-kaart"><div class="initialen">BC</div><button type="button" class="plus-knop" aria-hidden="true" tabindex="-1">+</button><div class="overlay"><div class="naam">Naam volgt</div><div class="functie">Baancoördinator</div></div></div>
-          <div class="team-kaart"><div class="initialen">TC</div><button type="button" class="plus-knop" aria-hidden="true" tabindex="-1">+</button><div class="overlay"><div class="naam">Naam volgt</div><div class="functie">Toernooicommissie</div></div></div>
-          <div class="team-kaart"><div class="initialen">JB</div><button type="button" class="plus-knop" aria-hidden="true" tabindex="-1">+</button><div class="overlay"><div class="naam">Naam volgt</div><div class="functie">Jeugdbegeleiding</div></div></div>
-          <div class="team-kaart"><div class="initialen">ON</div><button type="button" class="plus-knop" aria-hidden="true" tabindex="-1">+</button><div class="overlay"><div class="naam">Naam volgt</div><div class="functie">Onthaal nieuwe leden</div></div></div>
-        </div>
-      </div>
-      <div class="carousel-pijlen">
-        <button type="button" class="pijl-knop" id="team-links" aria-label="Vorige">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-        </button>
-        <button type="button" class="pijl-knop" id="team-rechts" aria-label="Volgende">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-        </button>
-      </div>
-    </div>
+    <ul class="usp-lijst reveal">
+      <li><span class="icoon-vinkje">✓</span> Makkelijk te leren, moeilijk te stoppen</li>
+      <li><span class="icoon-vinkje">✓</span> Van 8 tot 80 jaar, elk niveau welkom</li>
+      <li><span class="icoon-vinkje">✓</span> Net zoveel sociaal als sportief</li>
+    </ul>
   </section>
 
   <!-- ============ Statistieken ============ -->
