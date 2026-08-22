@@ -13,7 +13,7 @@
 <script>(function(){try{if(localStorage.getItem('pb_toegang_ok')!=='ja'){document.documentElement.classList.add('gate-locked');}}catch(e){document.documentElement.classList.add('gate-locked');}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Almere Pickleball — Doe mee</title>
-<meta name="description" content="Almere Pickleball: speeldagen, lidmaatschappen, speelsterkte en aanmelden voor een proefles." />
+<meta name="description" content="Almere Pickleball: wat pickleball is, waar en wanneer we spelen in Almere, en hoe je een gratis proefles aanvraagt." />
 <!-- Nog niet openbaar — preview-pagina, bewust niet gelinkt vanuit nav/sitemap en met noindex,
      zodat 'ie niet meegenomen wordt door zoekmachines/AI-crawlers voordat de club 'm vrijgeeft. -->
 <meta name="robots" content="noindex, nofollow" />
@@ -275,12 +275,11 @@
     <button type="button" class="sluit-knop" id="menu-sluit-btn" aria-label="Sluiten">✕</button>
   </div>
   <nav aria-label="Hoofdnavigatie">
+    <a href="#wat-is-pickleball">Wat is pickleball?</a>
     <a href="#over-ons">Over ons</a>
-    <a href="#programmas">Programma's</a>
-    <a href="#prijzen">Prijzen</a>
-    <a href="#nieuws">Blog</a>
+    <a href="#waar-wanneer">Waar &amp; wanneer</a>
     <a href="#contact">Contact</a>
-    <a href="#contact" class="aan-de-slag">Aan de slag →</a>
+    <a href="/proefles/" class="aan-de-slag">Doe mee →</a>
   </nav>
 </div>
 
@@ -299,13 +298,13 @@
             kom spelen met mensen die net zo verslingerd raken aan dit spel als jij.
           </p>
           <div class="hero-knoppen">
-            <button type="button" class="knop-cirkel-cta" data-scroll="prijzen">
+            <a class="knop-cirkel-cta" href="/proefles/">
               Doe mee
               <span class="cirkel" aria-hidden="true">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2a1e02" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </span>
-            </button>
-            <button type="button" class="knop knop-outline" style="color:#fff;border-color:rgba(255,255,255,0.4);" data-scroll="programmas">Bekijk programma's</button>
+            </a>
+            <button type="button" class="knop knop-outline" style="color:#fff;border-color:rgba(255,255,255,0.4);" data-scroll="waar-wanneer">Bekijk speelschema</button>
           </div>
         </div>
         <div class="hero-video-wrap" aria-hidden="true">
@@ -718,46 +717,6 @@
   }
 
   // ------------------------------------------------------------------
-  // Teamcarrousel: pijlknoppen scrollen de rij met kaarten.
-  // ------------------------------------------------------------------
-  const teamCarousel = document.getElementById('team-carousel');
-  document.getElementById('team-links').addEventListener('click', () => {
-    teamCarousel.scrollBy({ left: -240, behavior: reduceMotion ? 'auto' : 'smooth' });
-  });
-  document.getElementById('team-rechts').addEventListener('click', () => {
-    teamCarousel.scrollBy({ left: 240, behavior: reduceMotion ? 'auto' : 'smooth' });
-  });
-
-  // ------------------------------------------------------------------
-  // Transformatie-carrousel: dots + track-verschuiving.
-  // ------------------------------------------------------------------
-  const transformTrack = document.getElementById('transform-track');
-  const transformDots = document.querySelectorAll('#transform-dots button');
-  let transformIndex = 0;
-  function toonTransformSlide(i) {
-    transformIndex = i;
-    transformTrack.style.transform = 'translateX(-' + (i * 100) + '%)';
-    transformDots.forEach((d, di) => d.classList.toggle('actief', di === i));
-  }
-  transformDots.forEach((dot, i) => dot.addEventListener('click', () => toonTransformSlide(i)));
-
-  // ------------------------------------------------------------------
-  // Prijzen: maandelijks/jaarlijks-toggle.
-  // ------------------------------------------------------------------
-  const prijzenToggle = document.getElementById('prijzen-toggle');
-  const prijzenWrap = document.getElementById('prijzen-wrap');
-  const labelVolwassen = document.getElementById('label-volwassen');
-  const labelJeugd = document.getElementById('label-jeugd');
-  prijzenToggle.addEventListener('click', () => {
-    const jeugd = !prijzenWrap.classList.contains('jeugd');
-    prijzenWrap.classList.toggle('jeugd', jeugd);
-    prijzenToggle.classList.toggle('aan', jeugd);
-    prijzenToggle.setAttribute('aria-pressed', String(jeugd));
-    labelVolwassen.classList.toggle('actief-label', !jeugd);
-    labelJeugd.classList.toggle('actief-label', jeugd);
-  });
-
-  // ------------------------------------------------------------------
   // FAQ-accordion.
   // ------------------------------------------------------------------
   document.querySelectorAll('.faq-item').forEach((item) => {
@@ -776,96 +735,6 @@
     });
   });
 
-  // ------------------------------------------------------------------
-  // Consent-gate voor embeds (YouTube-video, Google Maps): toont eerst een
-  // toestemmingsvraag, laadt de iframe pas na een expliciete klik op
-  // "Inschakelen" — nooit stilzwijgend vooraf. Voorkeur wordt onthouden
-  // (localStorage) zodat een terugkerende bezoeker niet steeds opnieuw
-  // hoeft te bevestigen.
-  // ------------------------------------------------------------------
-  function zetEmbedGate(gateEl, opties) {
-    const sleutel = gateEl.dataset.embedSleutel;
-    const toestemming = localStorage.getItem(sleutel) === 'ja';
-    if (toestemming) {
-      gateEl.innerHTML = opties.bouwEmbed();
-      return;
-    }
-    gateEl.innerHTML =
-      '<div class="embed-gate-inhoud">' +
-      '<div class="embed-icoon" aria-hidden="true">' + opties.icoon + '</div>' +
-      '<div style="font-weight:700;font-size:15px;">' + opties.titel + '</div>' +
-      '<p>' + opties.uitleg + '</p>' +
-      '<div class="embed-gate-knoppen">' +
-      '<button type="button" class="knop knop-outline" data-actie="voorkeuren">Voorkeuren</button>' +
-      '<button type="button" class="knop knop-primair" data-actie="inschakelen">Inschakelen</button>' +
-      '</div>' +
-      '<div class="embed-gate-details" data-details>' + opties.details + '</div>' +
-      '</div>';
-    gateEl.querySelector('[data-actie="inschakelen"]').addEventListener('click', () => {
-      localStorage.setItem(sleutel, 'ja');
-      gateEl.innerHTML = opties.bouwEmbed();
-    });
-    gateEl.querySelector('[data-actie="voorkeuren"]').addEventListener('click', () => {
-      gateEl.querySelector('[data-details]').classList.toggle('tonen');
-    });
-  }
-
-  // TODO: vervang door de echte YouTube-video-ID van Almere Pickleball.
-  const YOUTUBE_VIDEO_ID = 'VIDEO_ID_HIER';
-
-  const ICOON_AFSPELEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l6 3.5-6 3.5z" fill="currentColor" stroke="none"/></svg>';
-  const ICOON_KAART = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><line x1="9" y1="4" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="20"/></svg>';
-
-  zetEmbedGate(document.getElementById('video-gate'), {
-    icoon: ICOON_AFSPELEN,
-    titel: 'Deze video wordt geladen via YouTube.',
-    uitleg: 'Wil je deze content tonen?',
-    details: 'YouTube (eigendom van Google) kan bij het afspelen cookies plaatsen en je IP-adres verwerken, volgens hun eigen voorwaarden. Wij laden de video pas nadat je hier toestemming geeft.',
-    bouwEmbed: () => {
-      if (YOUTUBE_VIDEO_ID === 'VIDEO_ID_HIER') {
-        return '<div class="embed-gate-inhoud"><div class="embed-icoon" aria-hidden="true">' + ICOON_AFSPELEN + '</div><p style="margin-top:6px;">Video volgt binnenkort.</p></div>';
-      }
-      return '<iframe src="https://www.youtube-nocookie.com/embed/' + YOUTUBE_VIDEO_ID +
-        '" title="Almere Pickleball introductievideo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
-    },
-  });
-
-  zetEmbedGate(document.getElementById('kaart-gate'), {
-    icoon: ICOON_KAART,
-    titel: 'Deze kaart wordt geladen via Google Maps.',
-    uitleg: 'Wil je deze content tonen?',
-    details: 'Google Maps kan bij het laden cookies plaatsen en je IP-adres verwerken, volgens hun eigen voorwaarden. Wij laden de kaart pas nadat je hier toestemming geeft.',
-    bouwEmbed: () =>
-      '<iframe src="https://www.google.com/maps?q=Sporthal+Almere+Haven,+Parkwerf+138,+Almere&output=embed" title="Locatie Sporthal Almere Haven" loading="lazy"></iframe>',
-  });
-
-  // ------------------------------------------------------------------
-  // Contactformulier: eenvoudige client-side validatie + bevestiging.
-  // TODO — koppel aan een Supabase-tabel/edge function (zelfde patroon als
-  // proefles/index.html) zodra de pagina live gaat.
-  // ------------------------------------------------------------------
-  document.getElementById('contact-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const status = document.getElementById('contact-status');
-    if (!form.checkValidity()) {
-      status.textContent = 'Vul alle verplichte velden in.';
-      status.className = 'form-status tonen fout';
-      return;
-    }
-    status.textContent = 'Bedankt! We nemen zo snel mogelijk contact met je op.';
-    status.className = 'form-status tonen ok';
-    form.reset();
-  });
-
-  // Nieuwsbrief-formulier: zelfde eenvoudige patroon (TODO: echte koppeling).
-  document.getElementById('nieuwsbrief-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const status = document.getElementById('nieuwsbrief-status');
-    status.textContent = 'Bedankt voor je aanmelding!';
-    status.classList.add('tonen');
-    e.target.reset();
-  });
 </script>
 </body>
 </html>
