@@ -24,10 +24,9 @@
 <style>
   /* ============================================================
      Design tokens — zelfde huisstijl als de rest van de site
-     (navy/goud, Unbounded/Manrope). De structuur van deze pagina
-     volgt een "fitness coaching"-UX/UI-bouwdocument van de klant,
-     maar met de kleuren/stijl van Almere Pickleball zelf i.p.v. de
-     roze/koraal/paars-paletsuggestie uit dat document.
+     (navy/goud, Unbounded/Manrope). Sectie-opbouw naar voorbeeld
+     van pickleballdenbosch.nl, zie
+     docs/superpowers/specs/2026-08-21-landingspagina-denbosch-opzet-design.md.
      ============================================================ */
   :root {
     --navy: #2457ff; --navy-deep: #003d82; --navy-ink: #041b33;
@@ -101,7 +100,6 @@
   .kaart { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-kaart); padding: 26px; box-shadow: var(--schaduw-kaart); }
   .hover-kaart { transition: transform 0.25s cubic-bezier(.2,.7,.3,1), box-shadow 0.25s ease; }
   .hover-kaart:hover { transform: translateY(-6px) scale(1.015); box-shadow: var(--schaduw-kaart-hover); }
-  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px; }
 
   /* ============================================================
      Header — vaste balk (logo links, pil-vormige MENU-knop rechts)
@@ -189,15 +187,8 @@
   .stat-label { margin-top: 8px; color: var(--ink-muted); font-size: 14px; font-weight: 600; }
 
 
-  .feature-lijst { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
-  .feature-lijst li { display: flex; align-items: center; gap: 10px; font-size: 14.5px; }
-
-
-
-
-
   /* ============================================================
-     FAQ
+     FAQ / accordion (hergebruikt door "Over ons" en de FAQ-pagina)
      ============================================================ */
   .faq-lijst { display: flex; flex-direction: column; gap: 12px; max-width: 760px; margin: 0 auto; }
   .faq-item { background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
@@ -388,138 +379,8 @@
     </div>
   </section>
 
-  <!-- ============ Transformatie ============ -->
-  <section class="sectie-licht">
-    <div class="sectie-kop reveal">
-      <span class="eyebrow">Groei op de baan</span>
-      <h2>Van eerste bal tot <span class="accent">baanheld</span></h2>
-      <p>Elke speler begint ergens. Zo ziet die groei er in het echt uit.</p>
-    </div>
-    <div class="reveal" style="max-width:720px;margin:0 auto;">
-      <div class="transform-frame">
-        <div class="transform-track" id="transform-track">
-          <div class="transform-slide">
-            <div class="transform-paneel voor">
-              <svg class="transform-illustratie" viewBox="0 0 220 220" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <line x1="8" y1="178" x2="212" y2="178" stroke-width="4"/>
-                <line x1="165" y1="50" x2="165" y2="178" stroke-width="5"/>
-                <line x1="153" y1="66" x2="177" y2="86"/><line x1="153" y1="90" x2="177" y2="110"/><line x1="153" y1="114" x2="177" y2="134"/><line x1="153" y1="138" x2="177" y2="158"/>
-                <circle cx="55" cy="95" r="13" fill="rgba(255,255,255,0.92)"/>
-                <line x1="55" y1="108" x2="52" y2="145"/>
-                <line x1="52" y1="145" x2="38" y2="176"/><line x1="52" y1="145" x2="66" y2="176"/>
-                <line x1="55" y1="118" x2="30" y2="110"/>
-                <line x1="55" y1="118" x2="78" y2="145"/>
-                <rect x="72" y="140" width="10" height="20" rx="5" fill="rgba(255,255,255,0.92)" transform="rotate(35 77 150)"/>
-                <path d="M80 150 Q95 163 100 170" stroke-dasharray="3 6"/>
-                <circle cx="102" cy="171" r="7" fill="rgba(255,255,255,0.92)"/>
-                <text x="82" y="66" font-size="30" font-weight="800" fill="rgba(255,255,255,0.92)" stroke="none" font-family="'Unbounded', sans-serif">?</text>
-              </svg>
-              <span class="label">Week 1</span><span class="bijschrift">Eerste keer op de baan</span>
-            </div>
-            <div class="transform-paneel na">
-              <svg class="transform-illustratie" viewBox="0 0 220 220" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <line x1="8" y1="178" x2="212" y2="178" stroke-width="4"/>
-                <line x1="165" y1="50" x2="165" y2="178" stroke-width="5"/>
-                <line x1="153" y1="66" x2="177" y2="86"/><line x1="153" y1="90" x2="177" y2="110"/><line x1="153" y1="114" x2="177" y2="134"/><line x1="153" y1="138" x2="177" y2="158"/>
-                <circle cx="58" cy="85" r="13" fill="rgba(255,255,255,0.92)"/>
-                <line x1="58" y1="98" x2="65" y2="135"/>
-                <line x1="65" y1="135" x2="40" y2="176"/><line x1="65" y1="135" x2="90" y2="160"/>
-                <line x1="58" y1="105" x2="30" y2="120"/>
-                <line x1="58" y1="105" x2="95" y2="80"/>
-                <rect x="90" y="68" width="10" height="22" rx="5" fill="rgba(255,255,255,0.92)" transform="rotate(-25 95 79)"/>
-                <path d="M95 80 Q133 42 163 88" stroke-dasharray="3 6"/>
-                <circle cx="164" cy="90" r="7" fill="rgba(255,255,255,0.92)"/>
-                <polygon points="190,48 193,56 202,56 195,61 197,70 190,65 183,70 185,61 178,56 187,56" fill="rgba(255,255,255,0.92)" stroke="none"/>
-              </svg>
-              <span class="label">Maand 3</span><span class="bijschrift">Eerste toernooi gespeeld</span>
-            </div>
-          </div>
-          <div class="transform-slide">
-            <div class="transform-paneel voor">
-              <svg class="transform-illustratie" viewBox="0 0 220 220" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <line x1="8" y1="178" x2="212" y2="178" stroke-width="4"/>
-                <line x1="165" y1="50" x2="165" y2="178" stroke-width="5"/>
-                <line x1="153" y1="66" x2="177" y2="86"/><line x1="153" y1="90" x2="177" y2="110"/><line x1="153" y1="114" x2="177" y2="134"/><line x1="153" y1="138" x2="177" y2="158"/>
-                <circle cx="55" cy="88" r="13" fill="rgba(255,255,255,0.92)"/>
-                <line x1="55" y1="101" x2="50" y2="140"/>
-                <line x1="50" y1="140" x2="35" y2="176"/><line x1="50" y1="140" x2="62" y2="176"/>
-                <line x1="55" y1="112" x2="40" y2="95"/>
-                <line x1="55" y1="112" x2="85" y2="135"/>
-                <rect x="80" y="128" width="9" height="18" rx="4" fill="rgba(255,255,255,0.92)" transform="rotate(50 84 137)"/>
-                <path d="M87 137 Q120 150 152 150" stroke-dasharray="3 6"/>
-                <circle cx="155" cy="150" r="7" fill="rgba(255,255,255,0.92)"/>
-                <line x1="150" y1="139" x2="143" y2="130"/><line x1="150" y1="139" x2="158" y2="130"/><line x1="150" y1="139" x2="150" y2="126"/>
-              </svg>
-              <span class="label">Voor</span><span class="bijschrift">Onwennig servicegebaar</span>
-            </div>
-            <div class="transform-paneel na">
-              <svg class="transform-illustratie" viewBox="0 0 220 220" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <line x1="8" y1="178" x2="212" y2="178" stroke-width="4"/>
-                <line x1="165" y1="50" x2="165" y2="178" stroke-width="5"/>
-                <line x1="153" y1="66" x2="177" y2="86"/><line x1="153" y1="90" x2="177" y2="110"/><line x1="153" y1="114" x2="177" y2="134"/><line x1="153" y1="138" x2="177" y2="158"/>
-                <circle cx="55" cy="85" r="13" fill="rgba(255,255,255,0.92)"/>
-                <line x1="55" y1="98" x2="52" y2="138"/>
-                <line x1="52" y1="138" x2="38" y2="176"/><line x1="52" y1="138" x2="64" y2="176"/>
-                <line x1="55" y1="110" x2="35" y2="100"/>
-                <line x1="55" y1="110" x2="90" y2="128"/>
-                <rect x="85" y="121" width="9" height="18" rx="4" fill="rgba(255,255,255,0.92)" transform="rotate(30 89 130)"/>
-                <path d="M90 128 Q140 92 183 138" stroke-dasharray="3 6"/>
-                <circle cx="184" cy="140" r="7" fill="rgba(255,255,255,0.92)"/>
-                <circle cx="188" cy="170" r="10"/><circle cx="188" cy="170" r="5"/><circle cx="188" cy="170" r="1.5" fill="rgba(255,255,255,0.92)" stroke="none"/>
-                <path d="M178 52 l7 7 l14 -15" stroke-width="5"/>
-              </svg>
-              <span class="label">Na</span><span class="bijschrift">Scherpe, precieze service</span>
-            </div>
-          </div>
-          <div class="transform-slide">
-            <div class="transform-paneel voor">
-              <svg class="transform-illustratie" viewBox="0 0 220 220" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <line x1="8" y1="178" x2="212" y2="178" stroke-width="4"/>
-                <line x1="165" y1="50" x2="165" y2="178" stroke-width="5"/>
-                <line x1="153" y1="66" x2="177" y2="86"/><line x1="153" y1="90" x2="177" y2="110"/><line x1="153" y1="114" x2="177" y2="134"/><line x1="153" y1="138" x2="177" y2="158"/>
-                <circle cx="55" cy="80" r="13" fill="rgba(255,255,255,0.92)"/>
-                <line x1="55" y1="93" x2="62" y2="128"/>
-                <line x1="62" y1="128" x2="35" y2="176"/><line x1="62" y1="128" x2="80" y2="166"/>
-                <line x1="55" y1="100" x2="30" y2="62"/>
-                <line x1="55" y1="100" x2="100" y2="72"/>
-                <rect x="95" y="64" width="10" height="22" rx="5" fill="rgba(255,255,255,0.92)" transform="rotate(-35 100 75)"/>
-                <line x1="70" y1="90" x2="82" y2="98"/><line x1="75" y1="80" x2="88" y2="86"/>
-                <path d="M100 72 Q160 22 213 15" stroke-dasharray="2 5"/>
-                <circle cx="212" cy="16" r="6" fill="rgba(255,255,255,0.92)"/>
-                <line x1="200" y1="10" x2="207" y2="18"/><line x1="205" y1="6" x2="209" y2="15"/>
-              </svg>
-              <span class="label">Voor</span><span class="bijschrift">Alleen hard slaan</span>
-            </div>
-            <div class="transform-paneel na">
-              <svg class="transform-illustratie" viewBox="0 0 220 220" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <line x1="8" y1="178" x2="212" y2="178" stroke-width="4"/>
-                <line x1="165" y1="50" x2="165" y2="178" stroke-width="5"/>
-                <line x1="153" y1="66" x2="177" y2="86"/><line x1="153" y1="90" x2="177" y2="110"/><line x1="153" y1="114" x2="177" y2="134"/><line x1="153" y1="138" x2="177" y2="158"/>
-                <circle cx="110" cy="95" r="13" fill="rgba(255,255,255,0.92)"/>
-                <line x1="110" y1="108" x2="106" y2="140"/>
-                <line x1="106" y1="140" x2="90" y2="172"/><line x1="106" y1="140" x2="120" y2="172"/>
-                <line x1="110" y1="118" x2="86" y2="126"/>
-                <line x1="110" y1="118" x2="140" y2="150"/>
-                <rect x="135" y="145" width="8" height="16" rx="4" fill="rgba(255,255,255,0.92)" transform="rotate(35 139 153)"/>
-                <path d="M141 152 Q159 118 175 152" stroke-dasharray="3 6"/>
-                <circle cx="176" cy="153" r="6" fill="rgba(255,255,255,0.92)"/>
-                <path d="M187 68 l0 12 M181 74 l12 0" stroke-width="3"/>
-              </svg>
-              <span class="label">Na</span><span class="bijschrift">Slim dinken bij het net</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="transform-dots" id="transform-dots">
-        <button type="button" class="actief" aria-label="Slide 1"></button>
-        <button type="button" aria-label="Slide 2"></button>
-        <button type="button" aria-label="Slide 3"></button>
-      </div>
-    </div>
-  </section>
-
   <!-- ============ Waar en wanneer ============ -->
-  <section id="waar-wanneer" class="sectie-licht">
+  <section id="waar-wanneer" class="sectie-grijs">
     <div class="sectie-kop reveal">
       <span class="eyebrow">Waar en wanneer</span>
       <h2>Kom een keer <span class="accent">meespelen</span></h2>
@@ -549,7 +410,7 @@
   </section>
 
   <!-- ============ Sponsors ============ -->
-  <section class="sectie-grijs">
+  <section class="sectie-licht">
     <div class="sectie-kop reveal">
       <span class="eyebrow">Steun de club</span>
       <h2>Ook <span class="accent">sponsor</span> worden?</h2>
