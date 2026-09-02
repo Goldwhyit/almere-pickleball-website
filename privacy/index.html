@@ -28,20 +28,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/assets/site.css" />
 <style>
-  :root { --gold: #ffd23f; --gold-deep: #b8860a; --card: #ffffff; --line: rgba(4,27,51,0.1); }
-  @media (prefers-color-scheme: dark) {
-    :root { --card: #101d30; --line: rgba(255,255,255,0.12); }
-  }
-  :root[data-theme="dark"] { --card: #101d30; }
-  :root[data-theme="light"] { --card: #ffffff; }
+  :root { --gold: #ffd23f; --gold-deep: #b8860a; }
   .thema-knop, .taal-knop { background: rgba(255,255,255,0.15); border: none; height: 34px; color: inherit; flex-shrink: 0; }
   .thema-knop { width: 34px; }
   .thema-knop svg { width: 16px; height: 16px; }
   .taal-knop { min-width: 34px; padding: 0 10px; }
   #thema-plek { flex-shrink: 0; }
-  header { background: linear-gradient(135deg, rgba(0,91,191,0.82), rgba(0,61,130,0.82)); padding: 18px 20px; }
-  header h1 { font-size: clamp(1.4rem, 5vw, 2rem); margin: 10px 0 4px; }
-  header p { margin: 0; color: #cfe0f0; font-size: 14px; }
   main { max-width: 680px; margin: 18px auto 60px; padding: 0 18px; }
   .kaart { border-radius: 16px; padding: 22px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-size: 14.5px; line-height: 1.65; color: var(--ink); }
   .kaart h2 { font-size: 15px; margin: 0 0 12px; color: var(--navy); }
@@ -58,7 +50,7 @@
 </style>
 </head>
 <body>
-<header class="header-glas">
+<header class="header-glas header-glas--basis">
   <a class="terug" href="/"><img src="/assets/img/logo.png" alt="" width="28" height="27" /> Almere Pickleball</a>
   <div id="thema-plek" style="position:absolute;top:20px;right:20px;"></div>
   <h1 data-i18n="titelPrivacy">Privacybeleid</h1>

@@ -44,22 +44,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/assets/site.css" />
 <style>
-  :root { --gold: #ffd23f; --gold-deep: #b8860a; --card: #ffffff; --line: rgba(4,27,51,0.1); --danger: #b3261e; }
+  :root { --gold: #ffd23f; --gold-deep: #b8860a; }
   @media (prefers-color-scheme: dark) {
-    :root { --card: #101d30; --line: rgba(255,255,255,0.12); }
     .prijs-regel .bedrag { color: #f2c869; }
   }
-  :root[data-theme="dark"] { --card: #101d30; }
-  :root[data-theme="light"] { --card: #ffffff; }
   .thema-knop, .taal-knop { background: rgba(255,255,255,0.15); border: none; height: 34px; color: inherit; flex-shrink: 0; }
   .thema-knop { width: 34px; }
   .thema-knop svg { width: 16px; height: 16px; }
   .taal-knop { min-width: 34px; padding: 0 10px; }
   #thema-plek { flex-shrink: 0; }
-  header { background: linear-gradient(135deg, rgba(0,91,191,0.82), rgba(0,61,130,0.82)); padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
-  header .merk { font-family: "Unbounded", sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #cfe0f0; }
-  header h1 { font-size: 20px; margin: 4px 0 0; }
-  header p { margin: 4px 0 0; color: #cfe0ee; font-size: 13.5px; }
   main { max-width: 480px; margin: 18px auto 40px; padding: 0 18px; }
   .kaart { border-radius: 16px; padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
   .kaart h2 { font-size: 14px; margin: 0 0 4px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; }
@@ -75,8 +68,8 @@
     width: 100%; padding: 11px 12px; border: 1.5px solid var(--line); border-radius: 10px;
     background: var(--paper); color: var(--ink); font-size: 15px; margin-top: 6px; font-family: inherit;
   }
-  label { font-size: 13px; color: var(--ink-muted); display: block; margin-top: 12px; }
-  label:first-child { margin-top: 0; }
+  .veld-label { margin-top: 12px; }
+  .veld-label:first-child { margin-top: 0; }
   .label-verplicht::after { content: " *"; color: var(--danger); }
   .maand-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
   .maand-nav .maand-titel { font-weight: 700; font-size: 14.5px; text-transform: capitalize; }
@@ -103,14 +96,13 @@
   .prijs-regel .bedrag { font-size: 22px; font-weight: 700; color: var(--navy); }
   button.primair { width: 100%; padding: 14px; border: none; border-radius: 10px; margin-top: 16px; font-size: 15.5px; font-weight: 700; cursor: pointer; font-family: inherit; }
   button.primair:disabled { opacity: 0.45; cursor: not-allowed; }
-  .fout { color: var(--danger); font-size: 13.5px; margin-top: 10px; }
-  .laden { text-align: center; padding: 30px; }
+  .fout { font-size: 13.5px; margin-top: 10px; }
   .terug { text-align: center; margin-top: 8px; }
   .mini-footer { margin-top: 10px; }
 </style>
 </head>
 <body>
-<header class="header-glas">
+<header class="header-glas header-glas--badge">
   <img src="/assets/img/logo.png" alt="" width="40" height="39" style="border-radius: 8px;" />
   <div>
     <div class="merk">Almere Pickleball</div>
@@ -217,9 +209,9 @@
       (gekozenDatum && gekozenSlot ?
         '<div class="kaart">' +
         '<h2>Je gegevens</h2>' +
-        '<label>Naam<input type="text" id="naam-invoer" autocomplete="name" required /></label>' +
-        '<label>E-mail<input type="email" id="email-invoer" autocomplete="email" required /></label>' +
-        '<label class="label-verplicht">Telefoon<input type="tel" id="telefoon-invoer" autocomplete="tel" required /></label>' +
+        '<label class="veld-label">Naam<input type="text" id="naam-invoer" autocomplete="name" required /></label>' +
+        '<label class="veld-label">E-mail<input type="email" id="email-invoer" autocomplete="email" required /></label>' +
+        '<label class="veld-label label-verplicht">Telefoon<input type="tel" id="telefoon-invoer" autocomplete="tel" required /></label>' +
         '<div class="prijs-regel"><span>Te betalen</span><span class="bedrag">' + prijsPerSlot + '</span></div>' +
         '<button type="button" class="primair" id="boek-knop">Doorgaan naar betalen</button>' +
         '<div id="fout-melding"></div>' +

@@ -12,12 +12,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/assets/site.css" />
 <style>
-  :root { --gold: #f9e534; --gold-deep: #b8860a; --card: #ffffff; --line: rgba(4,27,51,0.1); --danger: #e41d23; }
+  :root { --gold: #f9e534; --gold-deep: #b8860a; --danger: #e41d23; }
   @media (prefers-color-scheme: dark) {
-    :root { --gold: #dbc90a; --card: #101d30; --line: rgba(255,255,255,0.12); }
+    :root { --gold: #dbc90a; }
   }
-  :root[data-theme="dark"] { --gold: #dbc90a; --card: #101d30; }
-  :root[data-theme="light"] { --gold: #f9e534; --card: #ffffff; }
+  :root[data-theme="dark"] { --gold: #dbc90a; }
+  :root[data-theme="light"] { --gold: #f9e534; }
   #thema-plek { position: fixed; top: 16px; right: 16px; z-index: 50; }
   .thema-knop, .taal-knop { background: var(--card); border: 1.5px solid var(--line); height: 38px; color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
   .thema-knop { width: 38px; }
@@ -26,17 +26,16 @@
   body { min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 24px 24px 60px; }
   .kaart { width: 100%; max-width: 460px; border-radius: 20px; padding: 28px 26px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); margin-top: 24px; }
   .merk { text-align: center; }
-  @media (prefers-color-scheme: dark) { .merk { color: #8ab6ec; } }
-  h1 { font-family: "Unbounded", sans-serif; font-size: 21px; margin: 8px 0 16px; text-align: center; }
+  .hoofdtitel { font-size: 21px; margin: 8px 0 16px; text-align: center; }
   .voortgang { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 10px; }
   .voortgang-balk { flex: 1; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
   .voortgang-balk-vulling { height: 100%; background: var(--navy); border-radius: 999px; transition: width 0.2s ease; }
   :root[data-theme="dark"] .voortgang-balk-vulling { background: #8ab6ec; }
   .stap-label { font-size: 11.5px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
   :root[data-theme="dark"] .stap-label { color: #8ab6ec; }
-  label { font-size: 13px; font-weight: 600; color: var(--ink-muted); display: block; margin-top: 14px; }
-  label:first-of-type { margin-top: 0; }
-  label .verplicht { color: var(--danger); }
+  .veld-label { font-weight: 600; margin-top: 14px; }
+  .veld-label:first-of-type { margin-top: 0; }
+  .veld-label .verplicht { color: var(--danger); }
   input[type=text], input[type=tel], input[type=email], input[type=password], input[type=date], textarea {
     width: 100%; margin-top: 6px; padding: 11px 12px; border-radius: 10px; border: 1.5px solid var(--line);
     background: var(--paper); color: var(--ink); font-size: 15px; font-family: inherit; max-width: 100%;
@@ -97,7 +96,7 @@
   button.primair { flex: 2; }
   button.primair:disabled { opacity: 0.45; cursor: not-allowed; }
   button.secundair { flex: 1; background: transparent; border: 1.5px solid var(--line); color: var(--ink); }
-  .fout { color: var(--danger); font-size: 13.5px; margin-top: 12px; text-align: center; }
+  .fout { font-size: 13.5px; margin-top: 12px; text-align: center; }
   .terug-link { display: block; text-align: center; margin-top: 20px; font-size: 13px; color: var(--ink-muted); text-decoration: none; }
   .gelukt .icoon { color: #1e8a4c; }
 </style>
@@ -107,7 +106,7 @@
 <div class="kaart">
   <img src="/assets/img/logo.png" alt="Almere Pickleball" width="64" height="62" style="display: block; margin: 0 auto 8px;" />
   <div class="merk">Almere Pickleball</div>
-  <h1>Word lid</h1>
+  <h1 class="hoofdtitel">Word lid</h1>
 
   <form id="reg-form">
     <div class="voortgang">
@@ -117,33 +116,33 @@
 
     <div id="stap-0">
       <div class="rij-twee">
-        <div><label>Voornaam <span class="verplicht">*</span><input type="text" id="voornaam-invoer" autocomplete="given-name" /></label></div>
-        <div><label>Tussenvoegsel<input type="text" id="tussenvoegsel-invoer" autocomplete="off" /></label></div>
+        <div><label class="veld-label">Voornaam <span class="verplicht">*</span><input type="text" id="voornaam-invoer" autocomplete="given-name" /></label></div>
+        <div><label class="veld-label">Tussenvoegsel<input type="text" id="tussenvoegsel-invoer" autocomplete="off" /></label></div>
       </div>
-      <label>Achternaam <span class="verplicht">*</span><input type="text" id="achternaam-invoer" autocomplete="family-name" /></label>
-      <label>Telefoonnummer<input type="tel" id="telefoon-invoer" autocomplete="tel" /></label>
-      <label>Geslacht (voor toernooiklassen)</label>
+      <label class="veld-label">Achternaam <span class="verplicht">*</span><input type="text" id="achternaam-invoer" autocomplete="family-name" /></label>
+      <label class="veld-label">Telefoonnummer<input type="tel" id="telefoon-invoer" autocomplete="tel" /></label>
+      <label class="veld-label">Geslacht (voor toernooiklassen)</label>
       <div class="drie-knoppen" id="geslacht-knoppen">
         <button type="button" class="keuzeknop" data-geslacht="m"><span class="label-tekst">Man</span></button>
         <button type="button" class="keuzeknop" data-geslacht="v"><span class="label-tekst">Vrouw</span></button>
         <button type="button" class="keuzeknop" data-geslacht="x"><span class="label-tekst">Anders</span></button>
       </div>
-      <label>E-mailadres <span class="verplicht">*</span><input type="email" id="email-invoer" autocomplete="email" /></label>
-      <label>Geboortedatum <span class="verplicht">*</span><input type="date" id="geboortedatum-invoer" autocomplete="bday" /></label>
+      <label class="veld-label">E-mailadres <span class="verplicht">*</span><input type="email" id="email-invoer" autocomplete="email" /></label>
+      <label class="veld-label">Geboortedatum <span class="verplicht">*</span><input type="date" id="geboortedatum-invoer" autocomplete="bday" /></label>
       <div id="ouder-email-veld" style="display: none;">
-        <label>E-mailadres ouder/voogd <span class="verplicht">*</span><input type="email" id="ouder-email-invoer" /></label>
+        <label class="veld-label">E-mailadres ouder/voogd <span class="verplicht">*</span><input type="email" id="ouder-email-invoer" /></label>
         <p class="hint" style="margin-top: 5px;">Voor leden onder de 18 vragen we digitale toestemming van een ouder/voogd per e-mail.</p>
       </div>
-      <label>Adres<input type="text" id="adres-invoer" placeholder="Straat, huisnummer, postcode en plaats" /></label>
-      <label>Ervaring<textarea id="ervaring-invoer" rows="2" placeholder="Je pickleball- of racketsportervaring (optioneel)"></textarea></label>
-      <label>Medische informatie<textarea id="medische-info-invoer" rows="2" placeholder="Allergieën, suikerziekte, hartklachten, blessures, bloedgroep (optioneel)"></textarea></label>
-      <label style="margin-top: 20px; font-weight: 700; color: var(--ink);">Noodcontact</label>
-      <label>Naam noodcontact<input type="text" id="noodcontact-naam-invoer" /></label>
-      <label>Telefoon noodcontact<input type="tel" id="noodcontact-telefoon-invoer" /></label>
+      <label class="veld-label">Adres<input type="text" id="adres-invoer" placeholder="Straat, huisnummer, postcode en plaats" /></label>
+      <label class="veld-label">Ervaring<textarea id="ervaring-invoer" rows="2" placeholder="Je pickleball- of racketsportervaring (optioneel)"></textarea></label>
+      <label class="veld-label">Medische informatie<textarea id="medische-info-invoer" rows="2" placeholder="Allergieën, suikerziekte, hartklachten, blessures, bloedgroep (optioneel)"></textarea></label>
+      <label class="veld-label" style="margin-top: 20px; font-weight: 700; color: var(--ink);">Noodcontact</label>
+      <label class="veld-label">Naam noodcontact<input type="text" id="noodcontact-naam-invoer" /></label>
+      <label class="veld-label">Telefoon noodcontact<input type="tel" id="noodcontact-telefoon-invoer" /></label>
     </div>
 
     <div id="stap-1" style="display: none;">
-      <label style="font-weight: 700; color: var(--ink);">Speelniveau</label>
+      <label class="veld-label" style="font-weight: 700; color: var(--ink);">Speelniveau</label>
       <p class="hint" style="margin-top: 0;">Kies het niveau dat het beste bij je past</p>
       <div class="niveau-kaarten" id="niveau-kaarten">
         <button type="button" class="niveau-kaart" data-niveau="beginner"><span class="titel">Beginner</span><span class="uitleg">Nog nooit gespeeld</span></button>
@@ -151,7 +150,7 @@
         <button type="button" class="niveau-kaart" data-niveau="competitie"><span class="titel">Competitie</span><span class="uitleg">Competitie-ervaring</span></button>
       </div>
 
-      <label style="margin-top: 20px; font-weight: 700; color: var(--ink);">Kies je abonnement</label>
+      <label class="veld-label" style="margin-top: 20px; font-weight: 700; color: var(--ink);">Kies je abonnement</label>
       <p class="hint" id="categorie-hint" style="margin-top: 0; display: none;"></p>
       <div class="vorm-pillen" id="vorm-pillen"></div>
       <div class="plan-opties" id="plan-opties"></div>
@@ -160,7 +159,7 @@
 
     <div id="stap-2" style="display: none;">
       <div class="samenvatting-kaart" id="samenvatting-kaart"></div>
-      <label>Kies een wachtwoord<input type="password" id="wachtwoord-invoer" autocomplete="new-password" /></label>
+      <label class="veld-label">Kies een wachtwoord<input type="password" id="wachtwoord-invoer" autocomplete="new-password" /></label>
       <p class="hint">Minimaal 8 tekens.</p>
 
       <label class="toestemming-rij"><input type="checkbox" id="privacybeleid-invoer" />

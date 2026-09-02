@@ -81,10 +81,7 @@
 </script>
 <link rel="stylesheet" href="/assets/site.css" />
 <style>
-  :root { --navy-ink: #041b33; --gold: #ffd23f; --gold-deep: #e0a92e; --line: rgba(4, 27, 51, 0.1); }
-  @media (prefers-color-scheme: dark) {
-    :root { --line: rgba(255, 255, 255, 0.12); }
-  }
+  :root { --navy-ink: #041b33; --gold: #ffd23f; --gold-deep: #e0a92e; }
   #thema-plek { position: fixed; top: 16px; right: 16px; z-index: 50; }
   .thema-knop, .taal-knop { background: var(--navy); border: none; color: #fff; height: 38px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
   .thema-knop { width: 38px; }
@@ -124,7 +121,7 @@
   @media (prefers-reduced-motion: reduce) {
     .logo { animation: none; }
   }
-  h1 {
+  .hoofdtitel {
     font-family: "Unbounded", sans-serif;
     font-weight: 900;
     font-size: clamp(2.1rem, 6vw, 3.4rem);
@@ -132,8 +129,8 @@
     margin: 14px 0 0;
     text-wrap: balance;
   }
-  h1 span { color: var(--gold-deep); }
-  @media (prefers-color-scheme: dark) { h1 span { color: var(--gold); } }
+  .hoofdtitel span { color: var(--gold-deep); }
+  @media (prefers-color-scheme: dark) { .hoofdtitel span { color: var(--gold); } }
   .badge {
     display: inline-flex;
     align-items: center;
@@ -267,7 +264,7 @@
 <main>
   <img class="logo" src="/assets/img/logo.png" alt="Almere Pickleball" width="180" height="176" />
 
-  <h1><span data-i18n="heroPrefix">We zijn</span> <span data-i18n="heroAccent">volop aan het bouwen</span></h1>
+  <h1 class="hoofdtitel"><span data-i18n="heroPrefix">We zijn</span> <span data-i18n="heroAccent">volop aan het bouwen</span></h1>
 
   <div class="badge"><span class="stip"></span> <span data-i18n="badgeTekst">Nieuwe website in aanbouw</span></div>
 

@@ -14,20 +14,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/assets/site.css" />
 <style>
-  :root { --gold: #ffd23f; --gold-deep: #b8860a; --card: #ffffff; --line: rgba(4,27,51,0.1); --danger: #b3261e; }
-  @media (prefers-color-scheme: dark) {
-    :root { --card: #101d30; --line: rgba(255,255,255,0.12); }
-  }
-  :root[data-theme="dark"] { --card: #101d30; }
-  :root[data-theme="light"] { --card: #ffffff; }
+  :root { --gold: #ffd23f; --gold-deep: #b8860a; }
   .thema-knop, .taal-knop { background: rgba(255,255,255,0.15); border: none; height: 34px; color: inherit; flex-shrink: 0; }
   .thema-knop { width: 34px; }
   .thema-knop svg { width: 16px; height: 16px; }
   .taal-knop { min-width: 34px; padding: 0 10px; }
   #thema-plek { flex-shrink: 0; }
-  header { background: linear-gradient(135deg, rgba(0,91,191,0.82), rgba(0,61,130,0.82)); padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
-  header .merk { font-family: "Unbounded", sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #cfe0f0; }
-  header h1 { font-size: 20px; margin: 4px 0 0; }
   main { max-width: 460px; margin: 18px auto 40px; padding: 0 18px; }
   .kaart { border-radius: 16px; padding: 22px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
   .toelichting { font-size: 13.5px; color: var(--ink-muted); line-height: 1.5; margin: 0 0 14px; }
@@ -83,13 +75,13 @@
     .ticket-kaart { box-shadow: none; border: 1px solid #ccc; }
   }
   .laden { text-align: center; padding: 40px 0; }
-  .fout { color: var(--danger); text-align: center; padding: 20px 0; }
+  .fout { text-align: center; padding: 20px 0; }
   .terug { text-align: center; margin-top: 8px; }
   .mini-footer { margin-top: 10px; }
 </style>
 </head>
 <body>
-<header class="header-glas">
+<header class="header-glas header-glas--badge">
   <img src="/assets/img/logo.png" alt="" width="40" height="39" style="border-radius: 8px;" />
   <div>
     <div class="merk">Almere Pickleball</div>

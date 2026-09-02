@@ -11,8 +11,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/assets/site.css" />
-<link rel="stylesheet" href="/assets/leden.css" />
 <style>
+  .kaart { border-radius: 16px; padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .kaart h2 { font-size: 14px; margin: 0 0 12px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; }
   .beheer-intro { padding: 2px 2px 16px; }
   .beheer-intro h2 {
     font-family: "Unbounded", sans-serif; font-size: 17px; margin: 0 0 4px; letter-spacing: -0.01em;
@@ -58,7 +59,7 @@
   .veld-rij input, .veld-rij select, .veld-rij textarea { max-width: 100%; box-sizing: border-box; padding: 9px 11px; border-radius: 8px; font-size: 13.5px; }
   @media (max-width: 420px) { .veld-twee { grid-template-columns: 1fr; } }
   /* Club-instellingen-kaarten: zelfde afwisselende "mens"/"womens"-kleuren
-     als de nieuws-coverflow (assets/leden.css, #141D38/#FCDB32 en
+     als de nieuws-coverflow (assets/site.css, #141D38/#FCDB32 en
      #3447AA/#FBEAEB) — matcht _instellingKaart in admin_screen.dart (app). */
   .instelling-kaart { border-radius: 14px; padding: 14px; margin-bottom: 14px; }
   .instelling-kaart.mens { background: #141D38; }
@@ -117,7 +118,7 @@
 </style>
 </head>
 <body>
-<header>
+<header class="header-glas header-glas--portaal">
   <img src="/assets/img/logo.png" alt="" width="40" height="39" style="border-radius: 8px;" />
   <div style="flex: 1; min-width: 0;">
     <div class="merk"></div>
