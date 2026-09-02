@@ -79,48 +79,19 @@
   "about": "Ledenapp van Almere Pickleball: speelavonden reserveren, toernooien, nieuws en ledenoverzicht."
 }
 </script>
+<link rel="stylesheet" href="/assets/site.css" />
 <style>
-  :root {
-    --navy: #2457ff;
-    --navy-deep: #003d82;
-    --navy-ink: #041b33;
-    --gold: #ffd23f;
-    --gold-deep: #e0a92e;
-    --paper: #f5f8fc;
-    --ink: #0b1420;
-    --ink-muted: #5b6b7d;
-    --line: rgba(4, 27, 51, 0.1);
-  }
+  :root { --navy-ink: #041b33; --gold: #ffd23f; --gold-deep: #e0a92e; --line: rgba(4, 27, 51, 0.1); }
   @media (prefers-color-scheme: dark) {
-    :root {
-      --paper: #071224;
-      --ink: #eef3f9;
-      --ink-muted: #9fb2c4;
-      --line: rgba(255, 255, 255, 0.12);
-    }
+    :root { --line: rgba(255, 255, 255, 0.12); }
   }
-  :root[data-theme="dark"] { --paper: #071224; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
-  :root[data-theme="light"] { --paper: #f5f8fc; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1); }
-  #thema-plek {
-    position: fixed; top: 16px; right: 16px; z-index: 50; display: flex; gap: 8px; align-items: center;
-  }
-  .thema-knop, .taal-knop {
-    background: var(--navy); border: none; color: #fff; border-radius: 999px; height: 38px;
-    cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.12); font-family: inherit;
-    display: inline-flex; align-items: center; justify-content: center;
-  }
+  #thema-plek { position: fixed; top: 16px; right: 16px; z-index: 50; }
+  .thema-knop, .taal-knop { background: var(--navy); border: none; color: #fff; height: 38px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
   .thema-knop { width: 38px; }
   .thema-knop svg { width: 17px; height: 17px; }
-  .taal-knop { min-width: 38px; padding: 0 12px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.02em; }
-  * { box-sizing: border-box; }
+  .taal-knop { min-width: 38px; padding: 0 12px; }
   html, body { margin: 0; padding: 0; }
-  body {
-    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--paper);
-    color: var(--ink);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  body { font-family: "Manrope", -apple-system, BlinkMacSystemFont, sans-serif; min-height: 100vh; overflow-x: hidden; }
   .achtergrond {
     position: fixed;
     inset: 0;
@@ -154,7 +125,7 @@
     .logo { animation: none; }
   }
   h1 {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-weight: 900;
     font-size: clamp(2.1rem, 6vw, 3.4rem);
     line-height: 1.08;
@@ -182,13 +153,7 @@
     animation: knipperen 1.6s ease-in-out infinite;
   }
   @keyframes knipperen { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-  p.uitleg {
-    max-width: 480px;
-    margin: 22px 0 0;
-    font-size: 17px;
-    line-height: 1.6;
-    color: var(--ink-muted);
-  }
+  p.uitleg { max-width: 480px; margin: 22px 0 0; font-size: 17px; line-height: 1.6; }
   .app-sectie {
     margin-top: 56px;
     width: 100%;
@@ -203,7 +168,7 @@
     .app-sectie { background: rgba(255, 255, 255, 0.04); }
   }
   .app-sectie h2 {
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-size: 15px;
     font-weight: 700;
     margin: 0 0 6px;
@@ -232,7 +197,7 @@
     justify-content: space-between;
     align-items: baseline;
     gap: 4px 12px;
-    font-family: 'Unbounded', sans-serif;
+    font-family: "Unbounded", sans-serif;
     font-weight: 700;
     font-size: 18px;
     color: var(--navy);

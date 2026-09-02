@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/site.css" />
 <link rel="stylesheet" href="/assets/leden.css" />
 <style>
   /* Categoriefilter-pillen — 1-op-1 _categoriePil in nieuws_screen.dart. */
@@ -25,34 +26,16 @@
     box-shadow: 0 0 8px rgba(36,87,255,0.2);
   }
   .nieuws-titelblok { margin-bottom: 16px; }
-  .nieuws-titelblok h2 { margin: 0; font-size: 22px; font-family: 'Unbounded', sans-serif; }
+  .nieuws-titelblok h2 { margin: 0; font-size: 22px; font-family: "Unbounded", sans-serif; }
   .nieuws-titelblok p { margin: 4px 0 0; color: var(--ink-muted); font-size: 14px; }
   .nieuws-leeg-categorie {
     text-align: center; padding: 48px 32px; color: var(--ink-muted); font-size: 14px;
   }
-  .popup-overlay {
-    position: fixed; inset: 0; background: rgba(4,27,51,0.45); z-index: 100;
-    display: flex; align-items: center; justify-content: center; padding: 16px;
-    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-  }
-  .popup-kaart {
-    background: var(--glas-oppervlak); -webkit-backdrop-filter: blur(24px) saturate(160%);
-    backdrop-filter: blur(24px) saturate(160%); border: 1px solid var(--glas-rand);
-    border-radius: 22px; width: 100%; max-width: 420px; max-height: 80vh; overflow-y: auto; padding: 0;
-    box-shadow: 0 20px 50px rgba(4,27,51,0.35), inset 0 1px 0 var(--glas-hooglicht-boven), inset 0 -1px 0 var(--glas-hooglicht-onder);
-  }
-  .popup-kop {
-    display: flex; justify-content: space-between; align-items: center; gap: 10px;
-    padding: 18px 20px; border-bottom: 1px solid var(--glas-rand); position: sticky; top: 0;
-    background: var(--glas-oppervlak); -webkit-backdrop-filter: blur(24px) saturate(160%);
-    backdrop-filter: blur(24px) saturate(160%); border-radius: 22px 22px 0 0;
-  }
-  .popup-kop h3 { margin: 0; font-size: 15.5px; font-family: 'Unbounded', sans-serif; }
-  .popup-sluit {
-    background: rgba(91,107,125,0.12); border: none; border-radius: 50%; width: 30px; height: 30px;
-    font-size: 15px; cursor: pointer; color: var(--ink-muted); flex-shrink: 0;
-  }
-  .popup-lichaam { padding: 18px 20px; }
+  .popup-overlay { align-items: center; padding: 16px; }
+  .popup-kaart { border-radius: 22px; max-width: 420px; max-height: 80vh; overflow-y: auto; padding: 0; box-shadow: 0 20px 50px rgba(4,27,51,0.35), inset 0 1px 0 var(--glas-hooglicht-boven), inset 0 -1px 0 var(--glas-hooglicht-onder); }
+  .popup-kop { gap: 10px; padding: 18px 20px; border-bottom: 1px solid var(--glas-rand); position: sticky; top: 0; background: var(--glas-oppervlak); -webkit-backdrop-filter: blur(24px) saturate(160%); backdrop-filter: blur(24px) saturate(160%); border-radius: 22px 22px 0 0; }
+  .popup-kop h3 { font-size: 15.5px; font-family: "Unbounded", sans-serif; }
+  .popup-sluit { background: rgba(91,107,125,0.12); border-radius: 50%; width: 30px; height: 30px; font-size: 15px; flex-shrink: 0; }
   .popup-lichaam .lichaam { margin: 10px 0 0; font-size: 14px; line-height: 1.6; white-space: pre-line; }
   .popup-lichaam img { width: 100%; height: 160px; object-fit: cover; border-radius: 14px; }
   .popup-acties { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 20px; border-top: 1px solid var(--line); }

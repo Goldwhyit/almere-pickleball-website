@@ -89,71 +89,36 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/site.css" />
 <style>
-  :root {
-    --navy: #2457ff; --navy-deep: #003d82; --gold: #f9e534; --gold-deep: #b8860a;
-    --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1);
-  }
+  :root { --gold: #f9e534; --gold-deep: #b8860a; --card: #ffffff; --line: rgba(4,27,51,0.1); }
   @media (prefers-color-scheme: dark) {
-    :root { --gold: #dbc90a; --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+    :root { --gold: #dbc90a; --card: #101d30; --line: rgba(255,255,255,0.12); }
   }
-  :root[data-theme="dark"] { --gold: #dbc90a; --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
-  :root[data-theme="light"] { --gold: #f9e534; --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1); }
-  .thema-knop, .taal-knop {
-    background: rgba(255,255,255,0.15); border: none; border-radius: 999px; height: 34px;
-    cursor: pointer; color: inherit; flex-shrink: 0; font-family: inherit;
-    display: inline-flex; align-items: center; justify-content: center;
-  }
+  :root[data-theme="dark"] { --gold: #dbc90a; --card: #101d30; }
+  :root[data-theme="light"] { --gold: #f9e534; --card: #ffffff; }
+  .thema-knop, .taal-knop { background: rgba(255,255,255,0.15); border: none; height: 34px; color: inherit; flex-shrink: 0; }
   .thema-knop { width: 34px; }
   .thema-knop svg { width: 16px; height: 16px; }
-  .taal-knop { min-width: 34px; padding: 0 10px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.02em; }
-  #thema-plek { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: 'Manrope', -apple-system, sans-serif; background: var(--paper); color: var(--ink); }
-  header {
-    background: linear-gradient(135deg, rgba(0,91,191,0.82), rgba(0,61,130,0.82));
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
-    backdrop-filter: blur(24px) saturate(160%); color: #fff;
-    padding: 18px 20px;
-    position: sticky; top: 12px; z-index: 60; margin: 12px 12px 0;
-    box-shadow: 0 10px 28px rgba(4,27,51,0.22), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(0,0,0,0.12);
-    border-radius: 32px;
-    border: 1px solid rgba(255,255,255,0.24);
-  }
-  header .terug { color: #cfe0f0; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
-  header .terug img { border-radius: 6px; }
-  main .terug { display: block; text-align: center; margin-top: 20px; font-size: 13px; color: var(--ink-muted); text-decoration: none; }
-  header h1 { font-family: 'Unbounded', sans-serif; font-size: clamp(1.4rem, 5vw, 2rem); margin: 10px 0 4px; }
+  .taal-knop { min-width: 34px; padding: 0 10px; }
+  #thema-plek { flex-shrink: 0; }
+  header { background: linear-gradient(135deg, rgba(0,91,191,0.82), rgba(0,61,130,0.82)); padding: 18px 20px; }
+  header h1 { font-size: clamp(1.4rem, 5vw, 2rem); margin: 10px 0 4px; }
   header p { margin: 0; color: #cfe0f0; font-size: 14px; }
   main { max-width: 680px; margin: 18px auto 60px; padding: 0 18px; }
   .groep { margin-bottom: 22px; }
   .groep h2 {
-    font-family: 'Unbounded', sans-serif; font-size: 13px; margin: 0 0 10px;
+    font-family: "Unbounded", sans-serif; font-size: 13px; margin: 0 0 10px;
     color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.05em;
   }
-  details {
-    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
-    padding: 4px 18px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  }
-  summary {
-    padding: 14px 0; font-weight: 700; font-size: 15px; cursor: pointer;
-    list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 10px;
-  }
-  summary::-webkit-details-marker { display: none; }
-  summary::after {
-    content: '+'; font-size: 20px; font-weight: 400; color: var(--navy); flex-shrink: 0;
-    transition: transform 0.15s ease;
-  }
-  @media (prefers-color-scheme: dark) { summary::after { color: #8ab6ec; } }
-  details[open] summary::after { transform: rotate(45deg); }
+  summary { justify-content: space-between; gap: 10px; }
   .antwoord { padding: 0 0 16px; font-size: 14.5px; line-height: 1.6; color: var(--ink-muted); }
   .antwoord a { color: var(--navy); }
   @media (prefers-color-scheme: dark) { .antwoord a { color: #8ab6ec; } }
-  .voettekst { text-align: center; font-size: 13px; color: var(--ink-muted); margin-top: 30px; }
 </style>
 </head>
 <body>
-<header>
+<header class="header-glas">
   <a class="terug" href="/"><img src="/assets/img/logo.png" alt="" width="28" height="27" /> Almere Pickleball</a>
   <div id="thema-plek" style="position:absolute;top:20px;right:20px;"></div>
   <h1 data-i18n="titelFaq">Veelgestelde vragen</h1>

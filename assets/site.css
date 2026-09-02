@@ -1,0 +1,124 @@
+/* ============================================================================
+   Almere Pickleball — centrale, sitebrede stylesheet.
+
+   Bevat de CSS die letterlijk (of op de gedeelde eigenschappen na) identiek
+   was tussen meerdere pagina's: kleurtokens/thema, basisreset, de thema/
+   taal-schakelaar, de "liquid glass" header, en terugkerende onderdelen
+   (kaart, footer, knoppen, digitaal ticket, uitleg-accordeon, formulier-
+   rijtjes). Wordt geladen door vrijwel elke pagina van de site.
+
+   Wat hier NIET in staat, met opzet:
+   - assets/leden.css: de eigen, verdergaande gedeelde stijl van het
+     ledenportaal (popup/modal, statistiektegels, uitnodigingskaarten,
+     swipe-kaarten, coverflow, ...). Portaalpagina's laden dit bestand
+     bovenop site.css.
+   - assets/verjaardag/verjaardagstaart.html: bewust volledig zelfstandig
+     (werkt offline in een Flutter WebView), laadt geen externe CSS.
+   - Alles wat maar op één plek gebruikt wordt, of waarvan het samenvoegen
+     het risico gaf dat de stijl op een andere pagina zou meeveranderen
+     (bv. header op landingspagina/index.html gebruikt een eigen klasse
+     i.p.v. dit bestand, precies om dat te voorkomen).
+   ============================================================================ */
+
+/* ---- Kleurtokens (thema) ---- */
+  :root { --navy: #2457ff; --navy-deep: #003d82; --ink: #0b1420; --ink-muted: #5b6b7d; --paper: #f5f8fc; }
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #071224; --ink: #eef3f9; --ink-muted: #9fb2c4; }
+}
+/* Handmatige thema-keuze (assets/theme.js) wint altijd van de systeeminstelling hierboven, in beide richtingen. */
+  :root[data-theme="dark"] { --paper: #071224; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+  :root[data-theme="light"] { --paper: #f5f8fc; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1); }
+
+/* ---- Basisreset ---- */
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Manrope", -apple-system, sans-serif; background: var(--paper); color: var(--ink); }
+
+/* ---- Thema/taal-schakelaar (rechtsboven in elke header) ---- */
+  .thema-knop, .taal-knop { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; cursor: pointer; font-family: inherit; }
+  .taal-knop { font-size: 12.5px; font-weight: 700; letter-spacing: 0.02em; }
+  #thema-plek { display: flex; align-items: center; gap: 8px; }
+
+/* ---- "Liquid glass" header — voeg class="header-glas" toe aan <header>
+   om deze gedeelde chrome te krijgen; achtergrond/padding/gap blijven
+   bewust per pagina (verschillen per sectie). ---- */
+  .header-glas { -webkit-backdrop-filter: blur(24px) saturate(160%); backdrop-filter: blur(24px) saturate(160%); color: #fff; position: sticky; top: 12px; z-index: 60; margin: 12px 12px 0; box-shadow: 0 10px 28px rgba(4,27,51,0.22), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(0,0,0,0.12); border-radius: 32px; border: 1px solid rgba(255,255,255,0.24); }
+  .header-glas h1 { font-family: "Unbounded", sans-serif; }
+  .terug { display: block; color: var(--ink-muted); font-size: 13px; text-decoration: none; }
+  header .terug { display: inline-flex; align-items: center; gap: 8px; color: #cfe0f0; font-size: 13px; text-decoration: none; }
+  header .terug img { border-radius: 6px; }
+  main .terug { display: block; text-align: center; margin-top: 20px; color: var(--ink-muted); font-size: 13px; text-decoration: none; }
+
+/* ---- Kaart (basiscomponent voor content-blokken) ---- */
+  .kaart { background: var(--card); border: 1px solid var(--line); }
+  .kaart h2 { font-family: "Unbounded", sans-serif; }
+  .kaart .toelichting { color: var(--ink-muted); font-size: 13px; margin: 0 0 12px; }
+
+/* ---- Footer / voettekst ---- */
+  .mini-footer { text-align: center; font-size: 12px; color: var(--ink-muted); }
+  .mini-footer a { color: var(--ink-muted); }
+  .voettekst { text-align: center; margin-top: 30px; font-size: 13px; color: var(--ink-muted); }
+
+/* ---- Knoppen ---- */
+  .knop { border: none; cursor: pointer; font-weight: 700; }
+  button.primair { background: var(--gold); color: #241a02; }
+
+/* ---- Statusteksten ---- */
+  .laden { color: var(--ink-muted); }
+  p.uitleg { color: var(--ink-muted); }
+
+/* ---- "Gelukt"-bevestigingsscherm (registratie, proefles-aanvraag) ---- */
+  .gelukt { text-align: center; padding: 10px 0; }
+  .gelukt .icoon { font-size: 40px; }
+  .gelukt h2 { font-family: "Unbounded", sans-serif; font-size: 17px; margin: 10px 0 6px; }
+  .gelukt p { color: var(--ink-muted); font-size: 14px; }
+
+/* ---- Merk-tekst (login/registratie/toestemmingspagina's) ---- */
+  .merk { color: var(--navy); font-family: "Unbounded", sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; }
+  :root[data-theme="dark"] .merk { color: #8ab6ec; }
+
+/* ---- Formulier-rijtjes ---- */
+  .naam-rij { display: flex; }
+  .toestemming-rij { display: flex; align-items: flex-start; gap: 9px; cursor: pointer; color: var(--ink); font-size: 12.5px; font-weight: 400; }
+  .toestemming-rij input[type=checkbox] { accent-color: var(--navy); flex-shrink: 0; height: 17px; margin-top: 1px; width: 17px; }
+  .i-inline { flex-shrink: 0; height: 14px; margin-right: 3px; vertical-align: -2px; width: 14px; }
+
+/* ---- Uitklap-vragen (hulp.html, veelgestelde-vragen) ---- */
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 10px; padding: 4px 18px; }
+  summary { align-items: center; cursor: pointer; display: flex; font-size: 15px; font-weight: 700; list-style: none; padding: 14px 0; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-size: 20px; font-weight: 400; color: var(--navy); flex-shrink: 0; transition: transform 0.15s ease; }
+@media (prefers-color-scheme: dark) {
+  summary::after { color: #8ab6ec; }
+}
+  details[open] summary::after { transform: rotate(45deg); }
+
+/* ---- Digitaal ticket (bevestiging baanreservering + toernooi-inschrijving) ---- */
+  .ticket-kaart { background: var(--card); border: 2px solid var(--paper); border-radius: 28px; position: relative; }
+  .ticket-kop { text-align: center; }
+  .ticket-kop .titel { font-family: "Unbounded", sans-serif; font-weight: 800; margin: 0 0 10px; }
+  .ticket-badges { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .ticket-badge { border-radius: 999px; font-size: 9.5px; font-weight: 700; letter-spacing: 0.05em; padding: 5px 11px; text-transform: uppercase; }
+  .ticket-badge.type { background: var(--gold); color: #4a3300; }
+  .ticket-badge.status-bevestigd { color: var(--navy); }
+  .ticket-body { padding: 4px 22px 2px; }
+  .ticket-grid { column-gap: 14px; display: grid; grid-template-columns: 1fr 1fr; row-gap: 14px; }
+  .ticket-veld { min-width: 0; }
+  .ticket-veld .label { color: var(--ink-muted); display: block; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .ticket-veld .waarde { display: block; font-weight: 600; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ticket-perforatie { height: 20px; margin-top: 14px; position: relative; }
+  .ticket-perforatie .notch { background: var(--paper); border-radius: 50%; height: 26px; position: absolute; top: 50%; transform: translateY(-50%); width: 26px; z-index: 2; }
+  .ticket-perforatie .notch.links { left: -13px; }
+  .ticket-perforatie .notch.rechts { right: -13px; }
+  .ticket-perforatie .lijn { border-top: 1.5px dashed var(--line); left: 20px; position: absolute; right: 20px; top: 50%; }
+  .ticket-qr-sectie { padding: 4px 22px 22px; text-align: center; }
+  .ticket-qr-sectie img { border-radius: 10px; display: block; }
+  .ticket-referentie { color: var(--ink-muted); font-size: 11.5px; }
+  .ticket-referentie code { color: var(--navy); font-family: ui-monospace, "SF Mono", Menlo, monospace; font-weight: 700; }
+  .ticket-knop { align-items: center; border: none; border-radius: 999px; cursor: pointer; display: flex; font-family: inherit; font-size: 13px; font-weight: 700; gap: 6px; justify-content: center; padding: 11px; transition: filter 0.15s ease; width: 100%; }
+  .ticket-knop:hover { filter: brightness(0.96); }
+  .ticket-knop.deel { background: var(--navy); color: #fff; }
+  .ticket-knop svg { flex-shrink: 0; height: 16px; width: 16px; }
+@media (prefers-color-scheme: dark) {
+  .ticket-badge.status-bevestigd { color: #8ab6ec; }
+  .ticket-referentie code { color: #8ab6ec; }
+}
