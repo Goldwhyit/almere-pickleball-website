@@ -10,49 +10,30 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/site.css" />
 <style>
-  :root {
-    --navy: #2457ff; --navy-deep: #003d82; --gold: #f9e534; --gold-deep: #b8860a;
-    --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1);
-    --danger: #e41d23;
-  }
+  :root { --gold: #f9e534; --gold-deep: #b8860a; --card: #ffffff; --line: rgba(4,27,51,0.1); --danger: #e41d23; }
   @media (prefers-color-scheme: dark) {
-    :root { --gold: #dbc90a; --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
+    :root { --gold: #dbc90a; --card: #101d30; --line: rgba(255,255,255,0.12); }
   }
-  :root[data-theme="dark"] { --gold: #dbc90a; --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
-  :root[data-theme="light"] { --gold: #f9e534; --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1); }
-  #thema-plek { position: fixed; top: 16px; right: 16px; z-index: 50; display: flex; gap: 8px; align-items: center; }
-  .thema-knop, .taal-knop {
-    background: var(--card); border: 1.5px solid var(--line); border-radius: 999px; height: 38px;
-    cursor: pointer; color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,0.08); font-family: inherit;
-    display: inline-flex; align-items: center; justify-content: center;
-  }
+  :root[data-theme="dark"] { --gold: #dbc90a; --card: #101d30; }
+  :root[data-theme="light"] { --gold: #f9e534; --card: #ffffff; }
+  #thema-plek { position: fixed; top: 16px; right: 16px; z-index: 50; }
+  .thema-knop, .taal-knop { background: var(--card); border: 1.5px solid var(--line); height: 38px; color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
   .thema-knop { width: 38px; }
   .thema-knop svg { width: 17px; height: 17px; }
-  .taal-knop { min-width: 38px; padding: 0 12px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.02em; }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center;
-    font-family: 'Manrope', -apple-system, sans-serif; background: var(--paper); color: var(--ink);
-    padding: 24px 24px 60px;
-  }
-  .kaart {
-    width: 100%; max-width: 460px; background: var(--card); border: 1px solid var(--line);
-    border-radius: 20px; padding: 28px 26px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); margin-top: 24px;
-  }
-  .merk { font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 12px; letter-spacing: 0.12em;
-    text-transform: uppercase; color: var(--navy); text-align: center; }
+  .taal-knop { min-width: 38px; padding: 0 12px; }
+  body { min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 24px 24px 60px; }
+  .kaart { width: 100%; max-width: 460px; border-radius: 20px; padding: 28px 26px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); margin-top: 24px; }
+  .merk { text-align: center; }
   @media (prefers-color-scheme: dark) { .merk { color: #8ab6ec; } }
-  :root[data-theme="dark"] .merk { color: #8ab6ec; }
-  h1 { font-family: 'Unbounded', sans-serif; font-size: 21px; margin: 8px 0 16px; text-align: center; }
-
+  h1 { font-family: "Unbounded", sans-serif; font-size: 21px; margin: 8px 0 16px; text-align: center; }
   .voortgang { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 10px; }
   .voortgang-balk { flex: 1; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
   .voortgang-balk-vulling { height: 100%; background: var(--navy); border-radius: 999px; transition: width 0.2s ease; }
   :root[data-theme="dark"] .voortgang-balk-vulling { background: #8ab6ec; }
   .stap-label { font-size: 11.5px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
   :root[data-theme="dark"] .stap-label { color: #8ab6ec; }
-
   label { font-size: 13px; font-weight: 600; color: var(--ink-muted); display: block; margin-top: 14px; }
   label:first-of-type { margin-top: 0; }
   label .verplicht { color: var(--danger); }
@@ -66,14 +47,9 @@
   .rij-twee > div:first-child { flex: 3; }
   .rij-twee > div:last-child { flex: 2; }
   .hint { font-size: 12px; color: var(--ink-muted); margin-top: 5px; }
-  .toestemming-rij {
-    display: flex; align-items: flex-start; gap: 9px; font-size: 12.5px; font-weight: 400;
-    color: var(--ink); margin-top: 14px; cursor: pointer;
-  }
-  .toestemming-rij input[type=checkbox] { width: 17px; height: 17px; margin-top: 1px; flex-shrink: 0; accent-color: var(--navy); }
+  .toestemming-rij { margin-top: 14px; }
   .toestemming-rij a { color: var(--navy); }
   :root[data-theme="dark"] .toestemming-rij a { color: #8ab6ec; }
-
   .drie-knoppen { display: flex; gap: 8px; margin-top: 6px; }
   .keuzeknop {
     flex: 1; padding: 12px 6px; border-radius: 12px; border: 1.5px solid var(--line); background: transparent;
@@ -82,7 +58,6 @@
   .keuzeknop.actief { border-color: var(--navy); background: rgba(36,87,255,0.08); color: var(--navy); }
   :root[data-theme="dark"] .keuzeknop.actief { border-color: #8ab6ec; background: rgba(138,182,236,0.12); color: #8ab6ec; }
   .keuzeknop .label-tekst { font-size: 12.5px; font-weight: 700; display: block; }
-
   .niveau-kaarten { display: flex; gap: 8px; margin-top: 8px; }
   .niveau-kaart {
     flex: 1; padding: 14px 6px; border-radius: 14px; border: 1.5px solid var(--line); background: transparent;
@@ -92,7 +67,6 @@
   :root[data-theme="dark"] .niveau-kaart.actief { border-color: #8ab6ec; background: rgba(138,182,236,0.1); }
   .niveau-kaart .titel { font-weight: 700; font-size: 13px; display: block; }
   .niveau-kaart .uitleg { font-size: 10px; color: var(--ink-muted); display: block; margin-top: 2px; }
-
   .vorm-pillen { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
   .vorm-pil {
     padding: 9px 15px; border-radius: 999px; border: 1.5px solid var(--line); background: transparent;
@@ -100,7 +74,6 @@
   }
   .vorm-pil.actief { border-color: var(--navy); background: rgba(36,87,255,0.08); color: var(--navy); }
   :root[data-theme="dark"] .vorm-pil.actief { border-color: #8ab6ec; background: rgba(138,182,236,0.12); color: #8ab6ec; }
-
   .plan-opties, .betaal-opties { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
   .plan-optie {
     display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 12px;
@@ -112,26 +85,21 @@
   .plan-optie.actief .stip { border-color: var(--gold-deep); background: var(--gold); }
   .plan-optie .titel { font-weight: 700; font-size: 13.5px; }
   .plan-optie .sub { font-size: 12px; color: var(--ink-muted); margin-top: 1px; }
-
   .samenvatting-kaart {
     border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 18px; background: var(--paper);
   }
   .samenvatting-kaart .titel { font-weight: 700; font-size: 14px; }
   .samenvatting-kaart .sub { font-size: 12.5px; color: var(--ink-muted); margin-top: 2px; }
-
   .knoppen-rij { display: flex; gap: 10px; margin-top: 22px; }
   button.primair, button.secundair {
     padding: 13px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; border: none;
   }
-  button.primair { flex: 2; background: var(--gold); color: #241a02; }
+  button.primair { flex: 2; }
   button.primair:disabled { opacity: 0.45; cursor: not-allowed; }
   button.secundair { flex: 1; background: transparent; border: 1.5px solid var(--line); color: var(--ink); }
   .fout { color: var(--danger); font-size: 13.5px; margin-top: 12px; text-align: center; }
   .terug-link { display: block; text-align: center; margin-top: 20px; font-size: 13px; color: var(--ink-muted); text-decoration: none; }
-  .gelukt { text-align: center; padding: 10px 0; }
-  .gelukt .icoon { font-size: 40px; color: #1e8a4c; }
-  .gelukt h2 { font-family: 'Unbounded', sans-serif; font-size: 17px; margin: 10px 0 6px; }
-  .gelukt p { color: var(--ink-muted); font-size: 14px; }
+  .gelukt .icoon { color: #1e8a4c; }
 </style>
 </head>
 <body>

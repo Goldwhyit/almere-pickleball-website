@@ -1,49 +1,17 @@
 /* Almere Pickleball — gedeelde stijl voor het ledenportaal (alle pagina's
    onder /leden/, behalve index.html dat zijn eigen losse look heeft). */
-:root {
-  /* --navy/--accent/--gold komen 1-op-1 overeen met de app se kPrimair/
-     kAccent/kAccentGeel (lib/widgets/glass.dart) — zelfde merkkleuren op
-     beide platforms. */
-  --navy: #2457ff; --navy-deep: #003d82; --accent: #e41d23; --gold: #f9e534; --gold-deep: #b8860a;
-  --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1);
-  --glas-oppervlak: rgba(255,255,255,0.55); --glas-rand: rgba(255,255,255,0.6);
-  --glas-hooglicht-boven: rgba(255,255,255,0.55); --glas-hooglicht-onder: rgba(0,0,0,0.1);
-}
+:root { --accent: #e41d23; --gold: #f9e534; --gold-deep: #b8860a; --card: #ffffff; --line: rgba(4,27,51,0.1); --glas-oppervlak: rgba(255,255,255,0.55); --glas-rand: rgba(255,255,255,0.6); --glas-hooglicht-boven: rgba(255,255,255,0.55); --glas-hooglicht-onder: rgba(0,0,0,0.1); }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --gold: #dbc90a;
-    --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12);
-    --glas-oppervlak: rgba(28,28,30,0.55); --glas-rand: rgba(255,255,255,0.14);
-    --glas-hooglicht-boven: rgba(255,255,255,0.16); --glas-hooglicht-onder: rgba(0,0,0,0.3);
-  }
+  :root { --gold: #dbc90a; --card: #101d30; --line: rgba(255,255,255,0.12); --glas-oppervlak: rgba(28,28,30,0.55); --glas-rand: rgba(255,255,255,0.14); --glas-hooglicht-boven: rgba(255,255,255,0.16); --glas-hooglicht-onder: rgba(0,0,0,0.3); }
 }
 /* Handmatige thema-keuze (assets/theme.js) wint altijd van de
    systeeminstelling hierboven, in beide richtingen. */
-:root[data-theme="dark"] {
-  --gold: #dbc90a;
-  --paper: #071224; --card: #101d30; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12);
-  --glas-oppervlak: rgba(28,28,30,0.55); --glas-rand: rgba(255,255,255,0.14);
-  --glas-hooglicht-boven: rgba(255,255,255,0.16); --glas-hooglicht-onder: rgba(0,0,0,0.3);
-}
-:root[data-theme="light"] {
-  --gold: #f9e534;
-  --paper: #f5f8fc; --card: #ffffff; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1);
-  --glas-oppervlak: rgba(255,255,255,0.55); --glas-rand: rgba(255,255,255,0.6);
-  --glas-hooglicht-boven: rgba(255,255,255,0.55); --glas-hooglicht-onder: rgba(0,0,0,0.1);
-}
-* { box-sizing: border-box; }
-.thema-knop, .taal-knop {
-  background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.22); border-radius: 999px;
-  height: 34px; cursor: pointer; color: inherit; flex-shrink: 0; font-family: inherit;
-  display: inline-flex; align-items: center; justify-content: center;
-}
+:root[data-theme="dark"] { --gold: #dbc90a; --card: #101d30; --glas-oppervlak: rgba(28,28,30,0.55); --glas-rand: rgba(255,255,255,0.14); --glas-hooglicht-boven: rgba(255,255,255,0.16); --glas-hooglicht-onder: rgba(0,0,0,0.3); }
+:root[data-theme="light"] { --gold: #f9e534; --card: #ffffff; --glas-oppervlak: rgba(255,255,255,0.55); --glas-rand: rgba(255,255,255,0.6); --glas-hooglicht-boven: rgba(255,255,255,0.55); --glas-hooglicht-onder: rgba(0,0,0,0.1); }
+.thema-knop, .taal-knop { background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.22); height: 34px; color: inherit; flex-shrink: 0; }
 .thema-knop { width: 34px; }
 .thema-knop svg { width: 17px; height: 17px; }
-.taal-knop {
-  min-width: 34px; padding: 0 10px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.02em;
-}
-body { margin: 0; font-family: 'Manrope', -apple-system, sans-serif; background: var(--paper); color: var(--ink); }
-
+.taal-knop { min-width: 34px; padding: 0 10px; }
 /* "Liquid Glass" — zelfde recept als lib/widgets/glass.dart: backdrop-blur,
    halfdoorzichtig glasoppervlak, dunne glasrand, en een randlicht boven/
    onder dat het oppervlak als glas laat "vangen". De header behoudt de
@@ -65,20 +33,16 @@ header {
    Ellipsis + nowrap zodat een lange naam nooit tegen #account-plek
    (flex-shrink: 0, zie nav.js) aan botst. */
 header .merk {
-  font-family: 'Manrope', sans-serif; font-size: 13.5px; font-weight: 700;
+  font-family: "Manrope", sans-serif; font-size: 13.5px; font-weight: 700;
   color: #eaf1fb; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 header h1 {
-  font-family: 'Unbounded', sans-serif; font-size: clamp(15px, 4.8vw, 20px); margin: 4px 0 0; flex: 1;
+  font-family: "Unbounded", sans-serif; font-size: clamp(15px, 4.8vw, 20px); margin: 4px 0 0; flex: 1;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
-.kaart {
-  background: var(--card); border: 1px solid var(--line); border-radius: 16px;
-  padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-.kaart h2 { font-family: 'Unbounded', sans-serif; font-size: 14px; margin: 0 0 12px;
-  color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.kaart { border-radius: 16px; padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.kaart h2 { font-size: 14px; margin: 0 0 12px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; }
 .status-regel { display: flex; align-items: center; gap: 12px; }
 .status-badge {
   display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 700;
@@ -95,7 +59,6 @@ main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
 .locatie-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
 .locatie-dot.locatie-haven { background: var(--navy); }
 .locatie-dot.locatie-noordenplassen { background: #e0821f; }
-
 /* Kraaiennest (Noordenplassen)/Haven — zelfde kaart-kleuren als in de app
    (Reserveren-scherm): het hele swipe-kaart-oppervlak krijgt de
    locatiekleur i.p.v. alleen een accentrand. Klasse wordt door
@@ -122,10 +85,7 @@ main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
 .swipe-kaart.locatie-noordenplassen .knop.afmelden {
   background: transparent; color: #fff275; border: 1.5px solid #fff275;
 }
-.knop {
-  padding: 8px 14px; border-radius: 8px; border: none; font-size: 13px; font-weight: 700;
-  cursor: pointer; white-space: nowrap;
-}
+.knop { padding: 8px 14px; border-radius: 8px; font-size: 13px; white-space: nowrap; }
 .knop.aanmelden { background: var(--gold); color: #241a02; }
 .knop.afmelden { background: rgba(228,29,35,0.1); color: var(--accent); }
 .knop.vol { background: rgba(91,107,125,0.12); color: var(--ink-muted); cursor: default; }
@@ -137,7 +97,7 @@ main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
 .nieuws-item:first-of-type { border-top: none; padding-top: 0; }
 .nieuws-item h3 { margin: 0 0 4px; font-size: 14.5px; }
 .nieuws-item p { margin: 0; font-size: 13.5px; color: var(--ink-muted); line-height: 1.5; }
-.laden { text-align: center; color: var(--ink-muted); padding: 30px; }
+.laden { text-align: center; padding: 30px; }
 /* Toernooikaart (Almere) — zelfde kaart-kleuren als in de app
    (Toernooien-scherm, tab Almere): een volledig gekleurde kaart i.p.v.
    een lijstrij, met een gele actieknop. */
@@ -166,7 +126,6 @@ main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
   font-size: 13px; font-weight: 700; cursor: pointer;
 }
 .pil-toggle button.actief { background: var(--navy); color: #fff; }
-
 /* Gedeelde "tinder-stijl" kaartenstapel — zie assets/swipe-deck.js */
 .swipe-deck { margin-top: 4px; }
 .swipe-stapel { min-height: 80px; }
@@ -179,7 +138,7 @@ main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
 .swipe-kaart:active { cursor: grabbing; }
 .swipe-badge {
   position: absolute; top: 14px; z-index: 5; padding: 6px 14px; border-radius: 999px;
-  font-family: 'Unbounded', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+  font-family: "Unbounded", sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
   text-transform: uppercase; opacity: 0; pointer-events: none; border: 2px solid currentColor;
   transition: opacity 0.15s ease;
 }
@@ -208,7 +167,6 @@ main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
   background: rgba(36,87,255,0.12); color: var(--navy); text-decoration: none;
 }
 @media (prefers-color-scheme: dark) { .pil-knop-vorm { color: #8ab6ec; } }
-
 /* Gedeelde 3D-coverflow kaartenrij — zie assets/coverflow-deck.js. Repliceert
    lib/widgets/news_coverflow_slider/ (kleuren/geometrie 1-op-1 overgenomen:
    #141D38/#FCDB32 en #3447AA/#FBEAEB als afwisselende kaartthema's,
@@ -266,3 +224,37 @@ main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
 }
 .coverflow-leeg svg { width: 32px; height: 32px; }
 .coverflow-leeg span { font-size: 13.5px; text-align: center; padding: 0 20px; }
+/* ============================================================================
+   Onderstaande onderdelen kwamen tot voor kort dubbel voor in de <style>-
+   blokken van meerdere afzonderlijke ledenportaal-pagina's (elke pagina had
+   zijn eigen kopie). Nu één keer hier, want alle pagina's die ze gebruiken
+   laden dit bestand toch al.
+   ============================================================================ */
+/* ---- Popup/modal (bevestigingsvensters, detailkaarten) — gebruikt op
+   beheer/home/leden/nieuws/profiel/reserveren/toernooien. ---- */
+.popup-overlay { display: flex; justify-content: center; position: fixed; inset: 0; z-index: 100; background: rgba(4,27,51,0.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.popup-kaart { width: 100%; background: var(--glas-oppervlak); border: 1px solid var(--glas-rand); -webkit-backdrop-filter: blur(24px) saturate(160%); backdrop-filter: blur(24px) saturate(160%); }
+.popup-kop { align-items: center; display: flex; justify-content: space-between; }
+.popup-kop h3 { margin: 0; }
+.popup-sluit { border: none; color: var(--ink-muted); cursor: pointer; }
+.popup-lichaam { padding: 18px 20px; }
+/* ---- Statistiektegel (profiel/reserveren/toernooien) ---- */
+.stat-tegel { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; text-align: center; }
+.stat-tegel .waarde { color: var(--navy); font-weight: 700; }
+.stat-tegel .label { color: var(--ink-muted); margin-top: 2px; }
+@media (prefers-color-scheme: dark) {
+  .stat-tegel .waarde { color: #8ab6ec; }
+}
+/* ---- Uitnodigingskaart (home/leden) ---- */
+.uitnodig-kaart { align-items: center; border: none; cursor: pointer; display: flex; font-family: inherit; gap: 14px; text-align: left; width: 100%; }
+.uitnodig-icoon { align-items: center; background: rgba(36,87,255,0.1); border-radius: 50%; color: var(--navy); display: flex; flex-shrink: 0; height: 44px; justify-content: center; width: 44px; }
+.uitnodig-icoon svg { height: 22px; width: 22px; }
+.uitnodig-tekst { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.uitnodig-titel { color: var(--ink); font-size: 14.5px; font-weight: 600; }
+.uitnodig-sub { color: var(--ink-muted); font-size: 12.5px; }
+/* ---- Ledenlijstregel (beheer/leden) ---- */
+.lid-regel { align-items: center; display: flex; }
+/* ---- Formuliervelden in een twee-koloms rijtje (beheer/profiel) ---- */
+.veld-rij label { color: var(--ink-muted); display: block; font-weight: 600; margin-bottom: 4px; }
+.veld-rij input, .veld-rij select, .veld-rij textarea { background: var(--paper); border: 1.5px solid var(--line); color: var(--ink); font-family: inherit; width: 100%; }
+.veld-twee { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
