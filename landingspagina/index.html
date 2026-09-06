@@ -29,7 +29,7 @@
      van pickleballdenbosch.nl, zie
      docs/superpowers/specs/2026-08-21-landingspagina-denbosch-opzet-design.md.
      ============================================================ */
-  :root { --navy-ink: #041b33; --gold: #ffd23f; --gold-deep: #b8860a; --card: #ffffff; --line: rgba(4,27,51,0.1); --radius-kaart: 24px; --radius-kaart-groot: 32px; --radius-pil: 999px; --schaduw-kaart: 0 1px 3px rgba(0,0,0,0.06), 0 12px 28px -14px rgba(4,27,51,0.18); --schaduw-kaart-hover: 0 20px 44px -16px rgba(4,27,51,0.28); }
+  :root { --navy-ink: #041b33; --gold: #ffd23f; --gold-deep: #b8860a; --card: #ffffff; --line: rgba(4,27,51,0.1); --radius-kaart: 24px; --radius-kaart-groot: 32px; --radius-pil: 999px; --schaduw-kaart: 0 1px 3px rgba(0,0,0,0.06), 0 12px 28px -14px rgba(4,27,51,0.18); --schaduw-kaart-hover: 0 20px 44px -16px rgba(4,27,51,0.28); --ease-cta: cubic-bezier(0.22, 1, 0.36, 1); }
   @media (prefers-color-scheme: dark) {
     :root { --card: #101d30; --line: rgba(255,255,255,0.12); }
   }
@@ -67,10 +67,16 @@
   .knop-primair:hover { box-shadow: 0 16px 32px -8px rgba(255,210,63,0.7); transform: translateY(-1px); }
   .knop-outline { background: transparent; color: var(--navy); border: 1.5px solid var(--line); }
   @media (prefers-color-scheme: dark) { .knop-outline { color: #8ab6ec; } }
-  .knop-cirkel-cta { display: inline-flex; align-items: center; gap: 16px; background: #fff; color: var(--navy-ink); border-radius: var(--radius-pil); padding: 6px 8px 6px 28px; font-weight: 700; font-size: 15px; cursor: pointer; border: none; box-shadow: 0 16px 34px -10px rgba(0,0,0,0.35); transition: transform 0.18s ease, box-shadow 0.18s ease; }
-  .knop-cirkel-cta:hover { transform: translateY(-2px); box-shadow: 0 20px 40px -8px rgba(0,0,0,0.4); }
-  .knop-cirkel-cta:active { transform: scale(0.96); }
-  .knop-cirkel-cta .cirkel { width: 46px; height: 46px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .knop-cirkel-cta { display: inline-flex; align-items: center; gap: 16px; background: #fff; color: var(--navy-ink); border-radius: var(--radius-pil); padding: 6px 8px 6px 28px; font-weight: 700; font-size: 15px; cursor: pointer; border: none; box-shadow: 0 16px 34px -10px rgba(0,0,0,0.35); transition: background 0.35s var(--ease-cta), color 0.35s var(--ease-cta), box-shadow 0.18s ease; }
+  .knop-cirkel-cta.goud { background: var(--gold); color: #2a1e02; box-shadow: 0 12px 26px -8px rgba(255,210,63,0.55); }
+  .knop-cirkel-cta:hover, .knop-cirkel-cta:active { background: var(--navy); color: #fff; box-shadow: 0 20px 40px -8px rgba(0,0,0,0.4); }
+  .knop-cirkel-cta .knop-tekst { position: relative; overflow: hidden; display: inline-block; }
+  .knop-cirkel-cta .knop-tekst span { display: block; transition: transform 0.35s var(--ease-cta); }
+  .knop-cirkel-cta .knop-tekst span:last-child { position: absolute; inset: 0; transform: translateY(100%); }
+  .knop-cirkel-cta:hover .knop-tekst span:first-child, .knop-cirkel-cta:active .knop-tekst span:first-child { transform: translateY(-100%); }
+  .knop-cirkel-cta:hover .knop-tekst span:last-child, .knop-cirkel-cta:active .knop-tekst span:last-child { transform: translateY(0); }
+  .knop-cirkel-cta .cirkel { width: 46px; height: 46px; border-radius: 50%; background: var(--gold); color: #2a1e02; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.35s var(--ease-cta); }
+  .knop-cirkel-cta:hover .cirkel, .knop-cirkel-cta:active .cirkel { transform: rotate(-45deg); }
   .icoon-vinkje { width: 22px; height: 22px; border-radius: 50%; background: rgba(255,210,63,0.2); color: var(--gold-deep); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   @media (prefers-color-scheme: dark) { .icoon-vinkje { color: var(--gold); } }
   .usp-lijst { list-style: none; padding: 0; margin: 0 auto; max-width: 460px; display: flex; flex-direction: column; gap: 14px; }
@@ -267,9 +273,9 @@
           </p>
           <div class="hero-knoppen">
             <a class="knop-cirkel-cta" href="/proefles/">
-              Doe mee
+              <span class="knop-tekst"><span>Doe mee</span><span aria-hidden="true">Doe mee</span></span>
               <span class="cirkel" aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2a1e02" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </span>
             </a>
             <button type="button" class="knop knop-outline" style="color:#fff;border-color:rgba(255,255,255,0.4);" data-scroll="waar-wanneer">Bekijk speelschema</button>
@@ -382,7 +388,12 @@
       </div>
     </div>
     <div class="reveal" style="text-align:center;margin-top:32px;">
-      <a class="knop knop-primair" href="/proefles/">Meld je aan voor een proefles</a>
+      <a class="knop-cirkel-cta goud" href="/proefles/">
+        <span class="knop-tekst"><span>Meld je aan voor een proefles</span><span aria-hidden="true">Meld je aan voor een proefles</span></span>
+        <span class="cirkel" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+      </a>
     </div>
   </section>
 
