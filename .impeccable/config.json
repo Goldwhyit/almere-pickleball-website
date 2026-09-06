@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "kicker-above-heading",
+        "value": "*",
+        "files": [
+          "leden/nieuw-wachtwoord.html"
+        ],
+        "createdAt": "2026-09-06T20:45:31.520Z",
+        "reason": "matches existing .merk brand-kicker pattern already shipped in leden/index.html and other auth pages; site brand identity marker, not a generated filler kicker"
+      }
+    ]
+  }
+}
