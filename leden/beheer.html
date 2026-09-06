@@ -184,6 +184,7 @@
     leden: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.3 2.9-5.8 5.5-5.8s5.5 2.5 5.5 5.8"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 12.3c2.2.3 3.8 2.1 3.8 4.4" /></svg>',
     nieuweaccounts: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg>',
     statistieken: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="4"/></svg>',
+    verwijderopzeggingen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" y1="9" x2="22" y2="14"/><line x1="22" y1="9" x2="17" y2="14"/></svg>',
   };
 
   const SECTIES = [
@@ -200,6 +201,7 @@
     { key: 'betalingen', label: 'Betalingen' },
     { key: 'upgrades', label: 'Abo-upgrades' },
     { key: 'wedstrijden', label: 'Gemelde wedstrijden' },
+    { key: 'verwijderopzeggingen', label: 'Opzeggingen & verwijderverzoeken' },
   ];
 
   async function checkToegang() {
@@ -213,13 +215,17 @@
   }
 
   async function bouwPagina() {
-    const [proeflBadge, wedstrBadge, nieuweAccountsBadge] = await Promise.all([
+    const [proeflBadge, wedstrBadge, nieuweAccountsBadge, verwijderBadge] = await Promise.all([
       haalOp('lid_abonnementen', { select: 'id,goedgekeurd,abonnementen!inner(vorm)', status: 'eq.actief', 'abonnementen.vorm': 'eq.proef' })
         .then(rows => rows.filter(r => !r.goedgekeurd).length).catch(() => 0),
       haalOp('gemelde_wedstrijden', { select: 'id', status: 'eq.in_behandeling' }).then(rows => rows.length).catch(() => 0),
       haalOp('leden', { select: 'id', account_goedgekeurd: 'eq.false' }).then(rows => rows.length).catch(() => 0),
+      haalOp('leden', { select: 'id', verwijder_verzoek: 'not.is.null' }).then(rows => rows.length).catch(() => 0),
     ]);
-    const badges = { proefleden: proeflBadge, wedstrijden: wedstrBadge, nieuweaccounts: nieuweAccountsBadge };
+    const badges = {
+      proefleden: proeflBadge, wedstrijden: wedstrBadge, nieuweaccounts: nieuweAccountsBadge,
+      verwijderopzeggingen: verwijderBadge,
+    };
 
     hoofd.innerHTML =
       '<div class="beheer-intro"><h2>Beheer</h2><p>Kies een onderdeel om te bekijken of aan te passen.</p></div>' +
@@ -255,6 +261,7 @@
       upgrades: 'Abo-upgrades naar 2x per week', wedstrijden: 'Gemelde wedstrijden',
       leden: 'Leden beheren', nieuweaccounts: 'Nieuwe accounts goedkeuren',
       statistieken: 'Statistieken',
+      verwijderopzeggingen: 'Opzeggingen & verwijderverzoeken',
     };
     const lichaam = toonPopup(titels[key]);
     ({
@@ -262,6 +269,7 @@
       speeldagen: laadSpeeldagenBeheer, prijzen: laadPrijzen, instellingen: laadInstellingen,
       baanverhuur: laadBaanverhuur, betalingen: laadBetalingen, upgrades: laadUpgrades, wedstrijden: laadWedstrijden,
       leden: laadLedenBeheer, nieuweaccounts: laadNieuweAccounts, statistieken: laadStatistieken,
+      verwijderopzeggingen: laadOpzeggingenEnVerwijderverzoeken,
     })[key](lichaam);
   }
 
@@ -353,6 +361,52 @@
       '<div class="acties"><button class="mini-knop goed" data-lid="' + l.id + '">Goedkeuren</button></div></div>').join('');
     el.querySelectorAll('[data-lid]').forEach(btn => btn.addEventListener('click', async () => {
       try { await rpc('keur_lid_goed', { p_lid: btn.dataset.lid }); await laadNieuweAccounts(el); }
+      catch (e) { alert(e.message); }
+    }));
+  }
+
+  // ---------- Opzeggingen & verwijderverzoeken (1 tegel, 2 secties) -------
+  // Verwijderverzoeken: leden.verwijder_verzoek (Instellingen > Account
+  // verwijderen in de app) — de admin-RPC markeer_verwijderverzoek_afgehandeld
+  // (63_verwijderverzoek_afhandelen.sql) is dezelfde die de app (in
+  // admin_screen.dart) gebruikt, dus dit blijft in sync met de app.
+  // Opzeggingen: alleen-lezen overzicht van lid_abonnementen met
+  // status='opgezegd' — het opzeggen zelf doet een lid altijd zelf via
+  // Profiel/Instellingen, hier is geen actie voor nodig, enkel zichtbaarheid.
+  async function laadOpzeggingenEnVerwijderverzoeken(el) {
+    el.innerHTML = '<div class="laden">Laden…</div>';
+    const [verzoeken, opzeggingen] = await Promise.all([
+      haalOp('leden', {
+        select: 'id,naam,email,verwijder_verzoek', 'verwijder_verzoek': 'not.is.null',
+        order: 'verwijder_verzoek.asc',
+      }),
+      haalOp('lid_abonnementen', {
+        select: 'lid_id,opgezegd_op,eind_datum,leden(naam),abonnementen(naam)',
+        status: 'eq.opgezegd', order: 'opgezegd_op.desc', limit: '30',
+      }),
+    ]);
+
+    const verzoekenHtml = !verzoeken.length
+      ? '<p class="details">Geen openstaande verwijderverzoeken.</p>'
+      : verzoeken.map(l => '<div class="rij"><div class="info"><div class="naam">' + escapeHtml(l.naam) + '</div>' +
+          '<div class="sub">' + escapeHtml(l.email) + ' · aangevraagd op ' +
+          new Date(l.verwijder_verzoek).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) +
+          '</div></div><div class="acties"><button class="mini-knop fout" data-lid="' + l.id + '">Markeer afgehandeld</button></div></div>').join('');
+
+    const opzeggingenHtml = !opzeggingen.length
+      ? '<p class="details">Geen recente opzeggingen.</p>'
+      : opzeggingen.map(a => '<div class="rij"><div class="info"><div class="naam">' + escapeHtml((a.leden && a.leden.naam) || '—') + '</div>' +
+          '<div class="sub">' + escapeHtml((a.abonnementen && a.abonnementen.naam) || '') +
+          (a.opgezegd_op ? ' · opgezegd op ' + new Date(a.opgezegd_op).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) : '') +
+          (a.eind_datum ? ' · loopt door t/m ' + new Date(a.eind_datum).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) : '') +
+          '</div></div></div>').join('');
+
+    el.innerHTML =
+      '<h4 style="margin:0 0 8px">Verwijderverzoeken</h4>' + verzoekenHtml +
+      '<h4 style="margin:20px 0 8px">Recente opzeggingen</h4>' + opzeggingenHtml;
+
+    el.querySelectorAll('[data-lid]').forEach(btn => btn.addEventListener('click', async () => {
+      try { await rpc('markeer_verwijderverzoek_afgehandeld', { p_lid: btn.dataset.lid }); await laadOpzeggingenEnVerwijderverzoeken(el); }
       catch (e) { alert(e.message); }
     }));
   }
