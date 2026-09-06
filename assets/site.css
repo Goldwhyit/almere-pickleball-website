@@ -138,12 +138,15 @@ main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
 .voettekst { text-align: center; margin-top: 30px; font-size: 13px; color: var(--ink-muted); }
 
 /* ---- Knoppen ---- */
-.knop { border: none; cursor: pointer; font-weight: 700; padding: 8px 14px; border-radius: 8px; font-size: 13px; white-space: nowrap; }
+.knop { border: none; cursor: pointer; font-weight: 700; padding: 8px 14px; border-radius: 8px; font-size: 13px; white-space: nowrap; transition: transform 0.1s ease; }
 .knop.aanmelden { background: var(--gold); color: #241a02; }
 .knop.afmelden { background: rgba(228,29,35,0.1); color: var(--accent); }
 .knop.vol { background: rgba(91,107,125,0.12); color: var(--ink-muted); cursor: default; }
 .knop:disabled { opacity: 0.5; cursor: default; }
+.knop:active:not(:disabled) { transform: scale(0.96); }
+button.primair, button.secundair { transition: transform 0.1s ease; }
 button.primair { background: var(--gold); color: #241a02; }
+button.primair:active:not(:disabled), button.secundair:active:not(:disabled) { transform: scale(0.98); }
 
 /* ---- Statusteksten ---- */
 .laden { color: var(--ink-muted); text-align: center; padding: 30px; }
@@ -200,8 +203,9 @@ details[open] summary::after { transform: rotate(45deg); }
 .ticket-qr-sectie img { border-radius: 10px; display: block; }
 .ticket-referentie { color: var(--ink-muted); font-size: 11.5px; }
 .ticket-referentie code { color: var(--navy); font-family: ui-monospace, "SF Mono", Menlo, monospace; font-weight: 700; }
-.ticket-knop { align-items: center; border: none; border-radius: 999px; cursor: pointer; display: flex; font-family: inherit; font-size: 13px; font-weight: 700; gap: 6px; justify-content: center; padding: 11px; transition: filter 0.15s ease; width: 100%; }
+.ticket-knop { align-items: center; border: none; border-radius: 999px; cursor: pointer; display: flex; font-family: inherit; font-size: 13px; font-weight: 700; gap: 6px; justify-content: center; padding: 11px; transition: filter 0.15s ease, transform 0.1s ease; width: 100%; }
 .ticket-knop:hover { filter: brightness(0.96); }
+.ticket-knop:active { transform: scale(0.97); }
 .ticket-knop.deel { background: var(--navy); color: #fff; }
 .ticket-knop svg { flex-shrink: 0; height: 16px; width: 16px; }
 @media (prefers-color-scheme: dark) {
