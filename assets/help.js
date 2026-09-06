@@ -2,9 +2,8 @@
 //
 // Zelfde bouwpatroon als initThemeKnop (assets/theme.js): één knop die
 // zichzelf in een bestaande container zet, hergebruikt de .thema-knop-
-// CSS-klasse zodat er geen nieuwe stijlregels nodig zijn op de pagina's die
-// hun eigen lokale thema/taal-knop-CSS hebben (leden/index.html,
-// leden/registreren.html) én op de pagina's die assets/leden.css gebruiken.
+// CSS-klasse zodat er geen nieuwe stijlregels nodig zijn — die klasse komt
+// voor elke pagina uit de centrale assets/site.css.
 
 const HULP_ICOON =
   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +

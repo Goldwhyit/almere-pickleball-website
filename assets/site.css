@@ -1,124 +1,433 @@
 /* ============================================================================
-   Almere Pickleball — centrale, sitebrede stylesheet.
+   Almere Pickleball — centrale stylesheet voor de hele site.
 
-   Bevat de CSS die letterlijk (of op de gedeelde eigenschappen na) identiek
-   was tussen meerdere pagina's: kleurtokens/thema, basisreset, de thema/
-   taal-schakelaar, de "liquid glass" header, en terugkerende onderdelen
-   (kaart, footer, knoppen, digitaal ticket, uitleg-accordeon, formulier-
-   rijtjes). Wordt geladen door vrijwel elke pagina van de site.
+   Eén bestand voor alle CSS die door meer dan één pagina gebruikt wordt:
+   kleurtokens/thema, basisreset, de thema/taal-schakelaar, de "liquid
+   glass" header (met varianten via BEM-achtige modifiers), kaart/footer/
+   knop-componenten, formulieren, het digitale ticket, en alle onderdelen
+   van het ledenportaal (popup/modal, statistiektegels, swipe-kaarten,
+   coverflow, ...). Vrijwel elke pagina laadt alleen dit ene bestand.
+
+   Architectuur — waarom sommige dingen een klasse nodig hebben:
+   Een paar stukken CSS (de header-chrome, de titel-stijl, formulier-
+   labels) golden maar op een deel van de pagina's. Om ze hier veilig
+   samen te voegen zonder dat de stijl op een andere pagina meeverandert,
+   gebruiken die onderdelen een expliciete klasse (.header-glas--*,
+   .hoofdtitel, .veld-label) in plaats van een kale tag-selector als
+   "header" of "h1" — zo'n kale selector zou anders elk element van dat
+   type raken, ook op pagina's met een compleet eigen ontwerp.
 
    Wat hier NIET in staat, met opzet:
-   - assets/leden.css: de eigen, verdergaande gedeelde stijl van het
-     ledenportaal (popup/modal, statistiektegels, uitnodigingskaarten,
-     swipe-kaarten, coverflow, ...). Portaalpagina's laden dit bestand
-     bovenop site.css.
+   - landingspagina/index.html: heeft zijn eigen header (.site-header) en
+     een deel eigen design-tokens (--radius-kaart, --schaduw-kaart, ...);
+     leent hier alleen de basis-tokens en kaart/knop-stijl van.
    - assets/verjaardag/verjaardagstaart.html: bewust volledig zelfstandig
      (werkt offline in een Flutter WebView), laadt geen externe CSS.
-   - Alles wat maar op één plek gebruikt wordt, of waarvan het samenvoegen
-     het risico gaf dat de stijl op een andere pagina zou meeveranderen
-     (bv. header op landingspagina/index.html gebruikt een eigen klasse
-     i.p.v. dit bestand, precies om dat te voorkomen).
    ============================================================================ */
 
 /* ---- Kleurtokens (thema) ---- */
-  :root { --navy: #2457ff; --navy-deep: #003d82; --ink: #0b1420; --ink-muted: #5b6b7d; --paper: #f5f8fc; }
+:root {
+  --navy: #2457ff; --navy-deep: #003d82; --accent: #e41d23;
+  --gold: #f9e534; --gold-deep: #b8860a; --danger: #b3261e;
+  --ink: #0b1420; --ink-muted: #5b6b7d; --paper: #f5f8fc; --card: #ffffff; --line: rgba(4,27,51,0.1);
+  --glas-oppervlak: rgba(255,255,255,0.55); --glas-rand: rgba(255,255,255,0.6);
+  --glas-hooglicht-boven: rgba(255,255,255,0.55); --glas-hooglicht-onder: rgba(0,0,0,0.1);
+}
 @media (prefers-color-scheme: dark) {
-  :root { --paper: #071224; --ink: #eef3f9; --ink-muted: #9fb2c4; }
+  :root {
+    --gold: #dbc90a;
+    --ink: #eef3f9; --ink-muted: #9fb2c4; --paper: #071224; --card: #101d30; --line: rgba(255,255,255,0.12);
+    --glas-oppervlak: rgba(28,28,30,0.55); --glas-rand: rgba(255,255,255,0.14);
+    --glas-hooglicht-boven: rgba(255,255,255,0.16); --glas-hooglicht-onder: rgba(0,0,0,0.3);
+  }
 }
 /* Handmatige thema-keuze (assets/theme.js) wint altijd van de systeeminstelling hierboven, in beide richtingen. */
-  :root[data-theme="dark"] { --paper: #071224; --ink: #eef3f9; --ink-muted: #9fb2c4; --line: rgba(255,255,255,0.12); }
-  :root[data-theme="light"] { --paper: #f5f8fc; --ink: #0b1420; --ink-muted: #5b6b7d; --line: rgba(4,27,51,0.1); }
+:root[data-theme="dark"] {
+  --gold: #dbc90a;
+  --ink: #eef3f9; --ink-muted: #9fb2c4; --paper: #071224; --card: #101d30; --line: rgba(255,255,255,0.12);
+  --glas-oppervlak: rgba(28,28,30,0.55); --glas-rand: rgba(255,255,255,0.14);
+  --glas-hooglicht-boven: rgba(255,255,255,0.16); --glas-hooglicht-onder: rgba(0,0,0,0.3);
+}
+:root[data-theme="light"] {
+  --gold: #f9e534;
+  --ink: #0b1420; --ink-muted: #5b6b7d; --paper: #f5f8fc; --card: #ffffff; --line: rgba(4,27,51,0.1);
+  --glas-oppervlak: rgba(255,255,255,0.55); --glas-rand: rgba(255,255,255,0.6);
+  --glas-hooglicht-boven: rgba(255,255,255,0.55); --glas-hooglicht-onder: rgba(0,0,0,0.1);
+}
 
 /* ---- Basisreset ---- */
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: "Manrope", -apple-system, sans-serif; background: var(--paper); color: var(--ink); }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Manrope", -apple-system, sans-serif; background: var(--paper); color: var(--ink); }
 
 /* ---- Thema/taal-schakelaar (rechtsboven in elke header) ---- */
-  .thema-knop, .taal-knop { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; cursor: pointer; font-family: inherit; }
-  .taal-knop { font-size: 12.5px; font-weight: 700; letter-spacing: 0.02em; }
-  #thema-plek { display: flex; align-items: center; gap: 8px; }
+.thema-knop, .taal-knop { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; cursor: pointer; font-family: inherit; }
+.taal-knop { font-size: 12.5px; font-weight: 700; letter-spacing: 0.02em; }
+#thema-plek { display: flex; align-items: center; gap: 8px; }
 
-/* ---- "Liquid glass" header — voeg class="header-glas" toe aan <header>
-   om deze gedeelde chrome te krijgen; achtergrond/padding/gap blijven
-   bewust per pagina (verschillen per sectie). ---- */
-  .header-glas { -webkit-backdrop-filter: blur(24px) saturate(160%); backdrop-filter: blur(24px) saturate(160%); color: #fff; position: sticky; top: 12px; z-index: 60; margin: 12px 12px 0; box-shadow: 0 10px 28px rgba(4,27,51,0.22), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(0,0,0,0.12); border-radius: 32px; border: 1px solid rgba(255,255,255,0.24); }
-  .header-glas h1 { font-family: "Unbounded", sans-serif; }
-  .terug { display: block; color: var(--ink-muted); font-size: 13px; text-decoration: none; }
-  header .terug { display: inline-flex; align-items: center; gap: 8px; color: #cfe0f0; font-size: 13px; text-decoration: none; }
-  header .terug img { border-radius: 6px; }
-  main .terug { display: block; text-align: center; margin-top: 20px; color: var(--ink-muted); font-size: 13px; text-decoration: none; }
+/* ============================================================================
+   "Liquid glass" header — blok .header-glas met drie uiterlijk-varianten:
+   --badge (baan-huren/bedankt+index, proefles: badge-achtige .merk-tekst),
+   --basis (hulp, privacy, toernooien, veelgestelde-vragen: eenvoudige titel
+   + subtekst) en --portaal (ledenportaal: toont de naam van het ingelogde
+   lid, door nav.js gevuld). Voeg de bijpassende modifier-klasse toe aan
+   <header class="header-glas header-glas--...">.
+   ============================================================================ */
+.header-glas {
+  background: linear-gradient(135deg, rgba(0,91,191,0.82), rgba(0,61,130,0.82));
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  backdrop-filter: blur(24px) saturate(160%);
+  color: #fff;
+  position: sticky; top: 12px; z-index: 60;
+  margin: 12px 12px 0;
+  box-shadow: 0 10px 28px rgba(4,27,51,0.22), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(0,0,0,0.12);
+  border-radius: 32px;
+  border: 1px solid rgba(255,255,255,0.24);
+}
+.header-glas h1 { font-family: "Unbounded", sans-serif; }
+
+.header-glas--badge { padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
+.header-glas--badge .merk { font-family: "Unbounded", sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #cfe0f0; }
+.header-glas--badge h1 { font-size: 20px; margin: 4px 0 0; }
+.header-glas--badge p { margin: 4px 0 0; color: #cfe0ee; font-size: 13.5px; max-width: 100%; }
+
+.header-glas--basis { padding: 18px 20px; }
+.header-glas--basis h1 { font-size: clamp(1.4rem, 5vw, 2rem); margin: 10px 0 4px; }
+.header-glas--basis p { margin: 0; color: #cfe0f0; font-size: 14px; }
+.header-glas--basis .terug { color: #cfe0f0; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+.header-glas--basis .terug img { border-radius: 6px; }
+
+/* Getint navy-glas i.p.v. het blauwe verloop hierboven — zelfde recept als
+   lib/widgets/glass.dart. Toont de naam van het ingelogde lid (nav.js
+   vult dit bij het laden van elke pagina) i.p.v. een statische tekst.
+   Ellipsis + nowrap zodat een lange naam nooit tegen #account-plek
+   (flex-shrink: 0, zie nav.js) aan botst. */
+.header-glas--portaal {
+  background: linear-gradient(135deg, rgba(0,61,130,0.88), rgba(36,87,255,0.78));
+  padding: 16px 18px; display: flex; align-items: center; gap: 10px;
+}
+.header-glas--portaal .merk {
+  font-family: "Manrope", sans-serif; font-size: 13.5px; font-weight: 700;
+  color: #eaf1fb; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.header-glas--portaal h1 {
+  font-size: clamp(15px, 4.8vw, 20px); margin: 4px 0 0; flex: 1;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.header-glas--portaal .thema-knop, .header-glas--portaal .taal-knop {
+  background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.22); height: 34px; color: inherit; flex-shrink: 0;
+}
+.header-glas--portaal .thema-knop { width: 34px; }
+.header-glas--portaal .thema-knop svg { width: 17px; height: 17px; }
+.header-glas--portaal .taal-knop { min-width: 34px; padding: 0 10px; }
+
+.terug { display: block; color: var(--ink-muted); font-size: 13px; text-decoration: none; }
+main .terug { display: block; text-align: center; margin-top: 20px; color: var(--ink-muted); font-size: 13px; text-decoration: none; }
+
+/* ---- Titel op een losse pagina (login, registratie, toestemming, hero) ---- */
+.hoofdtitel { font-family: "Unbounded", sans-serif; }
 
 /* ---- Kaart (basiscomponent voor content-blokken) ---- */
-  .kaart { background: var(--card); border: 1px solid var(--line); }
-  .kaart h2 { font-family: "Unbounded", sans-serif; }
-  .kaart .toelichting { color: var(--ink-muted); font-size: 13px; margin: 0 0 12px; }
+main { max-width: 640px; margin: 18px auto 24px; padding: 0 18px; }
+.kaart { background: var(--card); border: 1px solid var(--line); }
+.kaart h2 { font-family: "Unbounded", sans-serif; }
+.kaart .toelichting { color: var(--ink-muted); font-size: 13px; margin: 0 0 12px; }
 
 /* ---- Footer / voettekst ---- */
-  .mini-footer { text-align: center; font-size: 12px; color: var(--ink-muted); }
-  .mini-footer a { color: var(--ink-muted); }
-  .voettekst { text-align: center; margin-top: 30px; font-size: 13px; color: var(--ink-muted); }
+.mini-footer { text-align: center; font-size: 12px; color: var(--ink-muted); }
+.mini-footer a { color: var(--ink-muted); }
+.voettekst { text-align: center; margin-top: 30px; font-size: 13px; color: var(--ink-muted); }
 
 /* ---- Knoppen ---- */
-  .knop { border: none; cursor: pointer; font-weight: 700; }
-  button.primair { background: var(--gold); color: #241a02; }
+.knop { border: none; cursor: pointer; font-weight: 700; padding: 8px 14px; border-radius: 8px; font-size: 13px; white-space: nowrap; transition: transform 0.1s ease; }
+.knop.aanmelden { background: var(--gold); color: #241a02; }
+.knop.afmelden { background: rgba(228,29,35,0.1); color: var(--accent); }
+.knop.vol { background: rgba(91,107,125,0.12); color: var(--ink-muted); cursor: default; }
+.knop:disabled { opacity: 0.5; cursor: default; }
+.knop:active:not(:disabled) { transform: scale(0.96); }
+button.primair, button.secundair { transition: transform 0.1s ease; }
+button.primair { background: var(--gold); color: #241a02; }
+button.primair:active:not(:disabled), button.secundair:active:not(:disabled) { transform: scale(0.98); }
 
 /* ---- Statusteksten ---- */
-  .laden { color: var(--ink-muted); }
-  p.uitleg { color: var(--ink-muted); }
+.laden { color: var(--ink-muted); text-align: center; padding: 30px; }
+.fout { color: var(--danger); }
+p.uitleg { color: var(--ink-muted); }
 
 /* ---- "Gelukt"-bevestigingsscherm (registratie, proefles-aanvraag) ---- */
-  .gelukt { text-align: center; padding: 10px 0; }
-  .gelukt .icoon { font-size: 40px; }
-  .gelukt h2 { font-family: "Unbounded", sans-serif; font-size: 17px; margin: 10px 0 6px; }
-  .gelukt p { color: var(--ink-muted); font-size: 14px; }
+.gelukt { text-align: center; padding: 10px 0; }
+.gelukt .icoon { font-size: 40px; }
+.gelukt h2 { font-family: "Unbounded", sans-serif; font-size: 17px; margin: 10px 0 6px; }
+.gelukt p { color: var(--ink-muted); font-size: 14px; }
 
 /* ---- Merk-tekst (login/registratie/toestemmingspagina's) ---- */
-  .merk { color: var(--navy); font-family: "Unbounded", sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; }
-  :root[data-theme="dark"] .merk { color: #8ab6ec; }
+.merk { color: var(--navy); font-family: "Unbounded", sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; }
+:root[data-theme="dark"] .merk { color: #8ab6ec; }
+@media (prefers-color-scheme: dark) { .merk { color: #8ab6ec; } }
 
-/* ---- Formulier-rijtjes ---- */
-  .naam-rij { display: flex; }
-  .toestemming-rij { display: flex; align-items: flex-start; gap: 9px; cursor: pointer; color: var(--ink); font-size: 12.5px; font-weight: 400; }
-  .toestemming-rij input[type=checkbox] { accent-color: var(--navy); flex-shrink: 0; height: 17px; margin-top: 1px; width: 17px; }
-  .i-inline { flex-shrink: 0; height: 14px; margin-right: 3px; vertical-align: -2px; width: 14px; }
+/* ---- Formulieren ---- */
+.naam-rij { display: flex; }
+.veld-label { color: var(--ink-muted); display: block; font-size: 13px; }
+.toestemming-rij { display: flex; align-items: flex-start; gap: 9px; cursor: pointer; color: var(--ink); font-size: 12.5px; font-weight: 400; }
+.toestemming-rij input[type=checkbox] { accent-color: var(--navy); flex-shrink: 0; height: 17px; margin-top: 1px; width: 17px; }
+.i-inline { flex-shrink: 0; height: 14px; margin-right: 3px; vertical-align: -2px; width: 14px; }
 
 /* ---- Uitklap-vragen (hulp.html, veelgestelde-vragen) ---- */
-  details { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 10px; padding: 4px 18px; }
-  summary { align-items: center; cursor: pointer; display: flex; font-size: 15px; font-weight: 700; list-style: none; padding: 14px 0; }
-  summary::-webkit-details-marker { display: none; }
-  summary::after { content: "+"; font-size: 20px; font-weight: 400; color: var(--navy); flex-shrink: 0; transition: transform 0.15s ease; }
+details { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 10px; padding: 4px 18px; }
+summary { align-items: center; cursor: pointer; display: flex; font-size: 15px; font-weight: 700; list-style: none; padding: 14px 0; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; font-size: 20px; font-weight: 400; color: var(--navy); flex-shrink: 0; transition: transform 0.15s ease; }
 @media (prefers-color-scheme: dark) {
   summary::after { color: #8ab6ec; }
 }
-  details[open] summary::after { transform: rotate(45deg); }
+details[open] summary::after { transform: rotate(45deg); }
 
 /* ---- Digitaal ticket (bevestiging baanreservering + toernooi-inschrijving) ---- */
-  .ticket-kaart { background: var(--card); border: 2px solid var(--paper); border-radius: 28px; position: relative; }
-  .ticket-kop { text-align: center; }
-  .ticket-kop .titel { font-family: "Unbounded", sans-serif; font-weight: 800; margin: 0 0 10px; }
-  .ticket-badges { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
-  .ticket-badge { border-radius: 999px; font-size: 9.5px; font-weight: 700; letter-spacing: 0.05em; padding: 5px 11px; text-transform: uppercase; }
-  .ticket-badge.type { background: var(--gold); color: #4a3300; }
-  .ticket-badge.status-bevestigd { color: var(--navy); }
-  .ticket-body { padding: 4px 22px 2px; }
-  .ticket-grid { column-gap: 14px; display: grid; grid-template-columns: 1fr 1fr; row-gap: 14px; }
-  .ticket-veld { min-width: 0; }
-  .ticket-veld .label { color: var(--ink-muted); display: block; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; }
-  .ticket-veld .waarde { display: block; font-weight: 600; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .ticket-perforatie { height: 20px; margin-top: 14px; position: relative; }
-  .ticket-perforatie .notch { background: var(--paper); border-radius: 50%; height: 26px; position: absolute; top: 50%; transform: translateY(-50%); width: 26px; z-index: 2; }
-  .ticket-perforatie .notch.links { left: -13px; }
-  .ticket-perforatie .notch.rechts { right: -13px; }
-  .ticket-perforatie .lijn { border-top: 1.5px dashed var(--line); left: 20px; position: absolute; right: 20px; top: 50%; }
-  .ticket-qr-sectie { padding: 4px 22px 22px; text-align: center; }
-  .ticket-qr-sectie img { border-radius: 10px; display: block; }
-  .ticket-referentie { color: var(--ink-muted); font-size: 11.5px; }
-  .ticket-referentie code { color: var(--navy); font-family: ui-monospace, "SF Mono", Menlo, monospace; font-weight: 700; }
-  .ticket-knop { align-items: center; border: none; border-radius: 999px; cursor: pointer; display: flex; font-family: inherit; font-size: 13px; font-weight: 700; gap: 6px; justify-content: center; padding: 11px; transition: filter 0.15s ease; width: 100%; }
-  .ticket-knop:hover { filter: brightness(0.96); }
-  .ticket-knop.deel { background: var(--navy); color: #fff; }
-  .ticket-knop svg { flex-shrink: 0; height: 16px; width: 16px; }
+.ticket-kaart { background: var(--card); border: 2px solid var(--paper); border-radius: 28px; position: relative; }
+.ticket-kop { text-align: center; }
+.ticket-kop .titel { font-family: "Unbounded", sans-serif; font-weight: 800; margin: 0 0 10px; }
+.ticket-badges { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.ticket-badge { border-radius: 999px; font-size: 9.5px; font-weight: 700; letter-spacing: 0.05em; padding: 5px 11px; text-transform: uppercase; }
+.ticket-badge.type { background: var(--gold); color: #4a3300; }
+.ticket-badge.status-bevestigd { color: var(--navy); }
+.ticket-body { padding: 4px 22px 2px; }
+.ticket-grid { column-gap: 14px; display: grid; grid-template-columns: 1fr 1fr; row-gap: 14px; }
+.ticket-veld { min-width: 0; }
+.ticket-veld .label { color: var(--ink-muted); display: block; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; }
+.ticket-veld .waarde { display: block; font-weight: 600; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ticket-perforatie { height: 20px; margin-top: 14px; position: relative; }
+.ticket-perforatie .notch { background: var(--paper); border-radius: 50%; height: 26px; position: absolute; top: 50%; transform: translateY(-50%); width: 26px; z-index: 2; }
+.ticket-perforatie .notch.links { left: -13px; }
+.ticket-perforatie .notch.rechts { right: -13px; }
+.ticket-perforatie .lijn { border-top: 1.5px dashed var(--line); left: 20px; position: absolute; right: 20px; top: 50%; }
+.ticket-qr-sectie { padding: 4px 22px 22px; text-align: center; }
+.ticket-qr-sectie img { border-radius: 10px; display: block; }
+.ticket-referentie { color: var(--ink-muted); font-size: 11.5px; }
+.ticket-referentie code { color: var(--navy); font-family: ui-monospace, "SF Mono", Menlo, monospace; font-weight: 700; }
+.ticket-knop { align-items: center; border: none; border-radius: 999px; cursor: pointer; display: flex; font-family: inherit; font-size: 13px; font-weight: 700; gap: 6px; justify-content: center; padding: 11px; transition: filter 0.15s ease, transform 0.1s ease; width: 100%; }
+.ticket-knop:hover { filter: brightness(0.96); }
+.ticket-knop:active { transform: scale(0.97); }
+.ticket-knop.deel { background: var(--navy); color: #fff; }
+.ticket-knop svg { flex-shrink: 0; height: 16px; width: 16px; }
 @media (prefers-color-scheme: dark) {
   .ticket-badge.status-bevestigd { color: #8ab6ec; }
   .ticket-referentie code { color: #8ab6ec; }
 }
+
+/* ============================================================================
+   Ledenportaal — onderdelen die alleen op /leden/-pagina's voorkomen.
+   Fysiek in hetzelfde bestand als de rest (één centrale stylesheet), maar
+   hieronder gegroepeerd zodat duidelijk blijft wat portaal-specifiek is.
+   ============================================================================ */
+
+.status-regel { display: flex; align-items: center; gap: 12px; }
+.status-badge {
+  display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 700;
+  background: rgba(36,87,255,0.1); color: var(--navy);
+}
+@media (prefers-color-scheme: dark) { .status-badge { color: #8ab6ec; } }
+.status-badge.leeg { background: rgba(91,107,125,0.12); color: var(--ink-muted); }
+.speeldag-regel { display: flex; justify-content: space-between; align-items: center; padding: 10px 0 10px 12px; border-top: 1px solid var(--line); gap: 10px; border-left: 4px solid transparent; }
+.speeldag-regel:first-of-type { border-top: none; padding-top: 0; }
+.speeldag-regel .dag { font-weight: 700; font-size: 14.5px; }
+.speeldag-regel .locatie { font-weight: 400; color: var(--ink-muted); font-size: 12.5px; }
+.speeldag-regel.locatie-haven { border-left-color: var(--navy); }
+.speeldag-regel.locatie-noordenplassen { border-left-color: #e0821f; }
+.locatie-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+.locatie-dot.locatie-haven { background: var(--navy); }
+.locatie-dot.locatie-noordenplassen { background: #e0821f; }
+
+/* Kraaiennest (Noordenplassen)/Haven — zelfde kaart-kleuren als in de app
+   (Reserveren-scherm): het hele swipe-kaart-oppervlak krijgt de
+   locatiekleur i.p.v. alleen een accentrand. Klasse wordt door
+   reserveren.html's onRender-callback op de .swipe-kaart gezet. */
+.swipe-kaart.locatie-haven {
+  background: linear-gradient(160deg, #0057ff, #0046cc);
+  border-color: transparent; color: #f8f7f4;
+}
+.swipe-kaart.locatie-noordenplassen {
+  background: linear-gradient(160deg, #c2185b, #9c1249);
+  border-color: transparent; color: #f8f7f4;
+}
+.swipe-kaart.locatie-haven .locatie,
+.swipe-kaart.locatie-noordenplassen .locatie { color: rgba(248,247,244,0.85); }
+.swipe-kaart.locatie-haven .locatie-dot,
+.swipe-kaart.locatie-noordenplassen .locatie-dot { background: #f8f7f4; }
+.swipe-kaart.locatie-haven .knop.aanmelden,
+.swipe-kaart.locatie-haven .knop.afmelden {
+  background: rgba(255,255,255,0.18); color: #f8f7f4;
+}
+.swipe-kaart.locatie-noordenplassen .knop.aanmelden {
+  background: #fff275; color: #241a02;
+}
+.swipe-kaart.locatie-noordenplassen .knop.afmelden {
+  background: transparent; color: #fff275; border: 1.5px solid #fff275;
+}
+.melding { font-size: 13px; margin-top: 10px; padding: 8px 10px; border-radius: 8px; }
+.melding.fout { background: rgba(228,29,35,0.1); color: var(--accent); }
+.melding.ok { background: rgba(36,87,255,0.1); color: var(--navy); }
+.nieuws-item { padding: 10px 0; border-top: 1px solid var(--line); }
+.nieuws-item:first-of-type { border-top: none; padding-top: 0; }
+.nieuws-item h3 { margin: 0 0 4px; font-size: 14.5px; }
+.nieuws-item p { margin: 0; font-size: 13.5px; color: var(--ink-muted); line-height: 1.5; }
+
+/* Toernooikaart (Almere) — zelfde kaart-kleuren als in de app
+   (Toernooien-scherm, tab Almere): een volledig gekleurde kaart i.p.v.
+   een lijstrij, met een gele actieknop. */
+.toernooi-regel {
+  background: linear-gradient(160deg, #0057ff, #0046cc);
+  color: #f8f7f4; border-radius: 16px; padding: 16px 18px; margin-bottom: 12px;
+}
+.toernooi-regel .naam { font-weight: 700; font-size: 14.5px; color: #f8f7f4; }
+.toernooi-regel .details { color: rgba(248,247,244,0.85); font-size: 12.5px; margin-top: 2px; }
+.toernooi-regel .locatie-regel {
+  display: flex; align-items: center; gap: 4px; color: rgba(248,247,244,0.85); font-size: 12.5px; margin-top: 4px;
+}
+.toernooi-regel .omschrijving { color: rgba(248,247,244,0.85); }
+.toernooi-regel .deelnemers-knop { color: #f8f7f4; }
+.toernooi-regel .actie { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.toernooi-regel select {
+  padding: 8px 10px; border-radius: 8px; border: 1.5px solid rgba(248,247,244,0.4);
+  background: rgba(255,255,255,0.12); color: #f8f7f4; font-size: 13px; flex: 1; min-width: 140px;
+}
+.toernooi-regel .knop.aanmelden { background: #fff275; color: #241a02; }
+.toernooi-regel .knop.afmelden { background: transparent; color: #fff275; border: 1.5px solid #fff275; }
+.toernooi-regel .knop.vol { background: rgba(255,255,255,0.14); color: rgba(248,247,244,0.7); }
+.pil-toggle { display: flex; gap: 6px; margin-bottom: 14px; background: rgba(36,87,255,0.06); border-radius: 999px; padding: 4px; }
+.pil-toggle button {
+  flex: 1; padding: 8px; border: none; border-radius: 999px; background: transparent; color: var(--ink-muted);
+  font-size: 13px; font-weight: 700; cursor: pointer;
+}
+.pil-toggle button.actief { background: var(--navy); color: #fff; }
+
+/* Gedeelde "tinder-stijl" kaartenstapel — zie assets/swipe-deck.js */
+.swipe-deck { margin-top: 4px; }
+.swipe-stapel { min-height: 80px; }
+.swipe-kaart {
+  background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+  padding: 18px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); cursor: grab; user-select: none;
+  transition: transform 0.22s ease; touch-action: pan-y; position: relative;
+  will-change: transform;
+}
+.swipe-kaart:active { cursor: grabbing; }
+.swipe-badge {
+  position: absolute; top: 14px; z-index: 5; padding: 6px 14px; border-radius: 999px;
+  font-family: "Unbounded", sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+  text-transform: uppercase; opacity: 0; pointer-events: none; border: 2px solid currentColor;
+  transition: opacity 0.15s ease;
+}
+.swipe-badge-links { left: 14px; color: var(--danger, var(--accent)); transform: rotate(-8deg); }
+.swipe-badge-rechts { right: 14px; color: var(--goed, #1e8a4c); transform: rotate(8deg); }
+.swipe-nav { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 12px; }
+.swipe-knop {
+  width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--line); background: var(--paper);
+  color: var(--ink); font-size: 17px; cursor: pointer; flex-shrink: 0; font-family: inherit;
+}
+.swipe-knop:disabled { opacity: 0.3; cursor: default; }
+.swipe-teller { font-size: 12.5px; color: var(--ink-muted); font-variant-numeric: tabular-nums; min-width: 50px; text-align: center; }
+.swipe-leeg { text-align: center; color: var(--ink-muted); padding: 40px 20px; }
+.swipe-banner {
+  display: flex; align-items: stretch; gap: 10px; padding: 10px 4px; border-radius: 14px;
+  background: var(--glas-oppervlak); border: 1px solid var(--glas-rand); margin-bottom: 10px;
+  font-size: 12px; color: var(--ink-muted); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+}
+.swipe-banner .helft { flex: 1; display: flex; align-items: center; gap: 6px; padding: 0 10px; min-width: 0; }
+.swipe-banner .helft.rechts { justify-content: flex-end; text-align: right; }
+.swipe-banner .scheiding { width: 1px; background: var(--line); flex-shrink: 0; }
+.swipe-banner strong { color: var(--ink); font-weight: 700; }
+.swipe-banner .pijl { font-size: 15px; flex-shrink: 0; }
+.pil-knop-vorm {
+  display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700;
+  background: rgba(36,87,255,0.12); color: var(--navy); text-decoration: none;
+}
+@media (prefers-color-scheme: dark) { .pil-knop-vorm { color: #8ab6ec; } }
+
+/* Gedeelde 3D-coverflow kaartenrij — zie assets/coverflow-deck.js. Repliceert
+   lib/widgets/news_coverflow_slider/ (kleuren/geometrie 1-op-1 overgenomen:
+   #141D38/#FCDB32 en #3447AA/#FBEAEB als afwisselende kaartthema's,
+   #C2185B/#E0F2FE als vaste badge-kleuren, radius 16px). */
+.coverflow-rij { display: flex; align-items: center; gap: 4px; }
+.coverflow-viewport {
+  flex: 1; position: relative; height: 260px; overflow: hidden;
+  perspective: 1000px; outline: none; touch-action: pan-y;
+}
+.coverflow-chevron {
+  width: 48px; height: 48px; flex-shrink: 0; border: none; background: transparent;
+  color: var(--ink-muted); font-size: 26px; cursor: pointer; border-radius: 50%;
+}
+.coverflow-chevron:disabled { opacity: 0.25; cursor: default; }
+.coverflow-chevron:not(:disabled):hover { background: rgba(91,107,125,0.1); }
+.coverflow-kaart {
+  position: absolute; top: 0; left: 50%; height: 100%; border-radius: 16px;
+  overflow: hidden; cursor: pointer; user-select: none;
+  transform-style: preserve-3d; backface-visibility: hidden; will-change: transform;
+  box-shadow: 0 10px 26px -6px rgba(0,0,0,0.35);
+}
+.coverflow-kaart:nth-of-type(odd) { background: #141D38; }
+.coverflow-kaart:nth-of-type(even) { background: #3447AA; }
+.coverflow-kaart .cf-foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.coverflow-kaart .cf-foto-leeg {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+}
+.coverflow-kaart:nth-of-type(odd) .cf-foto-leeg { color: #FCDB32; background: rgba(20,29,56,0.7); }
+.coverflow-kaart:nth-of-type(even) .cf-foto-leeg { color: #FBEAEB; background: rgba(52,71,170,0.7); }
+.coverflow-kaart .cf-foto-leeg svg { width: 28px; height: 28px; }
+.coverflow-kaart .cf-onderlaag {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 16px 14px;
+}
+.coverflow-kaart:nth-of-type(odd) .cf-onderlaag { background: linear-gradient(to bottom, rgba(20,29,56,0), rgba(20,29,56,0.94)); }
+.coverflow-kaart:nth-of-type(even) .cf-onderlaag { background: linear-gradient(to bottom, rgba(52,71,170,0), rgba(52,71,170,0.94)); }
+.coverflow-kaart .cf-badge {
+  display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 10px; font-weight: 700;
+  background: #C2185B; color: #E0F2FE; margin-bottom: 6px;
+}
+.coverflow-kaart .cf-titel {
+  font-size: 15px; font-weight: 700; line-height: 1.3; display: -webkit-box;
+  -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.coverflow-kaart:nth-of-type(odd) .cf-titel { color: #FCDB32; }
+.coverflow-kaart:nth-of-type(even) .cf-titel { color: #FBEAEB; }
+.coverflow-dots { display: flex; justify-content: center; gap: 5px; margin-top: 12px; }
+.coverflow-dot {
+  width: 7px; height: 7px; border-radius: 999px; border: none; padding: 0; cursor: pointer;
+  background: var(--ink-muted); opacity: 0.35; transition: width 0.22s ease, opacity 0.22s ease;
+}
+.coverflow-dot.actief { width: 22px; opacity: 1; background: #C2185B; }
+.coverflow-leeg {
+  height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; color: var(--ink-muted); background: rgba(91,107,125,0.06); border-radius: 16px;
+}
+.coverflow-leeg svg { width: 32px; height: 32px; }
+.coverflow-leeg span { font-size: 13.5px; text-align: center; padding: 0 20px; }
+
+/* ---- Popup/modal (bevestigingsvensters, detailkaarten) — gebruikt op
+   beheer/home/leden/nieuws/profiel/reserveren/toernooien. ---- */
+.popup-overlay { display: flex; justify-content: center; position: fixed; inset: 0; z-index: 100; background: rgba(4,27,51,0.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.popup-kaart { width: 100%; background: var(--glas-oppervlak); border: 1px solid var(--glas-rand); -webkit-backdrop-filter: blur(24px) saturate(160%); backdrop-filter: blur(24px) saturate(160%); }
+.popup-kop { align-items: center; display: flex; justify-content: space-between; }
+.popup-kop h3 { margin: 0; }
+.popup-sluit { border: none; color: var(--ink-muted); cursor: pointer; }
+.popup-lichaam { padding: 18px 20px; }
+
+/* ---- Statistiektegel (profiel/reserveren/toernooien) ---- */
+.stat-tegel { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; text-align: center; }
+.stat-tegel .waarde { color: var(--navy); font-weight: 700; }
+.stat-tegel .label { color: var(--ink-muted); margin-top: 2px; }
+@media (prefers-color-scheme: dark) {
+  .stat-tegel .waarde { color: #8ab6ec; }
+}
+
+/* ---- Uitnodigingskaart (home/leden) ---- */
+.uitnodig-kaart { align-items: center; border: none; cursor: pointer; display: flex; font-family: inherit; gap: 14px; text-align: left; width: 100%; }
+.uitnodig-icoon { align-items: center; background: rgba(36,87,255,0.1); border-radius: 50%; color: var(--navy); display: flex; flex-shrink: 0; height: 44px; justify-content: center; width: 44px; }
+.uitnodig-icoon svg { height: 22px; width: 22px; }
+.uitnodig-tekst { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.uitnodig-titel { color: var(--ink); font-size: 14.5px; font-weight: 600; }
+.uitnodig-sub { color: var(--ink-muted); font-size: 12.5px; }
+
+/* ---- Ledenlijstregel (beheer/leden) ---- */
+.lid-regel { align-items: center; display: flex; }
+
+/* ---- Formuliervelden in een twee-koloms rijtje (beheer/profiel) ---- */
+.veld-rij label { color: var(--ink-muted); display: block; font-weight: 600; margin-bottom: 4px; }
+.veld-rij input, .veld-rij select, .veld-rij textarea { background: var(--paper); border: 1.5px solid var(--line); color: var(--ink); font-family: inherit; width: 100%; }
+.veld-twee { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
