@@ -131,9 +131,15 @@ async function inloggen(email, wachtwoord) {
 }
 
 /// Stuurt een wachtwoord-herstel-mail (zelfde flow als login_screen.dart's
-/// resetPasswordForEmail in de app).
+/// resetPasswordForEmail in de app — alleen met een eigen redirect_to, want
+/// de app en de website gebruiken elk hun eigen "nieuw wachtwoord"-scherm).
+/// Geen code_challenge hier (geen SDK, rechtstreekse REST-call), dus dit
+/// triggert Supabase's oudere impliciete flow: de link levert
+/// access_token/refresh_token in de URL-hash op i.p.v. een PKCE-code — zie
+/// nieuw-wachtwoord.html, dat precies dat verwacht.
 async function stuurWachtwoordHerstel(email) {
-  const resp = await fetch(AUTH_BASE + '/recover', {
+  const redirectTo = window.location.origin + '/leden/nieuw-wachtwoord.html';
+  const resp = await fetch(AUTH_BASE + '/recover?redirect_to=' + encodeURIComponent(redirectTo), {
     method: 'POST',
     headers: { apikey: ANON_KEY, 'Content-Type': 'application/json' },
     body: JSON.stringify({ email }),
