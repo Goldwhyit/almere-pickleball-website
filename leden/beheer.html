@@ -256,10 +256,18 @@
   // inmiddels een betaald abonnement kozen (hun proef-rij wordt dan
   // 'opgezegd') of die zijn afgewezen, uit dit overzicht.
   async function laadProefleden(el) {
-    const rows = await haalOp('lid_abonnementen', {
-      select: 'lid_id,goedgekeurd,strippen_resterend,created_at,status,leden(naam,email),abonnementen!inner(vorm)',
-      'abonnementen.vorm': 'eq.proef', order: 'created_at.asc',
-    });
+    // email is kolom-afgeschermd voor gewone leden, dus niet meer via de
+    // leden(...)-embed op te vragen — apart via de admin-RPC en samengevoegd
+    // per lid_id, zodat r.leden.email verderop ongewijzigd werkt.
+    const [rows, contactRows] = await Promise.all([
+      haalOp('lid_abonnementen', {
+        select: 'lid_id,goedgekeurd,strippen_resterend,created_at,status,leden(naam),abonnementen!inner(vorm)',
+        'abonnementen.vorm': 'eq.proef', order: 'created_at.asc',
+      }),
+      rpc('leden_admin', {}),
+    ]);
+    const contact = Object.fromEntries(contactRows.map(l => [l.id, l]));
+    rows.forEach(r => { r.leden.email = contact[r.lid_id]?.email; });
     if (!rows.length) { el.innerHTML = '<p class="details">Geen proefleden.</p>'; return; }
     el.innerHTML = rows.map(r => {
       const lessenTekst = (r.strippen_resterend ?? 0) + ' van 3 lessen over';
@@ -331,7 +339,9 @@
   // mag nog helemaal niks totdat een beheerder het account goedkeurt" (zie
   // 57_account_goedkeuring.sql).
   async function laadNieuweAccounts(el) {
-    const rows = await haalOp('leden', { select: 'id,naam,email,lid_sinds', account_goedgekeurd: 'eq.false', order: 'lid_sinds.asc' });
+    const rows = (await rpc('leden_admin', {}))
+      .filter(l => l.account_goedgekeurd === false)
+      .sort((a, b) => (a.lid_sinds ?? '').localeCompare(b.lid_sinds ?? ''));
     if (!rows.length) { el.innerHTML = '<p class="details">Geen nieuwe accounts die wachten op goedkeuring.</p>'; return; }
     el.innerHTML = rows.map(l => '<div class="rij"><div class="info"><div class="naam">' + escapeHtml(l.naam) + '</div>' +
       '<div class="sub">' + escapeHtml(l.email) + (l.lid_sinds ? ' · ' + new Date(l.lid_sinds).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) : '') + '</div></div>' +
@@ -352,16 +362,16 @@
   // Profiel/Instellingen, hier is geen actie voor nodig, enkel zichtbaarheid.
   async function laadOpzeggingenEnVerwijderverzoeken(el) {
     el.innerHTML = '<div class="laden">Laden…</div>';
-    const [verzoeken, opzeggingen] = await Promise.all([
-      haalOp('leden', {
-        select: 'id,naam,email,verwijder_verzoek', 'verwijder_verzoek': 'not.is.null',
-        order: 'verwijder_verzoek.asc',
-      }),
+    const [verzoekenRuw, opzeggingen] = await Promise.all([
+      rpc('leden_admin', {}),
       haalOp('lid_abonnementen', {
         select: 'lid_id,opgezegd_op,eind_datum,leden(naam),abonnementen(naam)',
         status: 'eq.opgezegd', order: 'opgezegd_op.desc', limit: '30',
       }),
     ]);
+    const verzoeken = verzoekenRuw
+      .filter(l => l.verwijder_verzoek != null)
+      .sort((a, b) => a.verwijder_verzoek.localeCompare(b.verwijder_verzoek));
 
     const verzoekenHtml = !verzoeken.length
       ? '<p class="details">Geen openstaande verwijderverzoeken.</p>'
@@ -392,10 +402,8 @@
   async function laadLedenBeheer(el) {
     el.innerHTML = '<input type="search" class="zoekbalk" id="lb-zoek" placeholder="Zoek op naam of e-mail…" style="margin-bottom:10px;width:100%" />' +
       '<div id="lb-lijst"><div class="laden">Laden…</div></div>';
-    window.__ledenBeheerLijst = await haalOp('leden', {
-      select: 'id,naam,email,actief,ouder_email,ouder_toestemming_vereist,ouder_toestemming_gegeven_op',
-      order: 'naam.asc',
-    });
+    window.__ledenBeheerLijst = (await rpc('leden_admin', {}))
+      .sort((a, b) => a.naam.localeCompare(b.naam));
     renderLedenBeheer();
     document.getElementById('lb-zoek').addEventListener('input', renderLedenBeheer);
   }

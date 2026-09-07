@@ -214,11 +214,10 @@
   let mijnLid = null;
 
   async function laadProfiel() {
-    const rows = await haalOp('leden', {
-      select: 'naam,email,telefoon,geboortedatum,geslacht,niveau,adres,ervaring,medische_info,' +
-        'noodcontact_naam,noodcontact_telefoon,lid_sinds,rating,matches_played,foto_video_toestemming',
-      id: 'eq.' + sessie.user_id,
-    });
+    // mijn_volledig_profiel(): de meeste hier opgevraagde velden zijn
+    // kolom-afgeschermd voor gewone leden — deze RPC geeft ze alleen terug
+    // voor de eigen rij.
+    const rows = await rpc('mijn_volledig_profiel', {});
     if (!rows.length) return;
     mijnLid = rows[0];
     // De naam staat nu al in de header (zie nav.js) — de titel blijft hier

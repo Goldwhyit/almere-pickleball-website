@@ -432,7 +432,9 @@
   }
 
   async function inschrijvenPerMail(naam, email) {
-    const lid = await haalOp('leden', { select: 'naam,email,telefoon,niveau', id: 'eq.' + sessie.user_id });
+    // mijn_volledig_profiel(): email/telefoon zijn kolom-afgeschermd voor
+    // gewone leden — deze RPC geeft ze alleen terug voor de eigen rij.
+    const lid = await rpc('mijn_volledig_profiel', {});
     const l = lid[0] || {};
     const regels = ['Naam: ' + (l.naam || ''), 'E-mail: ' + (l.email || '')];
     if (l.niveau) regels.push('Niveau: ' + (niveauLabels[l.niveau] || l.niveau));

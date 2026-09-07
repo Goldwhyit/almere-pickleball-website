@@ -250,10 +250,9 @@
   const datumFormatKort = new Intl.DateTimeFormat('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
 
   async function laadProfiel() {
-    const rows = await haalOp('leden', {
-      select: 'naam,avatar_url,niveau,geboortedatum,geslacht,telefoon,lid_sinds,rating,matches_played',
-      id: 'eq.' + sessie.user_id,
-    });
+    // mijn_volledig_profiel(): telefoon is kolom-afgeschermd voor gewone
+    // leden — deze RPC geeft 'm alleen terug voor de eigen rij.
+    const rows = await rpc('mijn_volledig_profiel', {});
     if (!rows.length) return;
     const lid = rows[0];
     // De naam staat nu al in de header (zie nav.js) — hier alleen nog de
